@@ -4,9 +4,11 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.serialization.*
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 
 fun main(args: Array<String>) : Unit = io.ktor.server.netty.EngineMain.main(args)
 
+@Serializable
 data class ConfirmationJSON(val type: String, val group_id: Long)
 
 fun Application.module(testing: Boolean = false) {
@@ -17,7 +19,7 @@ fun Application.module(testing: Boolean = false) {
     routing {
         post("/") {
             val userInfo = call.receive<ConfirmationJSON>()
-            call.respond(mapOf("status" to "ok", "body" to "9bc0acdd"))
+            call.respond(mapOf("status" to "ok", "body" to "bb057939"))
         }
     }
 }

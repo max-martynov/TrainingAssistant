@@ -1,0 +1,7 @@
+POST http://0.0.0.0:8080/
+Content-Type: application/json
+
+{
+  "type": "confirmation",
+  "group_id": 205462754
+}
