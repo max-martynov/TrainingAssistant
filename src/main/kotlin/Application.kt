@@ -19,7 +19,7 @@ fun Application.module(testing: Boolean = false) {
     routing {
         post("/") {
             val userInfo = call.receive<ConfirmationJSON>()
-            call.respond(mapOf("status" to "ok", "body" to "bb057939"))
+            call.respondText("bb057939")
         }
     }
 }
