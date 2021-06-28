@@ -48,7 +48,7 @@ fun Application.routing() {
 
     val vkClientSettings = VkSettings(
         httpClient = VkOkHttpClient(),
-        apiVersion = 5.122,
+        apiVersion = 5.80,
         defaultParams = paramsOf("lang" to "en"),
         maxExecuteRequestsPerSecond = 3, // Default is 3. Provide [VkApi.EXECUTE_MAX_REQUESTS_PER_SECOND_DISABLED] to disable the `execute` queue loop
         backgroundDispatcher = Dispatchers.Default,

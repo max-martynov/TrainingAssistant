@@ -1,7 +1,4 @@
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{
-  "type": "confirmation",
-  "group_id": 205462754
-}
+{"type":"message_new", "object":{"id":8,"date":1624876741,"out":0,"user_id":217619042,"read_state":0,"title":"","body":"Ghbd","owner_ids":[]},"group_id":205462754,"event_id":"d65c8b6ffaed023932754d864da6895c8503b67f","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
