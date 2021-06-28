@@ -50,10 +50,13 @@ data class MyMessage(
     val fwdMessages: List<MessagePartial>
 )
 
+data class TypingState(val state: String, val fromId: Int, val toId: Int)
 
-data class MessageEvent(val type: String, val messagege: MyMessage, val groupId: Long)
+data class TypingStateEvent(val type: String, val state: TypingState, val groupId: Long)
 
-data class Event(val type: String, val object_: JsonElement, val groud_id: Long)
+//data class MessageEvent(val type: String, val messagege: MyMessage, val groupId: Long)
+
+//data class Event(val type: String, val object_: JsonElement, val groud_id: Long)
 
 fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
@@ -80,13 +83,17 @@ fun Application.routing() {
             val call = call.receiveText()
             println(call)
             val type = getType(call)
-            if (type == "message_new") {
-                val messageEvent = Klaxon().parse<MessageEvent>(call)
-                val messageReceived = messageEvent?.messagege
+            if (type == "message_typing_state") {
+                val typingStateEvent = Klaxon().parse<TypingStateEvent>(call)
+                client.sendMessage {
+                    peerId = typingStateEvent?.state?.fromId
+                    message = typingStateEvent?.state?.state + "..." + typingStateEvent?.state?.state
+                }.execute()
+                /*val messageReceived = messageEvent?.messagege
                 client.sendMessage {
                     peerId = messageReceived?.fromId
                     message = messageReceived?.text
-                }.execute()
+                }.execute()*/
             }
         }
     }
