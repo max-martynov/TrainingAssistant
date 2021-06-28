@@ -1,4 +1,4 @@
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{"type":"message_new", "object":{"id":8,"date":1624876741,"out":0,"user_id":217619042,"read_state":0,"title":"","body":"Ghbd","owner_ids":[]},"group_id":205462754,"event_id":"d65c8b6ffaed023932754d864da6895c8503b67f","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+{"type":"message_new","object":{"date":1624878147,"from_id":217619042,"id":12,"out":0,"peer_id":217619042,"text":"ggggg","conversation_message_id":11,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"ba619a9382702bbaf2e7b8e72eea79473a0d9833","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}

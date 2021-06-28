@@ -1,22 +1,15 @@
 import com.beust.klaxon.Klaxon
-import com.petersamokhin.vksdk.core.api.botslongpoll.VkBotsLongPollApi
 import com.petersamokhin.vksdk.core.client.VkApiClient
 import com.petersamokhin.vksdk.core.http.paramsOf
 import com.petersamokhin.vksdk.core.model.VkSettings
-import com.petersamokhin.vksdk.core.model.event.MessageNew
 import com.petersamokhin.vksdk.http.VkOkHttpClient
 import io.ktor.application.*
-import io.ktor.http.*
 import io.ktor.request.*
-import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.util.*
-import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import java.io.StringReader
-import java.nio.ByteBuffer
 
 
 /*
@@ -36,8 +29,29 @@ data class Message(
 
 )*/
 
+data class MyMessage(
+    val id: Int,
+    val date: Int,
+    @SerialName("from_id")
+    val fromId: Int,
+    @SerialName("random_id")
+    val randomId: Int? = null,
+    val text: String,
+    val attachments: List<JsonElement>,
+    @SerialName("conversation_message_id")
+    val conversationMessageId: Int,
+    @SerialName("peer_id")
+    val peerId: Int,
+    val out: Int? = null,
+    @SerialName("update_time")
+    val updateTime: Int? = null,
+    val isHidden: Boolean? = null,
+    val important: Boolean,
+    val fwdMessages: List<MessagePartial>
+)
 
-data class MessageEvent(val type: String, val message: MessageNew, val groupId: Long)
+
+data class MessageEvent(val type: String, val messagege: MyMessage, val groupId: Long)
 
 data class Event(val type: String, val object_: JsonElement, val groud_id: Long)
 
@@ -64,13 +78,14 @@ fun Application.routing() {
     routing {
         post("/") {
             val call = call.receiveText()
+            println(call)
             val type = getType(call)
             if (type == "message_new") {
                 val messageEvent = Klaxon().parse<MessageEvent>(call)
-                val messageReceived = messageEvent?.message
+                val messageReceived = messageEvent?.messagege
                 client.sendMessage {
-                    peerId = messageReceived?.message?.fromId
-                    message = "Hello, World!"
+                    peerId = messageReceived?.fromId
+                    message = messageReceived?.text
                 }.execute()
             }
         }
