@@ -38,9 +38,9 @@ fun setUp() {
 }
 
 fun Application.module(testing: Boolean = false) {
-    install(ContentNegotiation) {
-        json()
-    }
+    //install(ContentNegotiation) {
+      //  json()
+    //}
 
     //setUp()
 
