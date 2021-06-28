@@ -6,6 +6,9 @@ import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import com.petersamokhin.vksdk.core.model.event.MessageNew
 import com.petersamokhin.vksdk.http.VkOkHttpClient
 import io.ktor.application.*
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
@@ -68,9 +71,16 @@ data class MessageEvent(
 fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
 
+suspend fun sendMessage(peerId: Int, text: String) {
+    val httpClient: HttpClient = HttpClient()
+    val response = httpClient.post<HttpResponse>(
+        "https://api.vk.com/method/messages.send?peer_id=$peerId&message=$text&v=5.80"
+    )
+}
+
 fun Application.routing() {
 
-    val vkClientSettings = VkSettings(
+    /*val vkClientSettings = VkSettings(
         httpClient = VkOkHttpClient(),
         apiVersion = 5.80,
         defaultParams = paramsOf("lang" to "en"),
@@ -83,7 +93,7 @@ fun Application.routing() {
         token = "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e",
         type = VkApiClient.Type.Community,
         settings = vkClientSettings
-    )
+    )*/
 
     routing {
         post("/") {
@@ -91,10 +101,11 @@ fun Application.routing() {
             val type = getType(call)
             if (type == "message_new") {
                 val data = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(call)
-                client.sendMessage {
+                sendMessage(data.messageNew.fromId, data.messageNew.text + data.messageNew.text)
+                /*client.sendMessage {
                     peerId = data.messageNew.fromId
                     message = data.messageNew.text
-                }.execute()
+                }.execute()*/
                /*val typingStateEvent = Klaxon().parse<TypingStateEvent>(call)
                 client.sendMessage {
                     peerId = typingStateEvent?.state?.fromId
