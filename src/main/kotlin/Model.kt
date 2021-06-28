@@ -2,7 +2,7 @@ import com.petersamokhin.vksdk.core.api.VkApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-
+/*
 /**
  * VK incoming message object, e.g. for Long Poll events
  *
@@ -131,4 +131,4 @@ data class MessagePartial(
     val out: Int? = null,
     @SerialName("update_time")
     val updateTime: Int? = null
-)
+)*/

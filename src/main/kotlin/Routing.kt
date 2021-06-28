@@ -2,12 +2,16 @@ import com.beust.klaxon.Klaxon
 import com.petersamokhin.vksdk.core.client.VkApiClient
 import com.petersamokhin.vksdk.core.http.paramsOf
 import com.petersamokhin.vksdk.core.model.VkSettings
+import com.petersamokhin.vksdk.core.model.event.IncomingMessage
+import com.petersamokhin.vksdk.core.model.event.MessageNew
 import com.petersamokhin.vksdk.http.VkOkHttpClient
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
@@ -28,7 +32,7 @@ data class Message(
     val ref_source: String,
 
 )*/
-
+/*
 data class MyMessage(
     val id: Int,
     val date: Int,
@@ -48,13 +52,16 @@ data class MyMessage(
     val isHidden: Boolean? = null,
     val important: Boolean,
     val fwdMessages: List<MessagePartial>
-)
+)*/
 
-data class TypingState(val state: String, val fromId: Int, val toId: Int)
-
-data class TypingStateEvent(val type: String, val state: TypingState, val groupId: Long)
-
-//data class MessageEvent(val type: String, val messagege: MyMessage, val groupId: Long)
+@Serializable
+data class MessageEvent(
+    val type: String,
+    @SerialName("object")
+    val messageNew: IncomingMessage,
+    @SerialName("group_id")
+    val groupId: Long
+    )
 
 //data class Event(val type: String, val object_: JsonElement, val groud_id: Long)
 
@@ -81,10 +88,14 @@ fun Application.routing() {
     routing {
         post("/") {
             val call = call.receiveText()
-            println(call)
             val type = getType(call)
-            if (type == "message_typing_state") {
-                val typingStateEvent = Klaxon().parse<TypingStateEvent>(call)
+            if (type == "message_new") {
+                val data = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(call)
+                client.sendMessage {
+                    peerId = data.messageNew.fromId
+                    message = data.messageNew.text
+                }.execute()
+               /*val typingStateEvent = Klaxon().parse<TypingStateEvent>(call)
                 client.sendMessage {
                     peerId = typingStateEvent?.state?.fromId
                     message = typingStateEvent?.state?.state + "..." + typingStateEvent?.state?.state
@@ -93,7 +104,7 @@ fun Application.routing() {
                 client.sendMessage {
                     peerId = messageReceived?.fromId
                     message = messageReceived?.text
-                }.execute()*/
+                }.execute()*/*/
             }
         }
     }
