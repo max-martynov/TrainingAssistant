@@ -42,7 +42,7 @@ data class MessageEvent(val type: String, val message: MessageNew, val groupId: 
 data class Event(val type: String, val object_: JsonElement, val groud_id: Long)
 
 fun getType(call: String): String =
-    call.substringAfter('"').substringBefore('"')
+    call.substring(9, call.indexOf('"', 9))
 
 fun Application.routing() {
 
