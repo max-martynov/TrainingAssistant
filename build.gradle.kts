@@ -16,6 +16,7 @@ repositories {
 dependencies {
     val ktor_version: String by project
     val logback_version: String by project
+    val vk_sdk_version: String by project
 
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
@@ -30,6 +31,12 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-serialization:$ktor_version")
+
+    implementation("com.petersamokhin.vksdk:core:$vk_sdk_version")
+    implementation("com.petersamokhin.vksdk:http-client-jvm-okhttp:$vk_sdk_version")
+    implementation("com.petersamokhin.vksdk:http-client-common-ktor:$vk_sdk_version")
+
+    implementation("com.beust:klaxon:5.5")
 
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 
