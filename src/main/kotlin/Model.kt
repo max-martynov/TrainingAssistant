@@ -2,12 +2,46 @@ import com.petersamokhin.vksdk.core.api.VkApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+
+interface DataBase {
+    fun addClient(client: Client)
+    fun findClient(client: Client): Client?
+    fun findClientById(clientId: Int): Client?
+    fun containsClient(client: Client): Boolean =
+        findClient(client) != null
+    fun containsClient(clientId: Int): Boolean =
+        findClientById(clientId) != null
+}
+
+class InMemoryDataBase : DataBase {
+    private val clients = mutableSetOf<Client>()
+
+    override fun addClient(client: Client) {
+        clients.add(client)
+    }
+
+    override fun findClient(client: Client): Client? =
+        clients.find { it -> it == client }
+
+    override fun findClientById(clientId: Int): Client? =
+        clients.find { it -> it.id == clientId }
+}
+
+class Client(
+    val id: Int,
+    var weeksPassed: Int = 0, // [0, 4]
+    var currentPlan: Plan? = null,
+    val history: MutableList<Plan> = mutableListOf()
+) {
+
+
+}
+
+
+data class Plan(val id: Int) // TODO: create correct annotation
+
+
 /*
-/**
- * VK incoming message object, e.g. for Long Poll events
- *
- * [https://vk.com/dev/objects/message]
- */
 @Serializable
 data class IncomingMessage(
     val id: Int,
