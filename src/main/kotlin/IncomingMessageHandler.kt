@@ -40,14 +40,17 @@ suspend fun handleIncomingMessage(notification: String) {
 
     val client = dataBase.findClientById(clientId)
     if (client != null) {
+        println("in if")
         if (text == "3 часа")
             // TODO
         else if (text == "6 часов")
             // TODO
-        else if (text == "10 часов")
+        else if (text == "10 часов") {
+            println("I am here!")
             client.startTrainingPlan(
                 getTrainingPlanFromJson("src/main/resources/TrainingPlans/10hours.json")
             )
+        }
     }
     else {
         val newClient = Client(clientId)
