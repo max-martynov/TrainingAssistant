@@ -15,11 +15,14 @@ import io.ktor.routing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import java.io.InputStream
+import java.nio.charset.Charset
 
 
 fun getType(call: String): String =
@@ -29,12 +32,17 @@ fun getType(call: String): String =
 fun Application.routing() {
     routing {
         post("/") {
-            val notification = call.receiveText()
-            call.respondText("ok")
-            val type = getType(notification)
-            if (type == "message_new") {
-               handleIncomingMessage(notification)
+            withContext(Dispatchers.IO) {
+                call.receive<InputStream>().use {
+                    val notification = it.readBytes().decodeToString()
+                    call.respondText("ok")
+                    val type = getType(notification)
+                    if (type == "message_new") {
+                        handleIncomingMessage(notification)
+                    }
+                }
             }
+
         }
     }
 
