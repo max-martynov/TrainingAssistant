@@ -1,4 +1,5 @@
 import kotlinx.coroutines.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.lang.Thread.sleep
 import java.time.Duration
@@ -94,6 +95,7 @@ class Client(val id: Int) {
 @Serializable
 data class TrainingPlan(
     val id: Int,
+    @SerialName("training_days")
     val trainingDays: List<TrainingDay>
 )
 
@@ -101,6 +103,7 @@ data class TrainingPlan(
 data class TrainingDay(
     val description: String,
     val essence: String,
+    @SerialName("duration")
     val durationInMinutes: Int
 )
 
