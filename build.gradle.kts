@@ -14,10 +14,9 @@ repositories {
 }
 
 dependencies {
+    // ktor
     val ktor_version: String by project
     val logback_version: String by project
-    val vk_sdk_version: String by project
-
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
@@ -31,15 +30,24 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-serialization:$ktor_version")
+    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 
+    // vk sdk
+    val vk_sdk_version: String by project
     implementation("com.petersamokhin.vksdk:core:$vk_sdk_version")
     implementation("com.petersamokhin.vksdk:http-client-jvm-okhttp:$vk_sdk_version")
     implementation("com.petersamokhin.vksdk:http-client-common-ktor:$vk_sdk_version")
 
-    implementation("com.beust:klaxon:5.5")
 
-    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    // coroutines
+    val coroutines_version: String by project
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:$coroutines_version")
 
+    // tests
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     testImplementation(kotlin("test-junit5"))
 }

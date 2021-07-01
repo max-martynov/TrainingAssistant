@@ -2,10 +2,14 @@ import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import java.io.File
 
 
 @Serializable
@@ -17,11 +21,33 @@ data class MessageEvent(
     val groupId: Long
 )
 
+/*
+suspend fun startt(peerId: Int, message: String) = coroutineScope {
+    launch {
+        repeat(3) {
+            delay(5000)
+            sendMessage(peerId, message)
+        }
+    }
+}*/
+
 suspend fun handleIncomingMessage(notification: String) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
-    if (dataBase.containsClient(clientId)) {
-        sendMessage(clientId, "План выбран!")
+    val text = messageEvent.message.text
+
+    //startt(clientId, text)
+
+    val client = dataBase.findClientById(clientId)
+    if (client != null) {
+        if (text == "3 часа")
+            // TODO
+        else if (text == "6 часов")
+            // TODO
+        else if (text == "10 часов")
+            client.startTrainingPlan(
+                getTrainingPlanFromJson("src/main/resources/TrainingPlans/10hours.json")
+            )
     }
     else {
         val newClient = Client(clientId)
@@ -30,13 +56,18 @@ suspend fun handleIncomingMessage(notification: String) {
     }
 }
 
+fun getTrainingPlanFromJson(path: String): TrainingPlan {
+    val jsonString = File(path).readText()
+    return Json.decodeFromString(jsonString)
+}
+
 suspend fun sendGreetingsMessage(peerId: Int) {
     val greeting = "Привет!\n" +
-            "Тут у нас значится супер бот, который сделает из тебя победителя по жизни.\n" +
-            "Выбери подходящий план и кайфуй."
+            "Мы замутили супер бота, которой поможет стать вам победителем по жизни.\n" +
+            "Выберите подходящий план и кайфуйте."
     val selectPlanKeyboard = """
         {
-            "one_time":true, 
+            "one_time":false, 
             "buttons":
             [ 
                 [ 
@@ -66,7 +97,8 @@ suspend fun sendGreetingsMessage(peerId: Int) {
                         "color":"primary"
                     }
                 ]
-            ] 
+            ],
+            "inline":true
         }
     """.trimIndent()
     sendMessage(peerId, greeting, selectPlanKeyboard)

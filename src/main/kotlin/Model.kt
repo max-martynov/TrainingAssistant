@@ -1,7 +1,13 @@
-import com.petersamokhin.vksdk.core.api.VkApi
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
+import kotlinx.coroutines.*
+import java.lang.Thread.sleep
+import java.time.Duration
+import java.time.LocalDateTime
+import java.util.*
+import java.util.concurrent.Executors
+import kotlin.concurrent.schedule
+import kotlin.concurrent.timer
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 interface DataBase {
     fun addClient(client: Client)
@@ -9,6 +15,7 @@ interface DataBase {
     fun findClientById(clientId: Int): Client?
     fun containsClient(client: Client): Boolean =
         findClient(client) != null
+
     fun containsClient(clientId: Int): Boolean =
         findClientById(clientId) != null
 }
@@ -27,19 +34,73 @@ class InMemoryDataBase : DataBase {
         clients.find { it -> it.id == clientId }
 }
 
-class Client(
-    val id: Int,
-    var weeksPassed: Int = 0, // [0, 4]
-    var currentPlan: Plan? = null,
-    val history: MutableList<Plan> = mutableListOf()
-) {
+val service = Executors.newCachedThreadPool()
 
+class Client(val id: Int) {
+    //var daysPassed: Int = 0
+    var weeksPassed: Int = 0 // [0, 4]
+    var currentTrainingPlan: TrainingPlan? = null
+    val history: MutableList<TrainingPlan> = mutableListOf()
+
+    suspend fun startTrainingPlan(trainingPlan: TrainingPlan): Unit = coroutineScope {
+        currentTrainingPlan = trainingPlan
+        when(weeksPassed) {
+            0 -> showRules()
+            1, 2, 3 -> sendPlanForNextWeek()
+            4 -> requestPayment()
+        }
+        launch {
+            repeat(7) {
+                delay(
+                    Duration.between(LocalDateTime.now(), LocalDateTime.now().plusSeconds(it * 2L + 1))
+                        .toMillis()
+                )
+                sendMessageAboutTraining(it)
+            }
+        }
+    }
+
+    private suspend fun sendMessageAboutTraining(dayNum: Int) {
+        if (currentTrainingPlan == null)
+            throw Exception()
+        val message = "Тренировка на сегодня: " +
+                currentTrainingPlan!!.trainingDays[dayNum].description +
+                "\nСуть: " + currentTrainingPlan!!.trainingDays[dayNum].essence +
+                "\nДлительность: " + currentTrainingPlan!!.trainingDays[dayNum].durationInMinutes
+        sendMessage(id, message)
+    }
+
+    private fun sendPlanForNextWeek() {
+        // TODO
+    }
+
+    private fun requestPayment() {
+        // TODO
+    }
+
+    private suspend fun showRules() {
+        val message = "Отличный выбор!\n" +
+                "Со следующего дня вы начнете заниматься по плану, подобранному специально для вас:\n" +
+                "https://docs.google.com/spreadsheets/d/1licA3CnVWL--t8-0q2zDZFHhBXL5CPJOW82wwWcbgtU/edit#gid=1205962029\n" +
+                "Также каждый день я / мы  / бот (от какого лица мы общаемся я пока не решил) буду напоминать вам, какую тренировку следует сделать, " +
+                "а в конце недели вам будет предложено пройти опрос, чтобы сформировать план на следующую неделю."
+
+        sendMessage(id, message)
+    }
 
 }
 
 
-data class Plan(val id: Int) // TODO: create correct annotation
+data class TrainingPlan(
+    val id: Int,
+    val trainingDays: List<TrainingDay>
+)
 
+data class TrainingDay(
+    val description: String,
+    val essence: String,
+    val durationInMinutes: Int
+)
 
 /*
 @Serializable
