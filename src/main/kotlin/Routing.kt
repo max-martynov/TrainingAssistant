@@ -23,13 +23,14 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.time.LocalTime
 
 
 fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
 
 
-fun Application.routing() {
+fun Application.routing(clientRepository: ClientRepository) {
     routing {
         post("/") {
             withContext(Dispatchers.IO) {

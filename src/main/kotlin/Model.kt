@@ -1,82 +1,87 @@
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.lang.Thread.sleep
-import java.time.Duration
-import java.time.LocalDateTime
-import java.util.*
-import java.util.concurrent.Executors
-import kotlin.concurrent.schedule
-import kotlin.concurrent.timer
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
-interface DataBase {
-    fun addClient(client: Client)
-    fun findClient(client: Client): Client?
-    fun findClientById(clientId: Int): Client?
-    fun containsClient(client: Client): Boolean =
-        findClient(client) != null
-
-    fun containsClient(clientId: Int): Boolean =
-        findClientById(clientId) != null
+enum class Status {
+    ACTIVE, NEW_CLIENT, WAITING_FOR_PAYMENT, WAITING_FOR_RESULTS
 }
 
-class InMemoryDataBase : DataBase {
-    private val clients = mutableSetOf<Client>()
+data class Client(
+    val id: Int,
+    var status: Status,
+    var totalDaysPassed: Int,
+    var trainingPlan: TrainingPlan,
+    var daysInWeekPassed: Int,
+    var interviewResults: MutableList<Int>
+)
 
-    override fun addClient(client: Client) {
-        clients.add(client)
-    }
+data class InterviewResults(
+    val firstAnswer: Int? = null,
+    val secondAnswer: Int? = null
+)
 
-    override fun findClient(client: Client): Client? =
-        clients.find { it -> it == client }
-
-    override fun findClientById(clientId: Int): Client? =
-        clients.find { it -> it.id == clientId }
-}
-
-val service = Executors.newCachedThreadPool()
-
+/*
 class Client(val id: Int) {
     //var daysPassed: Int = 0
     var weeksPassed: Int = 0 // [0, 4]
-    var currentTrainingPlan: TrainingPlan? = null
+    //var currentTrainingPlan: TrainingPlan? = null
     val history: MutableList<TrainingPlan> = mutableListOf()
 
-    suspend fun startTrainingPlan(trainingPlan: TrainingPlan): Unit = coroutineScope {
-        currentTrainingPlan = trainingPlan
+    suspend fun startTrainingPlan(trainingPlan: TrainingPlan) {
         when(weeksPassed) {
             0 -> showRules()
-            1, 2, 3 -> sendPlanForNextWeek()
-            4 -> requestPayment()
+            1, 2, 3 -> sendPlanForNextWeek(trainingPlan)
+            4 -> processPayment()
         }
-        launch {
-            repeat(7) {
-                delay(
-                    Duration.between(LocalDateTime.now(), LocalDateTime.now().plusSeconds(it * 2L + 1))
-                        .toMillis()
-                )
-                sendMessageAboutTraining(it)
-            }
-        }
+        processWeek(trainingPlan)
     }
 
-    private suspend fun sendMessageAboutTraining(dayNum: Int) {
-        if (currentTrainingPlan == null)
-            throw Exception()
+    private suspend fun processWeek(trainingPlan: TrainingPlan) = coroutineScope {
+        launch {
+            repeat(7) {
+                /*delay(
+                    Duration.between(LocalDateTime.now(), LocalDateTime.now().plusDays(it + 1L).withHour(9))
+                        .toMillis()
+                )*/
+                delay(
+                    Duration.between(LocalDateTime.now(), LocalDateTime.now().plusSeconds((1..5).random().toLong()))
+                        .toMillis()
+                )
+                sendMessageAboutTraining(trainingPlan, it)
+            }
+            /*delay(
+                Duration.between(LocalDateTime.now(), LocalDateTime.now().withHour(21))
+                    .toMillis()
+            )*/
+        }
+        weeksPassed++
+        history.add(trainingPlan)
+        startTrainingPlan(determineNextTrainingPlan())
+    }
+
+    private fun determineNextTrainingPlan(): TrainingPlan =
+        TODO()
+
+    private suspend fun sendMessageAboutTraining(trainingPlan: TrainingPlan, dayNum: Int) {
         val message = "Тренировка на сегодня: " +
-                currentTrainingPlan!!.trainingDays[dayNum].description +
-                "\nСуть: " + currentTrainingPlan!!.trainingDays[dayNum].essence +
-                "\nДлительность: " + currentTrainingPlan!!.trainingDays[dayNum].durationInMinutes
+                trainingPlan.trainingDays[dayNum].description +
+                "\nСуть: " + trainingPlan.trainingDays[dayNum].essence +
+                "\nДлительность: " + trainingPlan.trainingDays[dayNum].durationInMinutes
         sendMessage(id, message)
     }
 
-    private fun sendPlanForNextWeek() {
-        // TODO
+    private suspend fun sendPlanForNextWeek(trainingPlan: TrainingPlan) {
+        val message = "Лови план на следующую неделю: " + trainingPlan.link
+        sendMessage(id, message)
     }
 
-    private fun requestPayment() {
+    private fun processPayment() {
         // TODO
     }
 
@@ -92,9 +97,35 @@ class Client(val id: Int) {
 
 }
 
+*/
+
+interface TrainingPlansRepository {
+    fun addTrainingPlan(trainingPlan: TrainingPlan)
+    fun findTrainingPlan(id: Int): TrainingPlan?
+}
+
+class LocalTrainingPlansRepository : TrainingPlansRepository {
+
+    private val pathToDirectory = "src/main/resources/TrainingPlans/"
+
+    override fun addTrainingPlan(trainingPlan: TrainingPlan) {
+        // gg wp
+    }
+
+    override fun findTrainingPlan(id: Int): TrainingPlan? {
+        val pathToFile = pathToDirectory + id.toString()
+        if (!File(pathToFile).exists())
+            return null
+        val jsonString = File(pathToFile).readText()
+        return Json.decodeFromString(jsonString)
+    }
+
+}
+
 @Serializable
 data class TrainingPlan(
     val id: Int,
+    val link: String,
     @SerialName("training_days")
     val trainingDays: List<TrainingDay>
 )
@@ -105,7 +136,10 @@ data class TrainingDay(
     val essence: String,
     @SerialName("duration")
     val durationInMinutes: Int
-)
+) {
+    override fun toString(): String =
+        "Описание: $description\nСуть: $essence\nДлительность: $durationInMinutes"
+}
 
 /*
 @Serializable

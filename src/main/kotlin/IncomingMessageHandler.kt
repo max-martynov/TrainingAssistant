@@ -21,39 +21,35 @@ data class MessageEvent(
     val groupId: Long
 )
 
-/*
-suspend fun startt(peerId: Int, message: String) = coroutineScope {
-    launch {
-        repeat(3) {
-            delay(5000)
-            sendMessage(peerId, message)
-        }
-    }
-}*/
 
-suspend fun handleIncomingMessage(notification: String) {
+suspend fun handleIncomingMessage(
+    notification: String
+) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
 
-    //startt(clientId, text)
 
-    val client = dataBase.findClientById(clientId)
-    if (client != null) {
-        if (text == "3 часа")
-            // TODO
-        else if (text == "6 часов")
-            // TODO
-        else if (text == "10 часов") {
-            client.startTrainingPlan(
-                getTrainingPlanFromJson("src/main/resources/TrainingPlans/10hours.json")
-            )
-        }
+    val client = clientRepository.findClientById(clientId)
+    if (client == null) {
+        sendGreetingsMessage(clientId)
     }
-    else {
-        val newClient = Client(clientId)
-        dataBase.addClient(newClient)
-        sendGreetingsMessage(newClient.id)
+    else if (text == "3 часа" || text == "6 часов" || text == "10 часов") {
+        val trainingPlan = when(text) {
+            "3 часа" -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/3hours.json")
+            "6 часов" -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/6hours.json")
+            else -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/2.json")
+        }
+        clientRepository.addClient(
+            Client(
+                id = clientId,
+                status = Status.NEW_CLIENT,
+                totalDaysPassed = 0,
+                trainingPlan = trainingPlan,
+                daysInWeekPassed = 0,
+                interviewResults = mutableListOf()
+            )
+        )
     }
 }
 
@@ -65,10 +61,10 @@ fun getTrainingPlanFromJson(path: String): TrainingPlan {
 suspend fun sendGreetingsMessage(peerId: Int) {
     val greeting = "Привет!\n" +
             "Мы замутили супер бота, которой поможет стать вам победителем по жизни.\n" +
-            "Выберите подходящий план и кайфуйте."
+            "Сколько часов в неделю вы хотите заниматься?"
     val selectPlanKeyboard = """
         {
-            "one_time":false, 
+            "one_time": false, 
             "buttons":
             [ 
                 [ 

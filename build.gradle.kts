@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+
 plugins {
     kotlin("jvm") version "1.4.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0"
@@ -38,7 +39,6 @@ dependencies {
     implementation("com.petersamokhin.vksdk:http-client-jvm-okhttp:$vk_sdk_version")
     implementation("com.petersamokhin.vksdk:http-client-common-ktor:$vk_sdk_version")
 
-
     // coroutines
     val coroutines_version: String by project
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
@@ -46,6 +46,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutines_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:$coroutines_version")
+
+    // sql exposed
+    val exposed_version: String by project
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("com.h2database:h2:1.4.197")
 
     // tests
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
