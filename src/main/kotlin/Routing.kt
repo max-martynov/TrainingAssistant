@@ -30,7 +30,7 @@ fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
 
 
-fun Application.routing(clientRepository: ClientRepository) {
+fun Application.routing() {
     routing {
         post("/") {
             withContext(Dispatchers.IO) {

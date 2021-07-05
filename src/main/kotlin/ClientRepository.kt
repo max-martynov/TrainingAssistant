@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 interface ClientRepository {
-    fun addClient(client: Client)
+    fun add(client: Client)
     fun containsClient(clientId: Int): Boolean =
         findClientById(clientId) != null
     fun findClientById(clientId: Int): Client?
@@ -22,7 +22,7 @@ interface ClientRepository {
 class InMemoryClientRepository : ClientRepository {
     private val clients = Collections.synchronizedSet(mutableSetOf<Client>())
 
-    override fun addClient(client: Client) {
+    override fun add(client: Client) {
         clients.add(client)
     }
 
@@ -61,7 +61,7 @@ class InDataBaseClientRepository(connStr: String, driver: String) : ClientReposi
         }
     }
 
-    override fun addClient(client: Client) {
+    override fun add(client: Client) {
         Clients.insert {
             it[id] = client.id
             it[status] = client.status.toString()

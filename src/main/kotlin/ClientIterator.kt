@@ -17,9 +17,13 @@ class ClientsIterator(
     suspend fun iterateMorning() {
         while (true) {
             delay(calculateDifference(nextMorningTime))
+            print("clientRepository=")
+            //println("clientRepository=$clientRepository")
             clientRepository.getAllClients().forEach {
+                println(it)
                 updateMorning(it)
             }
+            println()
             nextMorningTime += period
         }
     }
@@ -27,18 +31,28 @@ class ClientsIterator(
     private suspend fun updateMorning(client: Client) {
         if (client.status == Status.ACTIVE) {
             sendTraining(client)
-            client.totalDaysPassed++
-            client.daysInWeekPassed++
+            clientRepository.updateClient(
+                client.id,
+                newTotalDaysPassed = client.totalDaysPassed + 1,
+                newDaysInWeekPassed = client.daysInWeekPassed + 1
+            )
         } else if (client.status == Status.NEW_CLIENT)
-            client.status = Status.ACTIVE
+            clientRepository.updateClient(
+                client.id,
+                newStatus = Status.ACTIVE
+            )
     }
 
     private suspend fun sendTraining(client: Client) =
         sendMessage(
             peerId = client.id,
             text = "Лови тренировку на сегодня:\n" +
-                    client.trainingPlan.trainingDays[LocalDate.now().dayOfWeek.value - 1]
-        )
+                    client.trainingPlan.trainingDays[
+                            LocalDate.now().plusDays(
+                                client.totalDaysPassed.toLong()
+                            ).dayOfWeek.value - 1
+                    ]
+        ) // fix it, just for testing
 
     suspend fun iterateEvening() {
         while (true) {
@@ -63,9 +77,11 @@ class ClientsIterator(
     }
 
     private suspend fun requestPayment(client: Client) {
-        sendMessage(
-            peerId =
+        clientRepository.updateClient(
+            id = client.id,
+            newStatus = Status.WAITING_FOR_PAYMENT
         )
+        TODO()
     }
 
 
@@ -87,32 +103,32 @@ class ClientsIterator(
                         [
                             {
                                 "action":{
-                                "type":"text",
-                                "label":"1"
-                            },
+                                    "type":"text",
+                                    "label":"1"
+                                },
                                 "color":"primary"
                             }
                         ],
                         [
                             {
                                 "action":{
-                                "type":"text",
-                                "label":"2"
-                            },
+                                    "type":"text",
+                                    "label":"2"
+                                },
                                 "color":"primary"
                             }
                         ],
                         [
                             {
                                 "action":{
-                                "type":"text",
-                                "label":"3"
-                            },
+                                    "type":"text",
+                                    "label":"3"
+                                },
                                 "color":"primary"
                             }
-                        ],
-                ],
-                "inline":true
+                        ]
+                    ],
+                    "inline":true
             }
             """.trimIndent()
         )
@@ -123,6 +139,4 @@ class ClientsIterator(
             LocalTime.now().until(requiredTime, ChronoUnit.MILLIS)
         else
             TimeUnit.DAYS.toMillis(1) - requiredTime.until(LocalTime.now(), ChronoUnit.MILLIS)
-
-
 }

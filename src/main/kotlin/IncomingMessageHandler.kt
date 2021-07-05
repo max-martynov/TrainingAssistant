@@ -2,9 +2,6 @@ import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -29,28 +26,45 @@ suspend fun handleIncomingMessage(
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
 
-
     val client = clientRepository.findClientById(clientId)
+
     if (client == null) {
-        sendGreetingsMessage(clientId)
+        val newClient = Client(
+            id = clientId,
+            status = Status.WAITING_FOR_RESULTS,
+            totalDaysPassed = 0,
+            trainingPlan = trainingPlansRepository.findTrainingPlan(2)!!, //fix it later
+            daysInWeekPassed = 0,
+            interviewResults = mutableListOf()
+        )
+        println(newClient)
+        clientRepository.add(newClient)
+        sendGreetingsMessage(newClient)
     }
     else if (text == "3 часа" || text == "6 часов" || text == "10 часов") {
         val trainingPlan = when(text) {
-            "3 часа" -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/3hours.json")
-            "6 часов" -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/6hours.json")
-            else -> getTrainingPlanFromJson("src/main/resources/TrainingPlans/2.json")
-        }
-        clientRepository.addClient(
-            Client(
-                id = clientId,
-                status = Status.NEW_CLIENT,
-                totalDaysPassed = 0,
-                trainingPlan = trainingPlan,
-                daysInWeekPassed = 0,
-                interviewResults = mutableListOf()
-            )
+            "3 часа" -> trainingPlansRepository.findTrainingPlan(0)
+            "6 часов" -> trainingPlansRepository.findTrainingPlan(1)
+            else -> trainingPlansRepository.findTrainingPlan(2)
+        }!!
+        clientRepository.updateClient(
+            id = client.id,
+            newStatus = Status.NEW_CLIENT,
+            newTrainingPlan = trainingPlan
         )
+        //println("clientRepository=$clientRepository")
+        sendRules(client)
     }
+}
+
+suspend fun sendRules(client: Client) {
+    val message = "Отличный выбор!\n" +
+            "Со следующего дня вы начнете заниматься по плану, подобранному специально для вас:\n" +
+            "${client.trainingPlan.link}\n" +
+            "Также каждый день я / мы  / бот (от какого лица мы общаемся я пока не решил) буду напоминать вам, какую тренировку следует сделать, " +
+            "а в конце недели вам будет предложено пройти опрос, чтобы сформировать план на следующую неделю."
+
+    sendMessage(client.id, message)
 }
 
 fun getTrainingPlanFromJson(path: String): TrainingPlan {
@@ -58,7 +72,7 @@ fun getTrainingPlanFromJson(path: String): TrainingPlan {
     return Json.decodeFromString(jsonString)
 }
 
-suspend fun sendGreetingsMessage(peerId: Int) {
+suspend fun sendGreetingsMessage(client: Client) {
     val greeting = "Привет!\n" +
             "Мы замутили супер бота, которой поможет стать вам победителем по жизни.\n" +
             "Сколько часов в неделю вы хотите заниматься?"
@@ -98,7 +112,7 @@ suspend fun sendGreetingsMessage(peerId: Int) {
             "inline":true
         }
     """.trimIndent()
-    sendMessage(peerId, greeting, selectPlanKeyboard)
+    sendMessage(client.id, greeting, selectPlanKeyboard)
 }
 
 suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "") {

@@ -113,7 +113,7 @@ class LocalTrainingPlansRepository : TrainingPlansRepository {
     }
 
     override fun findTrainingPlan(id: Int): TrainingPlan? {
-        val pathToFile = pathToDirectory + id.toString()
+        val pathToFile = "$pathToDirectory$id.json"
         if (!File(pathToFile).exists())
             return null
         val jsonString = File(pathToFile).readText()

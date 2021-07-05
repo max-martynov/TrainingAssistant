@@ -21,8 +21,8 @@ fun main(args: Array<String>): Unit = runBlocking {
     launch(newSingleThreadContext("Thread for iterators")) {
         val clientsIterator = ClientsIterator(
             clientRepository,
+            LocalTime.now().plusSeconds(15),
             LocalTime.now().plusSeconds(30),
-            LocalTime.now().plusMinutes(1),
             Duration.ofSeconds(30)
         )
         async { clientsIterator.iterateMorning() }
@@ -40,7 +40,7 @@ fun Application.module(testing: Boolean = false) {
         json()
     }
 
-    clientRepository.addClient(
+    /*clientRepository.addClient(
         Client(
             id = 217619042,
             status = Status.ACTIVE,
@@ -49,9 +49,9 @@ fun Application.module(testing: Boolean = false) {
             trainingPlan = trainingPlansRepository.findTrainingPlan(2)!!,
             interviewResults = mutableListOf()
         )
-    )
+    )*/
 
-    routing(clientRepository)
+    routing()
     // }
 
     /* Database.connect("jdbc:h2:~/test", driver = "org.h2.Driver")
