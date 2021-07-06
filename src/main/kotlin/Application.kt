@@ -27,7 +27,7 @@ fun main(args: Array<String>): Unit = runBlocking {
             LocalTime.now().plusSeconds(24),
             Duration.ofSeconds(24)
         )
-        async { clientsIterator.iterateMorning() }
+        //async { clientsIterator.iterateMorning() }
         async { clientsIterator.iterateEvening() }
         async { clientsIterator.iterateNight() }
     }

@@ -31,7 +31,7 @@ class ClientsIterator(
 
     private suspend fun updateMorning(client: Client) {
         if (client.status == Status.ACTIVE) {
-            sendTraining(client)
+            §sendTraining(client)
             clientRepository.updateClient(
                 client.id,
                 newTotalDaysPassed = client.totalDaysPassed + 1,
@@ -117,7 +117,7 @@ class ClientsIterator(
     suspend fun iterateNight() {
         while (true) {
             delay(calculateDifference(nextNightTime))
-            println("${LocalDate.now().plusDays(++cnt).dayOfWeek} - 00:00")
+            println("${LocalDate.now().plusDays(++  cnt).dayOfWeek} - 00:00")
             clientRepository.getAllClients().forEach {
                 updateNight(it)
             }
