@@ -4,12 +4,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 interface ClientRepository {
-    fun add(client: Client)
-    fun containsClient(clientId: Int): Boolean =
-        findClientById(clientId) != null
-    fun findClientById(clientId: Int): Client?
-    fun getAllClients(): List<Client>
-    fun updateClient(
+    suspend fun add(client: Client)
+    suspend fun findClientById(clientId: Int): Client?
+    suspend fun getAllClients(): List<Client>
+    suspend fun updateClient(
         id: Int,
         newStatus: Status? = null,
         newTotalDaysPassed: Int? = null,
@@ -22,17 +20,17 @@ interface ClientRepository {
 class InMemoryClientRepository : ClientRepository {
     private val clients = Collections.synchronizedSet(mutableSetOf<Client>())
 
-    override fun add(client: Client) {
+    override suspend fun add(client: Client) {
         clients.add(client)
     }
 
-    override fun findClientById(clientId: Int): Client? =
+    override suspend fun findClientById(clientId: Int): Client? =
         clients.find { it -> it.id == clientId }
 
-    override fun getAllClients(): List<Client> =
+    override suspend fun getAllClients(): List<Client> =
         clients.toList()
 
-    override fun updateClient(
+    override suspend fun updateClient(
         id: Int,
         newStatus: Status?,
         newTotalDaysPassed: Int?,
@@ -61,7 +59,7 @@ class InDataBaseClientRepository(connStr: String, driver: String) : ClientReposi
         }
     }
 
-    override fun add(client: Client) {
+    override suspend fun add(client: Client) {
         Clients.insert {
             it[id] = client.id
             it[status] = client.status.toString()
@@ -72,7 +70,7 @@ class InDataBaseClientRepository(connStr: String, driver: String) : ClientReposi
         }
     }
 
-    override fun findClientById(clientId: Int): Client? {
+    override suspend fun findClientById(clientId: Int): Client? {
         val query = Clients.select { Clients.id eq clientId }
         if (query.empty())
             return null
@@ -95,10 +93,10 @@ class InDataBaseClientRepository(connStr: String, driver: String) : ClientReposi
         )
     }
 
-    override fun getAllClients(): List<Client> =
+    override suspend fun getAllClients(): List<Client> =
         Clients.selectAll().map { convertClientToDataClass(it) }
 
-    override fun updateClient(
+    override suspend fun updateClient(
         id: Int,
         newStatus: Status?,
         newTotalDaysPassed: Int?,

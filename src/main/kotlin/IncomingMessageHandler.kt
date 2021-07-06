@@ -18,7 +18,6 @@ data class MessageEvent(
     val groupId: Long
 )
 
-
 suspend fun handleIncomingMessage(
     notification: String
 ) {
@@ -33,28 +32,64 @@ suspend fun handleIncomingMessage(
             id = clientId,
             status = Status.WAITING_FOR_RESULTS,
             totalDaysPassed = 0,
-            trainingPlan = trainingPlansRepository.findTrainingPlan(2)!!, //fix it later
+            trainingPlan = trainingPlansRepository.findTrainingPlan(0)!!, //fix it later
             daysInWeekPassed = 0,
             interviewResults = mutableListOf()
         )
-        println(newClient)
         clientRepository.add(newClient)
         sendGreetingsMessage(newClient)
     }
-    else if (text == "3 часа" || text == "6 часов" || text == "10 часов") {
+    else if (client.status == Status.WAITING_FOR_RESULTS &&
+        (text == "3 часа" || text == "6 часов" || text == "10 часов")) {
         val trainingPlan = when(text) {
             "3 часа" -> trainingPlansRepository.findTrainingPlan(0)
-            "6 часов" -> trainingPlansRepository.findTrainingPlan(1)
-            else -> trainingPlansRepository.findTrainingPlan(2)
+            "6 часов" -> trainingPlansRepository.findTrainingPlan(0)
+            else -> trainingPlansRepository.findTrainingPlan(0)
         }!!
         clientRepository.updateClient(
             id = client.id,
             newStatus = Status.NEW_CLIENT,
             newTrainingPlan = trainingPlan
         )
-        //println("clientRepository=$clientRepository")
         sendRules(client)
     }
+    else if (client.status == Status.WAITING_FOR_RESULTS && text.toInt() in 1..3) { // reply in interview
+        val updatedResults = (client.interviewResults + text.toInt()).toMutableList()
+        clientRepository.updateClient(
+            client.id,
+            newInterviewResults = updatedResults
+        )
+        if (updatedResults.size == interview.size) { // interview is completed
+            val nextTrainingPlan = determineNextTrainingPlan(client)
+            sendMessageAboutNextWeek(client, nextTrainingPlan)
+            clientRepository.updateClient(
+                client.id,
+                newTrainingPlan = nextTrainingPlan,
+            )
+        }
+        else {
+            sendMessage(
+                peerId = client.id,
+                text = interview[updatedResults.size].question,
+                keyboard = interview[updatedResults.size].answers
+            )
+        }
+    }
+}
+
+/**
+ * TODO - add correct implementation
+ */
+fun determineNextTrainingPlan(client: Client): TrainingPlan {
+    return trainingPlansRepository.findTrainingPlan((client.trainingPlan.id + 1) % 4)!!
+}
+
+suspend fun sendMessageAboutNextWeek(client: Client, nextTrainingPlan: TrainingPlan) {
+    sendMessage(
+        peerId = client.id,
+        text = "Искусственный интеллект подобрал для вас такой план на следующую неделю:\n${nextTrainingPlan.link}\n" +
+                "Приступайте к тренировкам с завтрашнего дня."
+    )
 }
 
 suspend fun sendRules(client: Client) {
@@ -88,18 +123,14 @@ suspend fun sendGreetingsMessage(client: Client) {
                             "label":"3 часа"
                         },
                         "color":"primary"
-                    }
-                ],
-                [ 
+                    },
                     { 
                         "action":{ 
                             "type":"text", 
                             "label":"6 часов"
                         },
                         "color":"primary"
-                    }
-                ],
-                [ 
+                    },
                     { 
                         "action":{ 
                             "type":"text", 
