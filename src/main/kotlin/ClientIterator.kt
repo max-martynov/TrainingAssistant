@@ -31,7 +31,7 @@ class ClientsIterator(
 
     private suspend fun updateMorning(client: Client) {
         if (client.status == Status.ACTIVE) {
-            §sendTraining(client)
+            sendTraining(client)
             clientRepository.updateClient(
                 client.id,
                 newTotalDaysPassed = client.totalDaysPassed + 1,

@@ -28,8 +28,8 @@ fun main(args: Array<String>): Unit = runBlocking {
             Duration.ofSeconds(24)
         )
         //async { clientsIterator.iterateMorning() }
-        async { clientsIterator.iterateEvening() }
-        async { clientsIterator.iterateNight() }
+        //async { clientsIterator.iterateEvening() }
+        //async { clientsIterator.iterateNight() }
     }
     launch {
         io.ktor.server.netty.EngineMain.main(args)

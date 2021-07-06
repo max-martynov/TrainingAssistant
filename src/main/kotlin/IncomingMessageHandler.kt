@@ -27,6 +27,13 @@ suspend fun handleIncomingMessage(
 
     val client = clientRepository.findClientById(clientId)
 
+    if (text == "Здравствуйте!\nМеня заинтересовал этот товар.") {
+        sendMessage(
+            clientId,
+            "Привет!"
+        )
+    }
+/*
     if (client == null) {
         val newClient = Client(
             id = clientId,
@@ -74,7 +81,7 @@ suspend fun handleIncomingMessage(
                 keyboard = interview[updatedResults.size].answers
             )
         }
-    }
+    }*/
 }
 
 /**
