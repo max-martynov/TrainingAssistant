@@ -24,7 +24,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(1),
-            Duration.ofSeconds(1)
+            Duration.ofSeconds(2)
         )
     /*val clientsIterator = ClientsIterator(
             clientRepository,

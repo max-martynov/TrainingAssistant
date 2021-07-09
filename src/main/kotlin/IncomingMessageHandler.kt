@@ -131,7 +131,53 @@ suspend fun handleIncomingMessage(
             }
             Status.ACTIVE -> {
                 if (text == "Закончить цикл") {
-
+                    sendMessage(
+                        clientId,
+                        "Поздравляю с окончанием недельного цикла!\n" +
+                                "Чтобы сформировать план на следующую неделю, пройдите, пожалуйста, небольшой опрос."
+                    )
+                    clientsRepository.update(
+                        clientId,
+                        newStatus = Status.WAITING_FOR_RESULTS
+                    )
+                    sendInterviewQuestion(clientId, 0)
+                }
+                else {
+                    sendMessage(
+                        clientId,
+                        "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\"."
+                    )
+                }
+            }
+            Status.WAITING_FOR_RESULTS -> {
+                val answerNumber = Interview.findAnswerNumberOnKthQuestion(text, client.interviewResults.size)
+                if (answerNumber == -1) {
+                    sendMessage(
+                        clientId,
+                        "Выберите, пожалуйста, один из предложенных вариантов ответа."
+                    )
+                }
+                else {
+                    client.interviewResults.add(answerNumber)
+                    if (client.interviewResults.size == Interview.interviewQuestions.size) {
+                        clientsRepository.update(
+                            clientId,
+                            newStatus = Status.WAITING_FOR_START,
+                            newTrainingPlanId = determineNextTrainingPlan(client),
+                            newInterviewResults = mutableListOf()
+                        )
+                        sendMessage(
+                            clientId,
+                            "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план. " +
+                                    "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
+                        )
+                    }
+                    else {
+                        clientsRepository.update(
+                            clientId,
+                            newInterviewResults = client.interviewResults
+                        )
+                    }
                 }
             }
         }
@@ -148,17 +194,24 @@ suspend fun sendPlan(client: Client) {
     )
 }
 
-suspend fun sendInterviewQuestion()
+suspend fun sendInterviewQuestion(peerId: Int, questionNumber: Int) {
+    sendMessage(
+        peerId,
+        Interview.interviewQuestions[questionNumber].question,
+        keyboard = Interview.interviewQuestions[questionNumber].toString()
+    )
+}
 
 
 
 
 /**
  * TODO - add correct implementation
+*/
 
-fun determineNextTrainingPlan(client: Client): TrainingPlan {
-return trainingPlansRepository.findTrainingPlan((client.trainingPlan.id + 1) % 4)!!
-}*/
+fun determineNextTrainingPlan(client: Client): Int {
+    return 0
+}
 
 suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: Int = 500) {
     sendMessage(

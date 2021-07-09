@@ -10,6 +10,7 @@ interface ClientsRepository {
         newStatus: Status? = null,
         newDaysPassed: Int? = null,
         newTrainingPlanId: Int? = null,
+        newInterviewResults: MutableList<Int>? = null
     )
 }
 
@@ -30,7 +31,8 @@ class InMemoryClientsRepository : ClientsRepository {
         id: Int,
         newStatus: Status?,
         newDaysPassed: Int?,
-        newTrainingPlanId: Int?
+        newTrainingPlanId: Int?,
+        newInterviewResults: MutableList<Int>?
     ) {
         val client = findById(id) ?: return
         clients.remove(client)
@@ -42,6 +44,8 @@ class InMemoryClientsRepository : ClientsRepository {
             client.daysPassed = newDaysPassed
         if (newTrainingPlanId != null)
             client.trainingPlanId = newTrainingPlanId
+        if (newInterviewResults != null)
+            client.interviewResults = newInterviewResults
         clients.add(client)
     }
 }

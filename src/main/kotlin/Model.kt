@@ -24,7 +24,8 @@ data class Client(
     var status: Status = Status.WAITING_FOR_PLAN,
     var previousStatus: Status = status,
     var daysPassed: Int = -1,
-    var trainingPlanId: Int = -1
+    var trainingPlanId: Int = -1,
+    var interviewResults: MutableList<Int> = mutableListOf()
 )
 
 
