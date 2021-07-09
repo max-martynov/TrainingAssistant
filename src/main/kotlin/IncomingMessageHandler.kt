@@ -243,7 +243,7 @@ suspend fun sendGreetings(peerId: Int) {
                 "(дальше надо рассказть про то, как все утроено, например, про кнопки)",
         keyboard = """
             {
-                "one_time":true,
+                "one_time":false,
                 "buttons":[
                      [
                         {
