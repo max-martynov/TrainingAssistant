@@ -1,13 +1,37 @@
+import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 
+enum class Status {
+    ACTIVE, WAITING_FOR_PLAN, WAITING_FOR_START, WAITING_FOR_PAYMENT, WAITING_FOR_RESULTS
+}
+
+data class Client(
+    val id: Int,
+    var status: Status = Status.WAITING_FOR_PLAN,
+    var previousStatus: Status = status,
+    var daysPassed: Int = -1,
+    var trainingPlanId: Int = -1
+)
+
+
+
+
+
+/*
 enum class Status {
     ACTIVE, NEW_CLIENT, WAITING_FOR_PAYMENT, WAITING_FOR_RESULTS
 }
@@ -69,4 +93,4 @@ data class TrainingDay(
     override fun toString(): String =
         "Описание: $description\nСуть: $essence\nДлительность: ${durationInMinutes / 60}:${durationInMinutes % 60}"
 
-}
+}*/

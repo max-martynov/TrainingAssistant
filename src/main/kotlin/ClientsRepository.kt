@@ -1,8 +1,52 @@
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
+
+interface ClientsRepository {
+    suspend fun add(client: Client)
+    suspend fun findById(clientId: Int): Client?
+    suspend fun getAll(): List<Client>
+    suspend fun update(
+        id: Int,
+        newStatus: Status? = null,
+        newDaysPassed: Int? = null,
+        newTrainingPlanId: Int? = null,
+    )
+}
+
+class InMemoryClientsRepository : ClientsRepository {
+    private val clients = Collections.synchronizedSet(mutableSetOf<Client>())
+
+    override suspend fun add(client: Client) {
+        clients.add(client)
+    }
+
+    override suspend fun findById(clientId: Int): Client? =
+        clients.find { it -> it.id == clientId }
+
+    override suspend fun getAll(): List<Client> =
+        clients.toList()
+
+    override suspend fun update(
+        id: Int,
+        newStatus: Status?,
+        newDaysPassed: Int?,
+        newTrainingPlanId: Int?
+    ) {
+        val client = findById(id) ?: return
+        clients.remove(client)
+        if (newStatus != null) {
+            client.previousStatus = client.status
+            client.status = newStatus
+        }
+        if (newDaysPassed != null)
+            client.daysPassed = newDaysPassed
+        if (newTrainingPlanId != null)
+            client.trainingPlanId = newTrainingPlanId
+        clients.add(client)
+    }
+}
+
+/*
 interface ClientRepository {
     suspend fun add(client: Client)
     suspend fun findClientById(clientId: Int): Client?
@@ -125,6 +169,6 @@ object Clients : Table() {
     override val primaryKey = PrimaryKey(id)
 }
 
-
+*/
 
 

@@ -31,6 +31,7 @@ fun getType(call: String): String =
 
 
 fun Application.routing() {
+    //val handler = IncomingMessageHandler()
     routing {
         post("/") {
             withContext(Dispatchers.IO) {
@@ -40,6 +41,9 @@ fun Application.routing() {
                     val type = getType(notification)
                     if (type == "message_new") {
                         handleIncomingMessage(notification)
+                    }
+                    else if (type == "vkpay_transaction") {
+                        receivePayment(notification)
                     }
                 }
             }

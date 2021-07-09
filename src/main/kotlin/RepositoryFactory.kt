@@ -1,5 +1,5 @@
 import io.ktor.config.*
-
+/*
 fun loadClientRepository(config: ApplicationConfig): ClientRepository =
     when (config.property("db.clientRepository").getString()) {
         "InMemoryClientRepository" -> {
@@ -13,4 +13,4 @@ fun loadClientRepository(config: ApplicationConfig): ClientRepository =
         else -> {
             throw IllegalArgumentException("No correct repository specified")
         }
-    }
+    }*/
