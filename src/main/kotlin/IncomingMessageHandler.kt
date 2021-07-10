@@ -262,8 +262,7 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
 suspend fun sendGreetings(peerId: Int) {
     sendMessage(
         peerId,
-        "Здравствуйте!\nСпасибо, что решили воспользоваться нашим чат-ботом. " +
-                "(дальше надо рассказть про то, как все утроено, например, про кнопки)",
+        "Здравствуйте!\nСпасибо, что решили воспользоваться нашим чат-ботом.",
         keyboard = """
             {
                 "one_time":false,
