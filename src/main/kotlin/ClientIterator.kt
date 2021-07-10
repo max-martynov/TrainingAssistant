@@ -13,7 +13,7 @@ suspend fun iterateOverClients(
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
-       // println("${LocalDate.now().plusDays(cnt++)}")
+        println(LocalTime.now())
         clientsRepository.getAll().forEach {
             checkState(it)
         }
@@ -22,6 +22,7 @@ suspend fun iterateOverClients(
 }
 
 suspend fun checkState(client: Client) {
+    println("${LocalTime.now()}  ${client.status}  ${client.daysPassed}")
     val activeStatuses = listOf(Status.ACTIVE, Status.WAITING_FOR_START, Status.WAITING_FOR_RESULTS)
     if (activeStatuses.contains(client.status)) {
         if (client.daysPassed == 28) {

@@ -31,13 +31,11 @@ fun getType(call: String): String =
 
 
 fun Application.routing() {
-    //val handler = IncomingMessageHandler()
     routing {
         post("/") {
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
-                    println(notification)
                     call.respondText("ok")
                     val type = getType(notification)
                     if (type == "message_new") {

@@ -43,7 +43,7 @@ suspend fun receivePayment(
         } else { // not new, just notify that subscription is fine
             sendMessage(
                 client.id,
-                "Подписка успешно оформлена. Хороших тренировок!"
+                "Подписка успешно продлена. Хороших тренировок!"
             )
             clientsRepository.update(
                 fromId,
@@ -128,7 +128,7 @@ suspend fun handleIncomingMessage(
                 } else {
                     sendMessage(
                         clientId,
-                        "Оплатите подписку."
+                        "Оплатите, пожалуйста, подписку."
                     )
                 }
             }
