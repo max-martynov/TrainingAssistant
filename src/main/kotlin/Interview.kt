@@ -20,7 +20,7 @@ data class InterviewQuestion(val question: String, val interviewButtons: List<In
         if (interviewButtons.size == 2) {
             return  """
                 {
-                    "one_time": false,
+                    "one_time": true,
                     "buttons":
                     [
                         [

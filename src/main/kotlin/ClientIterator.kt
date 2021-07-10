@@ -46,7 +46,7 @@ suspend fun requestPaymentToContinue(peerId: Int, toUser: Int = 15733972, amount
         "Месячная подписка истекла. Продлите ее, если Вам понравился тренировочный процесс.",
         keyboard = """
             {
-                "one_time": false,
+                "one_time": true,
                 "buttons": [
                     [
                         {

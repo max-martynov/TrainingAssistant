@@ -177,6 +177,10 @@ suspend fun handleIncomingMessage(
                             clientId,
                             newInterviewResults = client.interviewResults
                         )
+                        sendInterviewQuestion(
+                            clientId,
+                            client.interviewResults.size
+                        )
                     }
                 }
             }
@@ -283,7 +287,7 @@ suspend fun sendSelectTrainingPlan(peerId: Int) {
         "Сколько часов в неделю у Вас есть возможность тренироваться?",
         keyboard = """
         {
-            "one_time": false, 
+            "one_time": true, 
             "buttons":
             [ 
                 [ 
