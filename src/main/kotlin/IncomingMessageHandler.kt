@@ -108,7 +108,7 @@ suspend fun handleIncomingMessage(
                         newStatus = Status.WAITING_FOR_PAYMENT,
                         newTrainingPlanId = 0
                     )
-                    requestPaymentToStart(clientId, 217619042, 1)
+                    requestPaymentToStart(clientId, amount = 1)
                 } else {
                     sendMessage(
                         clientId,

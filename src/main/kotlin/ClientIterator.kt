@@ -30,7 +30,7 @@ suspend fun checkState(client: Client) {
                 client.id,
                 newStatus = Status.WAITING_FOR_PAYMENT
             )
-            requestPaymentToContinue(client.id, 217619042, 1)
+            requestPaymentToContinue(client.id, amount = 1)
         }
         else {
             clientsRepository.update(
