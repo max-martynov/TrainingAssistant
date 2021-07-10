@@ -26,6 +26,7 @@ suspend fun receivePayment(
         @SerialName("from_id")
         val fromId: Int
     )
+
     val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).fromId
     val client = clientsRepository.findById(fromId) ?: return
     if (client.status == Status.WAITING_FOR_PAYMENT) {
@@ -39,8 +40,7 @@ suspend fun receivePayment(
                 newStatus = Status.WAITING_FOR_START,
                 newDaysPassed = 0
             )
-        }
-        else { // not new, just notify that subscription is fine
+        } else { // not new, just notify that subscription is fine
             sendMessage(
                 client.id,
                 "Подписка успешно оформлена. Хороших тренировок!"
@@ -63,6 +63,18 @@ data class MessageEvent(
     val groupId: Long
 )
 
+@Serializable
+data class Attachment(val type: String)
+
+@Serializable
+data class MarketAttachment(val market: Market)
+
+@Serializable
+data class Market(val category: Category)
+
+@Serializable
+data class Category(val id: Int)
+
 
 suspend fun handleIncomingMessage(
     notification: String
@@ -70,19 +82,25 @@ suspend fun handleIncomingMessage(
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
+    val attachments = messageEvent.message.attachments
+
 
     val client = clientsRepository.findById(clientId)
 
-    if (client == null) {
-        if (text == "Здравствуйте!\nМеня заинтересовал этот товар.") {
-            clientsRepository.add(
-                Client(clientId)
-            )
-            sendGreetings(clientId)
-            sendSelectTrainingPlan(clientId)
-        }
-    } else {
-        when(client.status) {
+    if (client == null &&
+        attachments.isNotEmpty() &&
+        Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachments[0].toString()).type == "market" &&
+        Json {
+            ignoreUnknownKeys = true
+        }.decodeFromString<MarketAttachment>(attachments[0].toString()).market.category.id == 803
+    ) {
+        clientsRepository.add(
+            Client(clientId)
+        )
+        sendGreetings(clientId)
+        sendSelectTrainingPlan(clientId)
+    } else if (client != null) {
+        when (client.status) {
             Status.WAITING_FOR_PLAN -> {
                 if (text == "6 часов" || text == "10 часов") {
                     clientsRepository.update(
@@ -90,9 +108,8 @@ suspend fun handleIncomingMessage(
                         newStatus = Status.WAITING_FOR_PAYMENT,
                         newTrainingPlanId = 0
                     )
-                    requestPaymentToStart(clientId,217619042, 1)
-                }
-                else {
+                    requestPaymentToStart(clientId, 217619042, 1)
+                } else {
                     sendMessage(
                         clientId,
                         "Выберите, сколько часов в неделю хотите тренироваться."
@@ -101,13 +118,14 @@ suspend fun handleIncomingMessage(
             }
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
-                    receivePayment("""
+                    receivePayment(
+                        """
                         {
                             "from_id": ${client.id}
                         }
-                    """.trimIndent())
-                }
-                else {
+                    """.trimIndent()
+                    )
+                } else {
                     sendMessage(
                         clientId,
                         "Оплатите подписку."
@@ -121,8 +139,7 @@ suspend fun handleIncomingMessage(
                         newStatus = Status.ACTIVE
                     )
                     sendPlan(client)
-                }
-                else {
+                } else {
                     sendMessage(
                         clientId,
                         "Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
@@ -141,8 +158,7 @@ suspend fun handleIncomingMessage(
                         newStatus = Status.WAITING_FOR_RESULTS
                     )
                     sendInterviewQuestion(clientId, 0)
-                }
-                else {
+                } else {
                     sendMessage(
                         clientId,
                         "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\"."
@@ -156,8 +172,7 @@ suspend fun handleIncomingMessage(
                         clientId,
                         "Выберите, пожалуйста, один из предложенных вариантов ответа."
                     )
-                }
-                else {
+                } else {
                     client.interviewResults.add(answerNumber)
                     if (client.interviewResults.size == Interview.interviewQuestions.size) {
                         clientsRepository.update(
@@ -171,8 +186,7 @@ suspend fun handleIncomingMessage(
                             "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план. " +
                                     "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
                         )
-                    }
-                    else {
+                    } else {
                         clientsRepository.update(
                             clientId,
                             newInterviewResults = client.interviewResults
@@ -193,7 +207,7 @@ suspend fun sendPlan(client: Client) {
     println("(${ids.first}, ${ids.second})")
     sendMessage(
         client.id,
-        "Хороших тренировок!" ,
+        "Хороших тренировок!",
         attachment = "doc${ids.first}_${ids.second}"
     )
 }
@@ -207,12 +221,9 @@ suspend fun sendInterviewQuestion(peerId: Int, questionNumber: Int) {
 }
 
 
-
-
 /**
  * TODO - add correct implementation
-*/
-
+ */
 fun determineNextTrainingPlan(client: Client): Int {
     return 0
 }
@@ -287,7 +298,7 @@ suspend fun sendSelectTrainingPlan(peerId: Int) {
         "Сколько часов в неделю у Вас есть возможность тренироваться?",
         keyboard = """
         {
-            "one_time": true, 
+            "one_time": false, 
             "buttons":
             [ 
                 [ 
