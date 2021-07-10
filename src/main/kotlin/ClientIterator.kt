@@ -13,7 +13,7 @@ suspend fun iterateOverClients(
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
-        println(LocalTime.now())
+        println(clientsRepository.getAll().size)
         clientsRepository.getAll().forEach {
             checkState(it)
         }

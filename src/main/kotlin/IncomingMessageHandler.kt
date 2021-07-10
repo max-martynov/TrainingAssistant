@@ -173,12 +173,24 @@ suspend fun handleIncomingMessage(
                         "Выберите, пожалуйста, один из предложенных вариантов ответа."
                     )
                 } else {
-                    client.interviewResults.add(answerNumber)
-                    if (client.interviewResults.size == Interview.interviewQuestions.size) {
+                    if (client.interviewResults.size == 2 && answerNumber == 0) {
+                        clientsRepository.update(
+                            clientId,
+                            newInterviewResults = (client.interviewResults + 0 + 0).toMutableList()
+                        )
+                    }
+                    else {
+                        clientsRepository.update(
+                            clientId,
+                            newInterviewResults = (client.interviewResults + answerNumber).toMutableList()
+                        )
+                    }
+                    val updatedClient = clientsRepository.findById(clientId) ?: throw Exception()
+                    if (updatedClient.interviewResults.size == Interview.interviewQuestions.size) {
                         clientsRepository.update(
                             clientId,
                             newStatus = Status.WAITING_FOR_START,
-                            newTrainingPlanId = determineNextTrainingPlan(client),
+                            newTrainingPlanId = determineNextTrainingPlan(updatedClient),
                             newInterviewResults = mutableListOf()
                         )
                         sendMessage(
@@ -187,13 +199,9 @@ suspend fun handleIncomingMessage(
                                     "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
                         )
                     } else {
-                        clientsRepository.update(
-                            clientId,
-                            newInterviewResults = client.interviewResults
-                        )
                         sendInterviewQuestion(
                             clientId,
-                            client.interviewResults.size
+                            updatedClient.interviewResults.size
                         )
                     }
                 }
