@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 import java.time.Duration
 import java.time.LocalTime
 
-val clientsRepository = InMemoryClientsRepository()
+val clientsRepository = InDataBaseClientsRepository()
 val trainingPlansRepository = TrainingPlansRepository(
     "src/main/resources/TrainingPlans",
     2
@@ -43,6 +43,8 @@ fun main(args: Array<String>): Unit = runBlocking {
 }
 
 fun Application.module(testing: Boolean = false) {
+
+    //clientsRepository.clear()
 
     install(ContentNegotiation) {
         json()

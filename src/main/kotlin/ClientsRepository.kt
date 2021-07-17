@@ -1,3 +1,8 @@
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 
@@ -12,13 +17,15 @@ interface ClientsRepository {
         newTrainingPlanId: Int? = null,
         newInterviewResults: MutableList<Int>? = null
     )
+    fun clear()
 }
 
 class InMemoryClientsRepository : ClientsRepository {
-    private val clients = Collections.synchronizedSet(mutableSetOf<Client>())
+    private val clients = Collections.synchronizedList(mutableListOf<Client>())
 
     override suspend fun add(client: Client) {
-        clients.add(client)
+        if (clients.count { it.id == client.id } == 0)
+            clients.add(client)
     }
 
     override suspend fun findById(clientId: Int): Client? =
@@ -48,131 +55,109 @@ class InMemoryClientsRepository : ClientsRepository {
             client.interviewResults = newInterviewResults
         clients.add(client)
     }
-}
 
-/*
-interface ClientRepository {
-    suspend fun add(client: Client)
-    suspend fun findClientById(clientId: Int): Client?
-    suspend fun getAllClients(): List<Client>
-    suspend fun updateClient(
-        id: Int,
-        newStatus: Status? = null,
-        newTotalDaysPassed: Int? = null,
-        newTrainingPlan: TrainingPlan? = null,
-        newDaysInWeekPassed: Int? = null,
-        newInterviewResults: MutableList<Int>? = null
-    )
-}
-
-class InMemoryClientRepository : ClientRepository {
-    private val clients = Collections.synchronizedSet(mutableSetOf<Client>())
-
-    override suspend fun add(client: Client) {
-        clients.add(client)
-    }
-
-    override suspend fun findClientById(clientId: Int): Client? =
-        clients.find { it -> it.id == clientId }
-
-    override suspend fun getAllClients(): List<Client> =
-        clients.toList()
-
-    override suspend fun updateClient(
-        id: Int,
-        newStatus: Status?,
-        newTotalDaysPassed: Int?,
-        newTrainingPlan: TrainingPlan?,
-        newDaysInWeekPassed: Int?,
-        newInterviewResults: MutableList<Int>?
-    ) {
-        val client = findClientById(id) ?: return
-        clients.remove(client)
-        if (newStatus != null) client.status = newStatus
-        if (newTotalDaysPassed != null) client.totalDaysPassed = newTotalDaysPassed
-        if (newTrainingPlan != null) client.trainingPlan = newTrainingPlan
-        if (newDaysInWeekPassed != null) client.daysInWeekPassed = newDaysInWeekPassed
-        if (newInterviewResults != null) client.interviewResults = newInterviewResults
-        clients.add(client)
+    override fun clear() {
+        clients.clear()
     }
 }
 
-class InDataBaseClientRepository(connStr: String, driver: String) : ClientRepository {
+class InDataBaseClientsRepository(
+    connStr: String = "jdbc:h2:~/test",
+    driver: String = "org.h2.Driver"
+) : ClientsRepository {
 
     init {
         Database.connect(connStr, driver)
 
         transaction {
             SchemaUtils.create(Clients)
+            addLogger(StdOutSqlLogger)
         }
     }
 
     override suspend fun add(client: Client) {
-        Clients.insert {
-            it[id] = client.id
-            it[status] = client.status.toString()
-            it[totalDaysPassed] = client.totalDaysPassed
-            it[trainingPlanId] = client.trainingPlan.id
-            it[daysInWeekPassed] = client.daysInWeekPassed
-            it[interviewResults] = client.interviewResults.joinToString(separator = "")
+        coroutineScope {
+            transaction {
+                runBlocking {
+                    if (findById(client.id) == null) {
+                        Clients.insert {
+                            it[id] = client.id
+                            it[status] = client.status.toString()
+                            it[previousStatus] = client.previousStatus.toString()
+                            it[daysPassed] = client.daysPassed
+                            it[trainingPlanId] = client.trainingPlanId
+                            it[interviewResults] = client.interviewResults.joinToString(separator = "")
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override suspend fun findClientById(clientId: Int): Client? {
-        val query = Clients.select { Clients.id eq clientId }
-        if (query.empty())
-            return null
-        return try {
-            convertClientToDataClass(query.toList()[0])
-        } catch (e: Exception) {
-            null
+    override suspend fun findById(clientId: Int): Client? {
+        return transaction {
+            val query = Clients.select { Clients.id eq clientId }
+            if (query.empty())
+                return@transaction null
+            return@transaction try {
+                convertClientToDataClass(query.toList()[0])
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
     private fun convertClientToDataClass(client: ResultRow): Client {
-        val trainingPlan = trainingPlansRepository.findTrainingPlan(client[Clients.trainingPlanId]) ?: throw Exception()
         return Client(
             id = client[Clients.id],
             status = Status.valueOf(client[Clients.status]),
-            totalDaysPassed = client[Clients.totalDaysPassed],
-            trainingPlan = trainingPlan,
-            daysInWeekPassed = client[Clients.daysInWeekPassed],
+            previousStatus = Status.valueOf(client[Clients.previousStatus]),
+            daysPassed = client[Clients.daysPassed],
+            trainingPlanId = client[Clients.trainingPlanId],
             interviewResults = client[Clients.interviewResults].map { it.toString().toInt() }.toMutableList()
         )
     }
 
-    override suspend fun getAllClients(): List<Client> =
+    override suspend fun getAll(): List<Client> = transaction {
         Clients.selectAll().map { convertClientToDataClass(it) }
+    }
 
-    override suspend fun updateClient(
+    override suspend fun update(
         id: Int,
         newStatus: Status?,
-        newTotalDaysPassed: Int?,
-        newTrainingPlan: TrainingPlan?,
-        newDaysInWeekPassed: Int?,
+        newDaysPassed: Int?,
+        newTrainingPlanId: Int?,
         newInterviewResults: MutableList<Int>?
     ) {
-        Clients.update({ Clients.id eq id }) {
-            if (newStatus != null) it[status] = newStatus.toString()
-            if (newTotalDaysPassed != null) it[totalDaysPassed] = newTotalDaysPassed
-            if (newTrainingPlan != null) it[trainingPlanId] = newTrainingPlan.id
-            if (newDaysInWeekPassed != null) it[daysInWeekPassed] = newDaysInWeekPassed
-            if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
+        transaction {
+            Clients.update({ Clients.id eq id }) {
+                if (newStatus != null) {
+                    it[previousStatus] = Clients.status
+                    it[status] = newStatus.toString()
+                }
+                if (newDaysPassed != null) it[daysPassed] = newDaysPassed
+                if (newTrainingPlanId != null) it[trainingPlanId] = newTrainingPlanId
+                if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
+            }
+        }
+    }
+
+    override fun clear() {
+        transaction {
+            SchemaUtils.drop(Clients)
         }
     }
 }
 
 object Clients : Table() {
     val id = integer("id")
-    val status = varchar("status", 10)
-    val totalDaysPassed = integer("total_days_passed")
+    val status = varchar("status", 20)
+    val previousStatus = varchar("previous_status", 20)
+    val daysPassed = integer("days_passed")
     val trainingPlanId = integer("training_plan_id")
-    val daysInWeekPassed = integer("days_in_week_passed")
     val interviewResults = varchar("interview_results", 10)
 
     override val primaryKey = PrimaryKey(id)
 }
-
-*/
 
 
