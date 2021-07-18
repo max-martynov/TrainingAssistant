@@ -6,10 +6,6 @@ import java.time.Duration
 import java.time.LocalTime
 
 val clientsRepository = InDataBaseClientsRepository()
-val trainingPlansRepository = TrainingPlansRepository(
-    "src/main/resources/TrainingPlans",
-    2
-)
 
 
 @OptIn(ObsoleteCoroutinesApi::class)
@@ -24,7 +20,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(1),
-            Duration.ofSeconds(4)
+            Duration.ofSeconds(5)
         )
     /*val clientsIterator = ClientsIterator(
             clientRepository,
@@ -44,7 +40,7 @@ fun main(args: Array<String>): Unit = runBlocking {
 
 fun Application.module(testing: Boolean = false) {
 
-    //clientsRepository.clear()
+    clientsRepository.clear()
 
     install(ContentNegotiation) {
         json()

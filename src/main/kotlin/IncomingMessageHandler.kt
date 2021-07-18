@@ -30,7 +30,7 @@ suspend fun receivePayment(
     val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).fromId
     val client = clientsRepository.findById(fromId) ?: return
     if (client.status == Status.WAITING_FOR_PAYMENT) {
-        if (client.daysPassed == -1) { // brand new client -> send him a plan
+        if (client.daysPassed == -1) {
             sendMessage(
                 client.id,
                 "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
@@ -40,7 +40,21 @@ suspend fun receivePayment(
                 newStatus = Status.WAITING_FOR_START,
                 newDaysPassed = 0
             )
-        } else { // not new, just notify that subscription is fine
+        }
+        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) {
+            clientsRepository.update(
+                fromId,
+                newStatus = Status.WAITING_FOR_START,
+                newTrainingPlan = determineFirstTrainingPlan(client),
+                newWeeksPassed = 0,
+                newDaysPassed = 0
+            )
+            sendMessage(
+                client.id,
+                "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
+            )
+        }
+        else { // not new, just notify that subscription is fine
             sendMessage(
                 client.id,
                 "Подписка успешно продлена. Хороших тренировок!"
@@ -106,13 +120,14 @@ suspend fun handleIncomingMessage(
                     clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_PAYMENT,
-                        newTrainingPlanId = 0
+                        newWeeksPassed = 0,
+                        newTrainingPlan = determineFirstTrainingPlan(client, if (text == "6 часов") 6 else 10)
                     )
                     requestPaymentToStart(clientId, amount = 1)
                 } else {
                     sendMessage(
                         clientId,
-                        "Выберите, сколько часов в неделю хотите тренироваться."
+                        "Выберите, пожалуйста, сколько часов в неделю хотите тренироваться."
                     )
                 }
             }
@@ -155,9 +170,10 @@ suspend fun handleIncomingMessage(
                     )
                     clientsRepository.update(
                         clientId,
-                        newStatus = Status.WAITING_FOR_RESULTS
+                        newStatus = Status.WAITING_FOR_RESULTS,
+                        newWeeksPassed = client.weeksPassed + 1
                     )
-                    sendInterviewQuestion(clientId, 0)
+                    sendInterviewQuestion(client, 0)
                 } else {
                     sendMessage(
                         clientId,
@@ -166,7 +182,14 @@ suspend fun handleIncomingMessage(
                 }
             }
             Status.WAITING_FOR_RESULTS -> {
-                val answerNumber = Interview.findAnswerNumberOnKthQuestion(text, client.interviewResults.size)
+                if (client.interviewResults.size == client.interview.interviewQuestions.size) { // he's already received 4 plans -> should wait until end of month
+                    sendMessage(
+                        clientId,
+                        "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
+                    )
+                    return
+                }
+                val answerNumber = client.interview.findAnswerNumberOnKthQuestion(text, client.interviewResults.size)
                 if (answerNumber == -1) {
                     sendMessage(
                         clientId,
@@ -186,21 +209,31 @@ suspend fun handleIncomingMessage(
                         )
                     }
                     val updatedClient = clientsRepository.findById(clientId) ?: throw Exception()
-                    if (updatedClient.interviewResults.size == Interview.interviewQuestions.size) {
-                        clientsRepository.update(
-                            clientId,
-                            newStatus = Status.WAITING_FOR_START,
-                            newTrainingPlanId = determineNextTrainingPlan(updatedClient),
-                            newInterviewResults = mutableListOf()
-                        )
-                        sendMessage(
-                            clientId,
-                            "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план. " +
-                                    "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
-                        )
+                    if (updatedClient.interviewResults.size == client.interview.interviewQuestions.size) {
+                        val nextTrainingPlan = determineNextTrainingPlan(updatedClient)
+                        if (nextTrainingPlan == null) {
+                            sendMessage(
+                                clientId,
+                                "Опрос заверешен! К сожалению, в данный момент Вы не можете начать цикл, так как за месяц можно получить только 4 плана. " +
+                                        "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
+                            )
+                        }
+                        else {
+                            clientsRepository.update(
+                                clientId,
+                                newStatus = Status.WAITING_FOR_START,
+                                newTrainingPlan = nextTrainingPlan,
+                                newInterviewResults = mutableListOf()
+                            )
+                            sendMessage(
+                                clientId,
+                                "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план. " +
+                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
+                            )
+                        }
                     } else {
                         sendInterviewQuestion(
-                            clientId,
+                            client,
                             updatedClient.interviewResults.size
                         )
                     }
@@ -211,8 +244,8 @@ suspend fun handleIncomingMessage(
 }
 
 suspend fun sendPlan(client: Client) {
-    val ids = trainingPlansRepository.prepareAsAttachment(client.trainingPlanId, client.id)
-    println("(${ids.first}, ${ids.second})")
+    val ids = client.trainingPlan.prepareAsAttachment(client.id)
+    //println("(${ids.first}, ${ids.second})")
     sendMessage(
         client.id,
         "Хороших тренировок!",
@@ -220,20 +253,12 @@ suspend fun sendPlan(client: Client) {
     )
 }
 
-suspend fun sendInterviewQuestion(peerId: Int, questionNumber: Int) {
+suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
     sendMessage(
-        peerId,
-        Interview.interviewQuestions[questionNumber].question,
-        keyboard = Interview.interviewQuestions[questionNumber].toString()
+        client.id,
+        client.interview.interviewQuestions[questionNumber].question,
+        keyboard = client.interview.interviewQuestions[questionNumber].toString()
     )
-}
-
-
-/**
- * TODO - add correct implementation
- */
-fun determineNextTrainingPlan(client: Client): Int {
-    return 0
 }
 
 suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: Int = 500) {

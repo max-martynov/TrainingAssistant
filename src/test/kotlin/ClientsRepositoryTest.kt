@@ -20,7 +20,8 @@ class ClientsRepositoryTest {
             id = 2,
             status = Status.WAITING_FOR_PAYMENT,
             daysPassed = 20,
-            trainingPlanId = 10,
+            weeksPassed = 2,
+            trainingPlan = TrainingPlan(1, 6, 2),
             interviewResults = mutableListOf(0, 1, 2)
         )
     )
@@ -28,6 +29,7 @@ class ClientsRepositoryTest {
 
     @BeforeAll
     fun addDefaultClients() = runBlocking {
+        clientsRepository.clear()
         clients.forEach {
             clientsRepository.add(it)
         }
@@ -69,11 +71,15 @@ class ClientsRepositoryTest {
         clientsRepository.update(
             id = 1,
             newDaysPassed = 31,
+            newWeeksPassed = 3,
             newInterviewResults = mutableListOf(0, 1),
-            newTrainingPlanId = 1
+            newTrainingPlan = TrainingPlan(10, 11, 12)
         )
         assertEquals(31, clientsRepository.findById(1)?.daysPassed)
+        assertEquals(3, clientsRepository.findById(1)?.weeksPassed)
         assertEquals(mutableListOf(0, 1), clientsRepository.findById(1)?.interviewResults)
-        assertEquals(1, clientsRepository.findById(1)?.trainingPlanId)
+        assertEquals(10, clientsRepository.findById(1)?.trainingPlan?.month)
+        assertEquals(11, clientsRepository.findById(1)?.trainingPlan?.hours)
+        assertEquals(12, clientsRepository.findById(1)?.trainingPlan?.week)
     }
 }

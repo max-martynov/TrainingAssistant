@@ -14,7 +14,8 @@ interface ClientsRepository {
         id: Int,
         newStatus: Status? = null,
         newDaysPassed: Int? = null,
-        newTrainingPlanId: Int? = null,
+        newWeeksPassed: Int? = null,
+        newTrainingPlan: TrainingPlan? = null,
         newInterviewResults: MutableList<Int>? = null
     )
     fun clear()
@@ -38,7 +39,8 @@ class InMemoryClientsRepository : ClientsRepository {
         id: Int,
         newStatus: Status?,
         newDaysPassed: Int?,
-        newTrainingPlanId: Int?,
+        newWeeksPassed: Int?,
+        newTrainingPlan: TrainingPlan?,
         newInterviewResults: MutableList<Int>?
     ) {
         val client = findById(id) ?: return
@@ -49,8 +51,10 @@ class InMemoryClientsRepository : ClientsRepository {
         }
         if (newDaysPassed != null)
             client.daysPassed = newDaysPassed
-        if (newTrainingPlanId != null)
-            client.trainingPlanId = newTrainingPlanId
+        if (newWeeksPassed != null)
+            client.weeksPassed = newWeeksPassed
+        if (newTrainingPlan != null)
+            client.trainingPlan = newTrainingPlan
         if (newInterviewResults != null)
             client.interviewResults = newInterviewResults
         clients.add(client)
@@ -85,7 +89,10 @@ class InDataBaseClientsRepository(
                             it[status] = client.status.toString()
                             it[previousStatus] = client.previousStatus.toString()
                             it[daysPassed] = client.daysPassed
-                            it[trainingPlanId] = client.trainingPlanId
+                            it[weeksPassed] = client.weeksPassed
+                            it[trainingPlanMonth] = client.trainingPlan.month
+                            it[trainingPlanWeek] = client.trainingPlan.week
+                            it[trainingPlanHours] = client.trainingPlan.hours
                             it[interviewResults] = client.interviewResults.joinToString(separator = "")
                         }
                     }
@@ -113,7 +120,12 @@ class InDataBaseClientsRepository(
             status = Status.valueOf(client[Clients.status]),
             previousStatus = Status.valueOf(client[Clients.previousStatus]),
             daysPassed = client[Clients.daysPassed],
-            trainingPlanId = client[Clients.trainingPlanId],
+            weeksPassed = client[Clients.weeksPassed],
+            trainingPlan = TrainingPlan(
+                month = client[Clients.trainingPlanMonth],
+                hours = client[Clients.trainingPlanHours],
+                week = client[Clients.trainingPlanWeek],
+            ),
             interviewResults = client[Clients.interviewResults].map { it.toString().toInt() }.toMutableList()
         )
     }
@@ -126,7 +138,8 @@ class InDataBaseClientsRepository(
         id: Int,
         newStatus: Status?,
         newDaysPassed: Int?,
-        newTrainingPlanId: Int?,
+        newWeeksPassed: Int?,
+        newTrainingPlan: TrainingPlan?,
         newInterviewResults: MutableList<Int>?
     ) {
         transaction {
@@ -136,7 +149,12 @@ class InDataBaseClientsRepository(
                     it[status] = newStatus.toString()
                 }
                 if (newDaysPassed != null) it[daysPassed] = newDaysPassed
-                if (newTrainingPlanId != null) it[trainingPlanId] = newTrainingPlanId
+                if (newWeeksPassed != null) it[weeksPassed] = newWeeksPassed
+                if (newTrainingPlan != null) {
+                    it[trainingPlanMonth] = newTrainingPlan.month
+                    it[trainingPlanHours] = newTrainingPlan.hours
+                    it[trainingPlanWeek] = newTrainingPlan.week
+                }
                 if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
             }
         }
@@ -145,6 +163,7 @@ class InDataBaseClientsRepository(
     override fun clear() {
         transaction {
             SchemaUtils.drop(Clients)
+            SchemaUtils.create(Clients)
         }
     }
 }
@@ -154,9 +173,11 @@ object Clients : Table() {
     val status = varchar("status", 20)
     val previousStatus = varchar("previous_status", 20)
     val daysPassed = integer("days_passed")
-    val trainingPlanId = integer("training_plan_id")
+    val weeksPassed = integer("weeks_passed")
+    val trainingPlanMonth = integer("training_plan_month")
+    val trainingPlanHours = integer("training_plan_hours")
+    val trainingPlanWeek = integer("training_plan_week")
     val interviewResults = varchar("interview_results", 10)
-
     override val primaryKey = PrimaryKey(id)
 }
 

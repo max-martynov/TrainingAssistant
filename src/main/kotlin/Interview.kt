@@ -55,8 +55,82 @@ data class InterviewQuestion(val question: String, val interviewButtons: List<In
     }
 }
 
-object Interview {
-    val interviewQuestions = listOf(
+abstract class Interview {
+    abstract val interviewQuestions: List<InterviewQuestion>
+
+    fun findAnswerNumberOnKthQuestion(answer: String, k: Int): Int {
+        interviewQuestions[k].interviewButtons.forEachIndexed { index, interviewButton ->
+            if (interviewButton.answer == answer)
+                return@findAnswerNumberOnKthQuestion index
+        }
+        return -1
+    }
+
+}
+
+class InterviewFor1Hour : Interview() {
+    override val interviewQuestions = listOf(
+        InterviewQuestion(
+            "Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?",
+            listOf(
+                InterviewButton("Устал / утомился"),
+                InterviewButton("Чувствую себя нормально"),
+                InterviewButton("Чувствую себя легко")
+            )
+        ),
+        InterviewQuestion(
+            "Восстановились ли Вы после болезни?",
+            listOf(
+                InterviewButton("Да"),
+                InterviewButton("Нет")
+            )
+        ),
+        InterviewQuestion(
+            "Сколько часоа Вы бы хотели заниматься на следующей неделе?",
+            listOf(
+                InterviewButton("6 часвов"),
+                InterviewButton("10 часов")
+            )
+        )
+    )
+}
+
+class InterviewFor6Hours : Interview() {
+    override val interviewQuestions = listOf(
+        InterviewQuestion(
+            "Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?",
+            listOf(
+                InterviewButton("Устал / утомился"),
+                InterviewButton("Чувствую себя нормально"),
+                InterviewButton("Чувствую себя легко")
+            )
+        ),
+        InterviewQuestion(
+            "Нужно ли сделать тренировочный план сложнее / больше?",
+            listOf(
+                InterviewButton("Да"),
+                InterviewButton("Нет")
+            )
+        ),
+        InterviewQuestion(
+            "Болели ли Вы в течение недельного цикла?",
+            listOf(
+                InterviewButton("Да"),
+                InterviewButton("Нет")
+            )
+        ),
+        InterviewQuestion(
+            "Нужно ли вам восстановление?",
+            listOf(
+                InterviewButton("Да"),
+                InterviewButton("Нет")
+            )
+        )
+    )
+}
+
+class InterviewFor10Hours : Interview() {
+    override val interviewQuestions = listOf(
         InterviewQuestion(
             "Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?",
             listOf(
@@ -87,13 +161,6 @@ object Interview {
             )
         )
     )
-
-    fun findAnswerNumberOnKthQuestion(answer: String, k: Int): Int {
-        interviewQuestions[k].interviewButtons.forEachIndexed { index, interviewButton ->
-            if (interviewButton.answer == answer)
-                return@findAnswerNumberOnKthQuestion index
-        }
-        return -1
-    }
 }
+
 
