@@ -196,7 +196,13 @@ suspend fun handleIncomingMessage(
                         "Выберите, пожалуйста, один из предложенных вариантов ответа."
                     )
                 } else {
-                    if (client.interviewResults.size == 2 && answerNumber == 1) {
+                    if (client.interview.interviewQuestions.size == 4 && client.interviewResults.size == 2 && answerNumber == 1) {
+                        clientsRepository.update(
+                            clientId,
+                            newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
+                        )
+                    }
+                    else if (client.interview.interviewQuestions.size == 3 && client.interviewResults.size == 1 && answerNumber == 1) {
                         clientsRepository.update(
                             clientId,
                             newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
