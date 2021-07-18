@@ -63,7 +63,8 @@ suspend fun receivePayment(
             clientsRepository.update(
                 fromId,
                 newStatus = client.previousStatus,
-                newDaysPassed = 0
+                newDaysPassed = 0,
+                newWeeksPassed = 0
             )
         }
     }

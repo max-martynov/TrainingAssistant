@@ -128,20 +128,20 @@ fun determineNextHours(client: Client): Int =
                 10
         }
         6 -> {
-            if (client.interviewResults[1] == 0)
-                10
-            else if (client.interviewResults[3] == 1)
-                6
-            else
+            if (client.interviewResults[3] == 0)
                 1
+            else if (client.interviewResults[1] == 0)
+                10
+            else
+                6
         }
         10 -> {
-            if (client.interviewResults[1] == 0)
-                6
-            else if (client.interviewResults[3] == 1)
-                10
-            else
+            if (client.interviewResults[3] == 0)
                 1
+            else if (client.interviewResults[1] == 0)
+                6
+            else
+                10
         }
         else -> -1
     }
