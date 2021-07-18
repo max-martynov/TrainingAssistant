@@ -47,7 +47,8 @@ suspend fun receivePayment(
                 newStatus = Status.WAITING_FOR_START,
                 newTrainingPlan = determineFirstTrainingPlan(client),
                 newWeeksPassed = 0,
-                newDaysPassed = 0
+                newDaysPassed = 0,
+                newInterviewResults = mutableListOf()
             )
             sendMessage(
                 client.id,
