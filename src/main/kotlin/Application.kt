@@ -10,28 +10,12 @@ val clientsRepository = InDataBaseClientsRepository()
 
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
-    //val applicationEnvironment = commandLineEnvironment(args)
-    //clientRepository = loadClientRepository(applicationEnvironment.config)
-
-    //clientRepository = InMemoryClientRepository()
-
-    //trainingPlansRepository = LocalTrainingPlansRepository()
 
     launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(1),
             Duration.ofSeconds(5)
         )
-    /*val clientsIterator = ClientsIterator(
-            clientRepository,
-            LocalTime.now().plusSeconds(9),
-            LocalTime.now().plusSeconds(20),
-            LocalTime.now().plusSeconds(24),
-            Duration.ofSeconds(24)
-        )*/
-        //async { clientsIterator.iterateMorning() }
-        //async { clientsIterator.iterateEvening() }
-        //async { clientsIterator.iterateNight() }
     }
     launch {
         io.ktor.server.netty.EngineMain.main(args)

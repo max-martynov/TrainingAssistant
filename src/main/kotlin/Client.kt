@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
 enum class Status {
-    ACTIVE, WAITING_FOR_PLAN, WAITING_FOR_START, WAITING_FOR_PAYMENT, WAITING_FOR_RESULTS
+    NEW_CLIENT, ACTIVE, WAITING_FOR_PLAN, WAITING_FOR_START, WAITING_FOR_PAYMENT, WAITING_FOR_RESULTS
 }
 
 data class Client(
@@ -36,4 +36,6 @@ data class Client(
         }
 
     fun completedInterview(): Boolean = interviewResults.size == interview.interviewQuestions.size
+
+    fun isNew(): Boolean = daysPassed == -1
 }

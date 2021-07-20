@@ -30,10 +30,14 @@ suspend fun receivePayment(
     val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).fromId
     val client = clientsRepository.findById(fromId) ?: return
     if (client.status == Status.WAITING_FOR_PAYMENT) {
-        if (client.daysPassed == -1) {
+        val phrases = listOf(
+            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
+            "Подписка успешно продлена! Надеюсь, что вам понравятся тренировки в этом месяце."
+        )
+        if (client.isNew()) { // brand new client
             sendMessage(
                 client.id,
-                "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
+                "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите \"Начать цикл\"."
             )
             clientsRepository.update(
                 fromId,
@@ -41,7 +45,7 @@ suspend fun receivePayment(
                 newDaysPassed = 0
             )
         }
-        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) {
+        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { //
             clientsRepository.update(
                 fromId,
                 newStatus = Status.WAITING_FOR_START,
@@ -52,13 +56,13 @@ suspend fun receivePayment(
             )
             sendMessage(
                 client.id,
-                "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
+                phrases.random()
             )
         }
         else { // not new, just notify that subscription is fine
             sendMessage(
                 client.id,
-                "Подписка успешно продлена. Хороших тренировок!"
+                phrases.random()
             )
             clientsRepository.update(
                 fromId,
@@ -79,18 +83,6 @@ data class MessageEvent(
     val groupId: Long
 )
 
-@Serializable
-data class Attachment(val type: String)
-
-@Serializable
-data class MarketAttachment(val market: Market)
-
-@Serializable
-data class Market(val category: Category)
-
-@Serializable
-data class Category(val id: Int)
-
 
 suspend fun handleIncomingMessage(
     notification: String
@@ -103,20 +95,28 @@ suspend fun handleIncomingMessage(
 
     val client = clientsRepository.findById(clientId)
 
-    if (client == null &&
-        attachments.isNotEmpty() &&
-        Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachments[0].toString()).type == "market" &&
-        Json {
-            ignoreUnknownKeys = true
-        }.decodeFromString<MarketAttachment>(attachments[0].toString()).market.category.id == 803
-    ) {
+    if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
         clientsRepository.add(
             Client(clientId)
         )
         sendGreetings(clientId)
-        sendSelectTrainingPlan(clientId)
+        clientsRepository.update(
+            clientId,
+            newStatus = Status.NEW_CLIENT
+        )
     } else if (client != null) {
         when (client.status) {
+            Status.NEW_CLIENT -> {
+                if (text == "Старт!") {
+                    sendMainKeyboard(clientId)
+                    sendSelectTrainingPlan(clientId)
+                } else {
+                    sendMessage(
+                        clientId,
+                        "Если вы готовы начать, жмите на \"Старт!\""
+                    )
+                }
+            }
             Status.WAITING_FOR_PLAN -> {
                 if (text == "6 часов" || text == "10 часов") {
                     clientsRepository.update(
@@ -159,16 +159,20 @@ suspend fun handleIncomingMessage(
                 } else {
                     sendMessage(
                         clientId,
-                        "Для того, чтобы получить план и начать недельный цикл, нажмите на \"Начать цикл\"."
+                        "Для того, чтобы получить план и начать недельный цикл, нажмите \"Начать цикл\"."
                     )
                 }
             }
             Status.ACTIVE -> {
                 if (text == "Закончить цикл") {
+                    val phrases = listOf(
+                        "Поздравляю с окончанием недельного цикла!\nЧтобы сформировать план на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
+                        "Отличная работа!\nДля формирования плана на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
+                        "Недельный цикл успешно завершен! Пройдите, пожалуйста, небольшой опрос, чтобы сформировать план на следующую неделю."
+                    )
                     sendMessage(
                         clientId,
-                        "Поздравляю с окончанием недельного цикла!\n" +
-                                "Чтобы сформировать план на следующую неделю, пройдите, пожалуйста, небольшой опрос."
+                        phrases.random()
                     )
                     clientsRepository.update(
                         clientId,
@@ -233,10 +237,15 @@ suspend fun handleIncomingMessage(
                                 newTrainingPlan = nextTrainingPlan,
                                 newInterviewResults = mutableListOf()
                             )
+                            val phrases = listOf(
+                                "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план.\n" +
+                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\".",
+                                "Опрос подошел к концу. Спасибо за Ваши ответы! На основании них для Вас был подобран уникальный тренировочный план.\n" +
+                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
+                            )
                             sendMessage(
                                 clientId,
-                                "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план. " +
-                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
+                                phrases.random()
                             )
                         }
                     } else {
@@ -251,12 +260,31 @@ suspend fun handleIncomingMessage(
     }
 }
 
+fun isOurProduct(attachment: String): Boolean {
+    @Serializable
+    data class Attachment(val type: String)
+    @Serializable
+    data class Category(val id: Int)
+    @Serializable
+    data class Market(val category: Category)
+    @Serializable
+    data class MarketAttachment(val market: Market)
+
+    return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
+            Json {
+                ignoreUnknownKeys = true
+            }.decodeFromString<MarketAttachment>(attachment).market.category.id == 803
+}
+
 suspend fun sendPlan(client: Client) {
     val ids = client.trainingPlan.prepareAsAttachment(client.id)
-    //println("(${ids.first}, ${ids.second})")
+    val phrases = listOf(
+        "Хороших тренировок!",
+        "Удачных тренировок!"
+    )
     sendMessage(
         client.id,
-        "Хороших тренировок!",
+        phrases.random(),
         attachment = "doc${ids.first}_${ids.second}"
     )
 }
@@ -270,9 +298,14 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
 }
 
 suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: Int = 500) {
+    val phrases = listOf(
+        "Отличный выбор!\nЧтобы увидеть план и начать тренироваться, оплатите месячную подписку.",
+        "Хороший выбор!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",
+        "Превосходно!\nВсе, что Вам осталось, это оплатить месячную подписку."
+    )
     sendMessage(
         peerId,
-        "Отличный выбор!\nЧтобы увидеть план и начать тренироваться, оплатите месячную подписку.",
+        phrases.random(),
         keyboard = """
             {
                 "one_time": false,
@@ -295,8 +328,41 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
 suspend fun sendGreetings(peerId: Int) {
     sendMessage(
         peerId,
-        "Здравствуйте!\nСпасибо, что решили воспользоваться нашим чат-ботом.",
+        "Здравствуйте!\nСпасибо, что решили попробовать обновленные тренировки по подписке 🤖\n" +
+                "Если у Вас есть вопросы о том, как тут все работает, жмите на \"Краткое руководство\". " +
+                "Специально для Вас мы написали подробную статью, чтобы процесс взаимодействия с чат-ботом был простым и удобным 👍\n" +
+                "Если же вы все поняли и готовы начинать, жмите на \"Старт!\".",
         keyboard = """
+            {
+                "one_time":false,
+                "buttons":[
+                     [
+                        {
+                            "action":{
+                                "type":"open_link",
+                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
+                                "label":"Краткое руководство"
+                            }
+                        }, {
+                            "action":{
+                                "type":"text",
+                                "label":"Старт!"
+                            },
+                            "color":"primary"
+                        }
+                     ]
+                ],
+                "inline": false
+            }
+        """.trimIndent()
+    )
+}
+
+suspend fun sendMainKeyboard(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
+       keyboard = """
             {
                 "one_time":false,
                 "buttons":[
@@ -308,8 +374,15 @@ suspend fun sendGreetings(peerId: Int) {
                                 "label":"Обратная связь"
                             }
                         } 
-                     ],
-                     [   
+                     ], [
+                        {
+                            "action":{
+                                "type":"open_link",
+                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
+                                "label":"Краткое руководство"
+                            }
+                        }
+                     ], [   
                         {
                             "action":{
                                 "type":"text",
@@ -379,7 +452,6 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
         parameter("attachment", attachment)
         parameter("v", "5.80")
     }
-    //println(response.content.readUTF8Line())
 }
 
 
