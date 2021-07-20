@@ -454,7 +454,7 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
         parameter("message", text)
         parameter("keyboard", keyboard)
         parameter("attachment", attachment)
-        parameter("v", "5.80")
+        parameter("v", "5.95")
     }
 }
 

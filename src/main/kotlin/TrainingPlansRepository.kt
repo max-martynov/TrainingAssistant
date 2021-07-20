@@ -16,7 +16,7 @@ data class TrainingPlan(
 ) {
     private val pathToDirectory = "src/main/resources/TrainingPlans"
 
-    val pathToFile = "$pathToDirectory/$month/$hours/$week.pdf"
+    private val pathToFile = "$pathToDirectory/$month/$hours/$week.pdf"
 
     suspend fun prepareAsAttachment(peerId: Int): Pair<Int, Int> {
         val uploadUrl = getMessagesUploadServer(peerId)
@@ -52,7 +52,7 @@ data class TrainingPlan(
             )
             parameter("type", "doc")
             parameter("peer_id", peerId)
-            parameter("v", "5.80")
+            parameter("v", "5.95")
         }.response.uploadUrl
     }
 
@@ -91,7 +91,7 @@ data class TrainingPlan(
                 "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e"
             )
             parameter("file", file)
-            parameter("v", "5.80")
+            parameter("v", "5.95")
         }
         return Pair(response.response[0].ownerId, response.response[0].id)
     }
