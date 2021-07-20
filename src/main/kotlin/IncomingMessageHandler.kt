@@ -32,7 +32,7 @@ suspend fun receivePayment(
     if (client.status == Status.WAITING_FOR_PAYMENT) {
         val phrases = listOf(
             "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
-            "Подписка успешно продлена! Надеюсь, что вам понравятся тренировки в этом месяце."
+            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
         )
         if (client.isNew()) { // brand new client
             sendMessage(
@@ -157,7 +157,8 @@ suspend fun handleIncomingMessage(
                 if (text == "Начать цикл") {
                     clientsRepository.update(
                         clientId,
-                        newStatus = Status.ACTIVE
+                        newStatus = Status.ACTIVE,
+                        newWeeksPassed = client.weeksPassed + 1
                     )
                     sendPlan(client)
                 } else {
@@ -180,8 +181,7 @@ suspend fun handleIncomingMessage(
                     )
                     clientsRepository.update(
                         clientId,
-                        newStatus = Status.WAITING_FOR_RESULTS,
-                        newWeeksPassed = client.weeksPassed + 1
+                        newStatus = Status.WAITING_FOR_RESULTS
                     )
                     sendInterviewQuestion(client, 0)
                 } else {
