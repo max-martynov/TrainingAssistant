@@ -110,6 +110,10 @@ suspend fun handleIncomingMessage(
                 if (text == "Старт!") {
                     sendMainKeyboard(clientId)
                     sendSelectTrainingPlan(clientId)
+                    clientsRepository.update(
+                        clientId,
+                        newStatus = Status.WAITING_FOR_PLAN
+                    )
                 } else {
                     sendMessage(
                         clientId,
