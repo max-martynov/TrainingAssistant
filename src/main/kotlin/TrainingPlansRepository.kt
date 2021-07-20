@@ -52,7 +52,7 @@ data class TrainingPlan(
             )
             parameter("type", "doc")
             parameter("peer_id", peerId)
-            parameter("v", "5.95")
+            parameter("v", "5.80")
         }.response.uploadUrl
     }
 

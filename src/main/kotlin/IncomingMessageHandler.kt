@@ -1,4 +1,5 @@
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
+import com.petersamokhin.vksdk.core.model.event.MessageNew
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.features.json.*
@@ -74,20 +75,23 @@ suspend fun receivePayment(
     }
 }
 
-@Serializable
+
+
+
+/*@Serializable
 data class MessageEvent(
     val type: String,
     @SerialName("object")
     val message: IncomingMessage,
     @SerialName("group_id")
     val groupId: Long
-)
+)*/
 
 
 suspend fun handleIncomingMessage(
     notification: String
 ) {
-    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
+    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageNew>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
@@ -454,7 +458,7 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
         parameter("message", text)
         parameter("keyboard", keyboard)
         parameter("attachment", attachment)
-        parameter("v", "5.95")
+        parameter("v", "5.131")
     }
 }
 
