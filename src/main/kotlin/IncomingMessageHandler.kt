@@ -17,6 +17,9 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import java.io.File
+import java.util.*
+import kotlin.random.Random.Default.nextInt
+import kotlin.random.Random.Default.nextLong
 
 
 suspend fun receivePayment(
@@ -447,6 +450,7 @@ suspend fun sendSelectTrainingPlan(peerId: Int) {
 
 suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
     val httpClient: HttpClient = HttpClient()
+    val rand = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).random()
     val response = httpClient.post<HttpResponse>(
         "https://api.vk.com/method/messages.send?"
     ) {
@@ -454,12 +458,14 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
             "access_token",
             "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e"
         )
+        parameter("random_id", rand)
         parameter("peer_id", peerId)
         parameter("message", text)
         parameter("keyboard", keyboard)
         parameter("attachment", attachment)
         parameter("v", "5.131")
     }
+    println(response.content.readUTF8Line())
 }
 
 
