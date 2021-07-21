@@ -36,9 +36,10 @@ fun Application.routing() {
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
+                    println(notification)
+                    call.respondText("ok")
                     val type = getType(notification)
                     if (type == "message_new") {
-                        call.respondText("ok")
                         handleIncomingMessage(notification)
                     }
                     else if (type == "vkpay_transaction") {
