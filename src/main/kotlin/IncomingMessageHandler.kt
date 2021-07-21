@@ -63,16 +63,15 @@ suspend fun receivePayment(
         else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { //
             clientsRepository.update(
                 fromId,
-                newStatus = Status.WAITING_FOR_START,
-                //newTrainingPlan = determineFirstTrainingPlan(client),
                 newWeeksPassed = 0,
-                newDaysPassed = 0,
-                newInterviewResults = mutableListOf()
+                newDaysPassed = 0
             )
             val updatedClient = clientsRepository.findById(fromId)!!
             clientsRepository.update(
                 fromId,
-                newTrainingPlan = determineNextTrainingPlan(updatedClient)
+                newStatus = Status.WAITING_FOR_START,
+                newTrainingPlan = determineNextTrainingPlan(updatedClient),
+                newInterviewResults = mutableListOf()
             )
             sendMessage(
                 fromId,
