@@ -96,15 +96,10 @@ suspend fun handleIncomingMessage(
 ) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
-    /*val text = messageEvent.message.text
-    val attachments = messageEvent.message.attachments*/
+    val text = messageEvent.message.text
+    val attachments = messageEvent.message.attachments
 
-    requestPaymentToStart(
-        clientId,
-        amount = 1
-    )
-
-    /*val client = clientsRepository.findById(clientId)
+    val client = clientsRepository.findById(clientId)
 
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
         clientsRepository.add(
@@ -272,7 +267,7 @@ suspend fun handleIncomingMessage(
                 }
             }
         }
-    }*/
+    }
 }
 
 fun isOurProduct(attachment: String): Boolean {
@@ -329,7 +324,7 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
                         {
                             "action":{ 
                                 "type":"vkpay", 
-                                "hash":"action=transfer-to-group&group_id=181108510&aid=10" 
+                                "hash":"action=pay-to-user&user_id=$toUser&amount=$amount&aid=7889001" 
                              } 
                         }
                     ]
