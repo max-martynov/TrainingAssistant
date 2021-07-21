@@ -86,7 +86,7 @@ class InterviewFor1Hour : Interview() {
             )
         ),
         InterviewQuestion(
-            "Сколько часоа Вы бы хотели заниматься на следующей неделе?",
+            "Сколько часов Вы бы хотели заниматься на следующей неделе?",
             listOf(
                 InterviewButton("6 часвов"),
                 InterviewButton("10 часов")

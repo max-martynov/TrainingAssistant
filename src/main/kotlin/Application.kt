@@ -20,7 +20,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(1),
-            Duration.ofSeconds(10)
+            Duration.ofSeconds(5)
         )
     }
     launch {

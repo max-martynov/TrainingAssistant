@@ -64,13 +64,18 @@ suspend fun receivePayment(
             clientsRepository.update(
                 fromId,
                 newStatus = Status.WAITING_FOR_START,
-                newTrainingPlan = determineFirstTrainingPlan(client),
+                //newTrainingPlan = determineFirstTrainingPlan(client),
                 newWeeksPassed = 0,
                 newDaysPassed = 0,
                 newInterviewResults = mutableListOf()
             )
+            val updatedClient = clientsRepository.findById(fromId)!!
+            clientsRepository.update(
+                fromId,
+                newTrainingPlan = determineNextTrainingPlan(updatedClient)
+            )
             sendMessage(
-                client.id,
+                fromId,
                 phrases.random()
             )
         }
