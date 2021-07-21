@@ -457,10 +457,7 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
     val response = httpClient.post<HttpResponse>(
         "https://api.vk.com/method/messages.send?"
     ) {
-        parameter(
-            "access_token",
-            "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e"
-        )
+        parameter("access_token", accessToken)
         parameter("peer_id", peerId)
         parameter("message", text)
         parameter("keyboard", keyboard)
