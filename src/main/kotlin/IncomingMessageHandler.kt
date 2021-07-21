@@ -85,7 +85,7 @@ suspend fun receivePayment(
 data class MessageEvent(
     val type: String,
     @SerialName("object")
-    val objectt: MessageNew,
+    val message: IncomingMessage,
     @SerialName("group_id")
     val groupId: Long
 )
@@ -95,12 +95,16 @@ suspend fun handleIncomingMessage(
     notification: String
 ) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
-    val clientId = messageEvent.objectt.message.fromId
-    val text = messageEvent.objectt.message.text
-    val attachments = messageEvent.objectt.message.attachments
+    val clientId = messageEvent.message.fromId
+    /*val text = messageEvent.message.text
+    val attachments = messageEvent.message.attachments*/
 
+    requestPaymentToStart(
+        clientId,
+        amount = 1
+    )
 
-    val client = clientsRepository.findById(clientId)
+    /*val client = clientsRepository.findById(clientId)
 
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
         clientsRepository.add(
@@ -268,7 +272,7 @@ suspend fun handleIncomingMessage(
                 }
             }
         }
-    }
+    }*/
 }
 
 fun isOurProduct(attachment: String): Boolean {
@@ -450,7 +454,6 @@ suspend fun sendSelectTrainingPlan(peerId: Int) {
 
 suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
     val httpClient: HttpClient = HttpClient()
-    val rand = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).random()
     val response = httpClient.post<HttpResponse>(
         "https://api.vk.com/method/messages.send?"
     ) {
@@ -458,14 +461,12 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
             "access_token",
             "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e"
         )
-        parameter("random_id", rand)
         parameter("peer_id", peerId)
         parameter("message", text)
         parameter("keyboard", keyboard)
         parameter("attachment", attachment)
-        parameter("v", "5.131")
+        parameter("v", "5.81")
     }
-    println(response.content.readUTF8Line())
 }
 
 
