@@ -324,7 +324,7 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
                         {
                             "action":{ 
                                 "type":"vkpay", 
-                                "hash":"action=pay-to-user&user_id=$toUser&amount=$amount&aid=7889001" 
+                                "hash":"action=pay-to-group&group_id=205462754&amount=$amount&aid=7889001" 
                              } 
                         }
                     ]
