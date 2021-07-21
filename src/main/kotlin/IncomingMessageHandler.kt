@@ -329,7 +329,7 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
                         {
                             "action": {
                                 "type": "vkpay",
-                                "payload": "gg wp",
+                                "payload": "{\"button\": \"1\"}",
                                 "hash": "action=pay-to-user&amount=5&description=aaaa&user_id=15733972&aid=7889001"
                             }
                         }
