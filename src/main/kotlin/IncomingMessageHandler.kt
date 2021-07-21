@@ -327,11 +327,10 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
                 "buttons": [
                     [
                         {
-                            "action": {
-                                "type": "vkpay",
-                                "payload": "{\"button\": \"1\"}",
-                                "hash": "action=pay-to-user&amount=5&description=aaaa&user_id=15733972&aid=7889001"
-                            }
+                            "action":{ 
+                                "type":"vkpay", 
+                                "hash":"action=transfer-to-group&group_id=181108510&aid=10" 
+                             } 
                         }
                     ]
                 ],
@@ -489,5 +488,11 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
  * Деньги собирать всегда через 30 дней
  * Может начать план только 4 раза за месяц
  * Забиваем на 3 часа
+ *
+ * "action": {
+"type": "vkpay",
+"payload": "{\"button\": \"1\"}",
+"hash": "action=pay-to-user&amount=5&description=aaaa&user_id=15733972&aid=7889001"
+}
  *
  */
