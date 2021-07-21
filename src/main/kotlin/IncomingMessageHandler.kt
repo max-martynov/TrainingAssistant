@@ -27,8 +27,9 @@ suspend fun receivePayment(
 ) {
     @Serializable
     data class Payment(
-@SerialName("from_id")
-val fromId: Int
+        @SerialName("from_id")
+        val fromId: Int,
+        val amount: Int
 )
     @Serializable
     data class PaymentEvent(
@@ -39,9 +40,11 @@ val fromId: Int
         val groupId: Long
     )
 
-    val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment.fromId
+    val paymentInfo = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment
+    val fromId = paymentInfo.fromId
+    val amount = paymentInfo.amount
     val client = clientsRepository.findById(fromId) ?: return
-    if (client.status == Status.WAITING_FOR_PAYMENT) {
+    if (amount == 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
         val phrases = listOf(
             "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
             "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
@@ -154,11 +157,7 @@ suspend fun handleIncomingMessage(
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
                     receivePayment(
-                        """
-                        {
-                            "from_id": ${client.id}
-                        }
-                    """.trimIndent()
+                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":217619042,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
                     )
                 } else if (text != "") {
                     sendMessage(
