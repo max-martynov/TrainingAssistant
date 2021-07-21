@@ -17,12 +17,12 @@ const val accessToken = "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2f
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
-    /*launch(newSingleThreadContext("Thread for iterators")) {
+    launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(1),
-            Duration.ofSeconds(5)
+            Duration.ofSeconds(10)
         )
-    }*/
+    }
     launch {
         io.ktor.server.netty.EngineMain.main(args)
     }

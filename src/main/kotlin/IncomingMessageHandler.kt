@@ -26,7 +26,10 @@ suspend fun receivePayment(
     notification: String
 ) {
     @Serializable
-    data class Payment(val fromId: Int)
+    data class Payment(
+@SerialName("from_id")
+val fromId: Int
+)
     @Serializable
     data class PaymentEvent(
         val type: String,
