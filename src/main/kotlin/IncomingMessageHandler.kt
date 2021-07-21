@@ -26,12 +26,17 @@ suspend fun receivePayment(
     notification: String
 ) {
     @Serializable
+    data class Payment(val fromId: Int)
+    @Serializable
     data class PaymentEvent(
-        @SerialName("from_id")
-        val fromId: Int
+        val type: String,
+        @SerialName("object")
+        val payment: Payment,
+        @SerialName("group_id")
+        val groupId: Long
     )
 
-    val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).fromId
+    val fromId = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment.fromId
     val client = clientsRepository.findById(fromId) ?: return
     if (client.status == Status.WAITING_FOR_PAYMENT) {
         val phrases = listOf(
@@ -152,7 +157,7 @@ suspend fun handleIncomingMessage(
                         }
                     """.trimIndent()
                     )
-                } else {
+                } else if (text != "") {
                     sendMessage(
                         clientId,
                         "Оплатите, пожалуйста, подписку."
@@ -307,7 +312,7 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
     )
 }
 
-suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: Int = 500) {
+suspend fun requestPaymentToStart(peerId: Int, toGroup: Int = 205462754, amount: Int = 500) {
     val phrases = listOf(
         "Отличный выбор!\nЧтобы увидеть план и начать тренироваться, оплатите месячную подписку.",
         "Хороший выбор!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",
@@ -324,7 +329,7 @@ suspend fun requestPaymentToStart(peerId: Int, toUser: Int = 15733972, amount: I
                         {
                             "action":{ 
                                 "type":"vkpay", 
-                                "hash":"action=pay-to-group&group_id=205462754&amount=$amount&aid=7889001" 
+                                "hash":"action=pay-to-group&group_id=$toGroup&amount=$amount&aid=7889001" 
                              } 
                         }
                     ]
