@@ -465,6 +465,7 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
         parameter("attachment", attachment)
         parameter("v", "5.81")
     }
+    println(response.content.readUTF8Line())
 }
 
 
