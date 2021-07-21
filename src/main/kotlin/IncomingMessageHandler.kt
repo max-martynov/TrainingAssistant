@@ -17,20 +17,19 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import java.io.File
+import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 import kotlin.random.Random.Default.nextLong
 
 
-suspend fun receivePayment(
-    notification: String
-) {
+suspend fun receivePayment(notification: String) {
     @Serializable
     data class Payment(
         @SerialName("from_id")
         val fromId: Int,
         val amount: Int
-)
+    )
     @Serializable
     data class PaymentEvent(
         val type: String,
@@ -148,7 +147,7 @@ suspend fun handleIncomingMessage(
                         clientId,
                         newStatus = Status.WAITING_FOR_PAYMENT,
                         newWeeksPassed = 0,
-                        newTrainingPlan = determineFirstTrainingPlan(client, if (text == "6 часов") 6 else 10)
+                        newTrainingPlan = TrainingPlan(LocalDate.now().monthValue, if (text == "6 часов") 6 else 10, 0)
                     )
                     requestPaymentToStart(clientId, amount = 1)
                 } else {

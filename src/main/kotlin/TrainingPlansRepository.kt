@@ -91,15 +91,6 @@ data class TrainingPlan(
     }
 }
 
-fun determineFirstTrainingPlan(client: Client, passedHours: Int? = null): TrainingPlan {
-    val month = if (LocalDate.now().dayOfMonth < 30)
-        LocalDate.now().monthValue
-    else
-        calculateNextMonth(LocalDate.now().monthValue)
-    val hours = passedHours ?: determineNextHours(client)
-    return TrainingPlan(month = month, hours = hours, week = 0)
-}
-
 fun determineNextTrainingPlan(client: Client): TrainingPlan? {
     if (client.weeksPassed == 4)
         return null
