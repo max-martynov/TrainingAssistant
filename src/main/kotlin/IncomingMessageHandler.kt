@@ -293,7 +293,7 @@ fun isOurProduct(attachment: String): Boolean {
     return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
             Json {
                 ignoreUnknownKeys = true
-            }.decodeFromString<MarketAttachment>(attachment).market.category.id == 803
+            }.decodeFromString<MarketAttachment>(attachment).market.category.id == productId
 }
 
 suspend fun sendPlan(client: Client) {
