@@ -317,7 +317,7 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
     )
 }
 
-suspend fun requestPaymentToStart(peerId: Int, toGroup: Int = 205462754, amount: Int = 500) {
+suspend fun requestPaymentToStart(peerId: Int, toGroup: Int = groupId, amount: Int = 500) {
     val phrases = listOf(
         "Отличный выбор!\nЧтобы увидеть план и начать тренироваться, оплатите месячную подписку.",
         "Хороший выбор!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",

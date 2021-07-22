@@ -41,7 +41,7 @@ suspend fun checkState(client: Client) {
     }
 }
 
-suspend fun requestPaymentToContinue(peerId: Int, toGroup: Int = 205462754, amount: Int = 500) {
+suspend fun requestPaymentToContinue(peerId: Int, toGroup: Int = groupId, amount: Int = 500) {
     val phrases = listOf(
         "К сожалению, месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс.",
         "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
