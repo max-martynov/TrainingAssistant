@@ -37,7 +37,7 @@ fun Application.routing() {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
                     //println(notification)
-                    //call.respondText("ok")
+                    call.respondText("ok")
                     val type = getType(notification)
                     if (type == "message_new") {
                         handleIncomingMessage(notification)

@@ -113,7 +113,12 @@ suspend fun handleIncomingMessage(
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
 
-    val client = clientsRepository.findById(clientId)
+    sendMessage(
+        clientId,
+        "Привет!"
+    )
+
+    /*val client = clientsRepository.findById(clientId)
 
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
         clientsRepository.add(
@@ -277,7 +282,7 @@ suspend fun handleIncomingMessage(
                 }
             }
         }
-    }
+    }*/
 }
 
 fun isOurProduct(attachment: String): Boolean {
