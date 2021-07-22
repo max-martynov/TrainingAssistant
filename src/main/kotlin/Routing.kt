@@ -37,14 +37,14 @@ fun Application.routing() {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
                     //println(notification)
-                    call.respondText("ok")
+                    //call.respondText("ok")
                     val type = getType(notification)
                     if (type == "message_new") {
                         handleIncomingMessage(notification)
                     } else if (type == "vkpay_transaction") {
                         receivePayment(notification)
                     } else if (type == "confirmation") {
-                        val responseString = "1b2c3e8a" // Warning! May change after some time
+                        val responseString = "be0eac70" // Warning! May change after some time
                         call.respondText(responseString)
                     }
                 }
