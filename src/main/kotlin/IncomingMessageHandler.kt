@@ -43,13 +43,26 @@ suspend fun receivePayment(notification: String) {
     val fromId = paymentInfo.fromId
     val amount = paymentInfo.amount
     val client = clientsRepository.findById(fromId) ?: return
-    if (amount == 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
-
-        if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for clients after trial and those who completed month too fast
-            val phrases = listOf(
-                "Подписка успешно оформлена! Впереди месяц разнообразных тренировок.",
-                "Подписка успешно омормлена! Надеюсь, Вам понравятся тренировки в этом месяце."
+    if (amount == paymentAmount * 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
+        val phrases = listOf(
+            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
+            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
+        )
+        if (client.trial) { // for clients after trial
+            clientsRepository.update(
+                fromId,
+                newTrial = false,
+                newStatus = Status.WAITING_FOR_START,
+                newWeeksPassed = 0,
+                newDaysPassed = 0
             )
+            sendMessage(
+                fromId,
+                "Подписка успешно оформлена! Спасибо, что решили продолжить тренировки по подписке.\n" +
+                        "Нажмите \"Начать цикл\", чтобы получить план и начать следующий цикл."
+            )
+        }
+        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
             clientsRepository.update(
                 fromId,
                 newWeeksPassed = 0,
@@ -67,11 +80,7 @@ suspend fun receivePayment(notification: String) {
                 phrases.random()
             )
         }
-        else { // not new, just notify that subscription is fine
-            val phrases = listOf(
-                "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
-                "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
-            )
+        else { // for usual clients
             sendMessage(
                 client.id,
                 phrases.random()
@@ -127,7 +136,7 @@ suspend fun handleIncomingMessage(
                 } else {
                     sendMessage(
                         clientId,
-                        "Если вы готовы начать, жмите на \"Старт!\""
+                        "Если вы готовы начать, жмите \"Старт!\""
                     )
                 }
             }
@@ -234,8 +243,9 @@ suspend fun handleIncomingMessage(
                             if (client.trial) {
                                 clientsRepository.update(
                                     clientId,
-                                    newTrial = false,
-                                    newStatus = Status.WAITING_FOR_PAYMENT
+                                    newStatus = Status.WAITING_FOR_PAYMENT,
+                                    newTrainingPlan = determineNextTrainingPlan(client),
+                                    newInterviewResults = mutableListOf()
                                 )
                                 requestPaymentToStart(clientId)
                             }
@@ -269,7 +279,7 @@ suspend fun handleIncomingMessage(
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
                     receivePayment(
-                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
+                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":${paymentAmount*1000},\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
                     )
                 } else if (text != "") {
                     sendMessage(
@@ -328,8 +338,8 @@ suspend fun sendSelectTrainingPlan(peerId: Int) {
 suspend fun sendTrialMessage(peerId: Int) {
     sendMessage(
         peerId,
-        "Хорошие новости! Специально для Вас пробная неделя в подарок 🎁\nНажмите \"Начать цикл\", чтобы получить план и начать недельный цикл. " +
-                "После прохождения плана нажмите \"Закончить цикл\" и пройдите опрос. Надеемся, Вам понравится тренировочный процесс, и Вы продолжите тренировки!"
+        "Хорошие новости! Чтобы Вы попробовали обновленные тренировки по подписке, не рискую своими деньгами, первая неделя у нас в подарок 🎁\n" +
+                "Нажмите \"Начать цикл\", чтобы получить план и начать недельный цикл."
     )
 }
 
@@ -355,14 +365,9 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
 }
 
 suspend fun requestPaymentToStart(peerId: Int) {
-    val phrases = listOf(
-        "Опрос завершен!\nДля продолжения тренировочного процесса, оплатите месячную подписку.",
-        "Опрос завершен!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",
-        "Превосходно!\nВсе, что Вам осталось, это оплатить месячную подписку."
-    )
     sendMessage(
         peerId,
-        phrases.random(),
+        "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!",
         keyboard = paymentKeyboard
     )
 }
