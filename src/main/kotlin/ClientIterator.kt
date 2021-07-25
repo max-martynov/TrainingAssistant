@@ -1,3 +1,4 @@
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -12,19 +13,17 @@ fun iterateOverClients(
 ) = runBlocking {
     var nextCheckTime = checkTime
     var cnt = 0L
+    var jobs: List<Job>
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
         println(clientsRepository.getAll().size)
-        val jobs = clientsRepository.getAll().map {
+        jobs = clientsRepository.getAll().map {
             launch {
                 checkState(it)
             }
         }
         jobs.forEach { it.join() }
-        /*clientsRepository.getAll().forEach {
-            checkState(it)
-        }*/
         nextCheckTime += period
     }
 }
