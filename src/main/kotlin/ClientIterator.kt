@@ -1,22 +1,30 @@
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.h2.util.DateTimeUtils.getDayOfWeek
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
-suspend fun iterateOverClients(
+fun iterateOverClients(
     checkTime: LocalTime = LocalTime.of(18, 0),
     period: Duration = Duration.ofDays(1)
-) {
+) = runBlocking {
     var nextCheckTime = checkTime
     var cnt = 0L
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
         println(clientsRepository.getAll().size)
-        clientsRepository.getAll().forEach {
-            checkState(it)
+        val jobs = clientsRepository.getAll().map {
+            launch {
+                checkState(it)
+            }
         }
+        jobs.forEach { it.join() }
+        /*clientsRepository.getAll().forEach {
+            checkState(it)
+        }*/
         nextCheckTime += period
     }
 }
