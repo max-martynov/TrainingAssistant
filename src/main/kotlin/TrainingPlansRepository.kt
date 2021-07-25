@@ -94,12 +94,11 @@ data class TrainingPlan(
 fun determineNextTrainingPlan(client: Client): TrainingPlan? {
     if (client.weeksPassed == 4)
         return null
-    val week = (client.trainingPlan.week + 1) % 4
-    val month = if (week != 0)
+    val month = if (client.trainingPlan.week != 4)
         client.trainingPlan.month
     else
         calculateNextMonth(client.trainingPlan.month)
-    //LocalDate.now().monthValue
+    val week = calculateNextWeek(client.trainingPlan.week)
     return TrainingPlan(month, determineNextHours(client), week)
 }
 
@@ -131,6 +130,9 @@ fun determineNextHours(client: Client): Int =
         }
         else -> -1
     }
+
+fun calculateNextWeek(currentWeek: Int): Int =
+    maxOf(1, (currentWeek + 1) % 5)
 
 fun calculateNextMonth(currentMonth: Int): Int =
     maxOf(1, (currentMonth + 1) % 13)

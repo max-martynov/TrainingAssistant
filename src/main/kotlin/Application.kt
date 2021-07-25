@@ -10,6 +10,7 @@ const val accessToken = "8d8088feeb18744bc2e5a7ed11067faf9cf495fce1c99c6c430e59b
 const val productId = 8 // 803 for Fake Community
 const val groupId = 136349636 // 205462754 for Fake Community
 const val paymentAmount = 1
+const val startFromAugust = true
 
 
 @OptIn(ObsoleteCoroutinesApi::class)

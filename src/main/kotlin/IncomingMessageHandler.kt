@@ -145,7 +145,11 @@ suspend fun handleIncomingMessage(
                     clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_START,
-                        newTrainingPlan = TrainingPlan(LocalDate.now().monthValue, if (text == "6 часов") 6 else 10, 0)
+                        newTrainingPlan = TrainingPlan(
+                            if (startFromAugust) 8 else LocalDate.now().monthValue,
+                            if (text == "6 часов") 6 else 10,
+                            0
+                        )
                     )
                     sendTrialMessage(clientId)
                 } else {
@@ -244,7 +248,7 @@ suspend fun handleIncomingMessage(
                                 clientsRepository.update(
                                     clientId,
                                     newStatus = Status.WAITING_FOR_PAYMENT,
-                                    newTrainingPlan = determineNextTrainingPlan(client),
+                                    newTrainingPlan = nextTrainingPlan,
                                     newInterviewResults = mutableListOf()
                                 )
                                 requestPaymentToStart(clientId)
