@@ -21,6 +21,7 @@ enum class Status {
 
 data class Client(
     val id: Int,
+    var trial: Boolean = true,
     var status: Status = Status.WAITING_FOR_PLAN,
     var previousStatus: Status = status,
     var daysPassed: Int = -1,

@@ -44,22 +44,12 @@ suspend fun receivePayment(notification: String) {
     val amount = paymentInfo.amount
     val client = clientsRepository.findById(fromId) ?: return
     if (amount == 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
-        val phrases = listOf(
-            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
-            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
-        )
-        if (client.isNew()) { // brand new client
-            sendMessage(
-                client.id,
-                "Подписка успешно оформлена! Для того, чтобы получить план и начать недельный цикл, нажмите \"Начать цикл\"."
+
+        if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for clients after trial and those who completed month too fast
+            val phrases = listOf(
+                "Подписка успешно оформлена! Впереди месяц разнообразных тренировок.",
+                "Подписка успешно омормлена! Надеюсь, Вам понравятся тренировки в этом месяце."
             )
-            clientsRepository.update(
-                fromId,
-                newStatus = Status.WAITING_FOR_START,
-                newDaysPassed = 0
-            )
-        }
-        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { //
             clientsRepository.update(
                 fromId,
                 newWeeksPassed = 0,
@@ -78,6 +68,10 @@ suspend fun receivePayment(notification: String) {
             )
         }
         else { // not new, just notify that subscription is fine
+            val phrases = listOf(
+                "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
+                "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
+            )
             sendMessage(
                 client.id,
                 phrases.random()
@@ -92,9 +86,6 @@ suspend fun receivePayment(notification: String) {
     }
 }
 
-
-
-
 @Serializable
 data class MessageEvent(
     val type: String,
@@ -103,7 +94,6 @@ data class MessageEvent(
     @SerialName("group_id")
     val groupId: Long
 )
-
 
 suspend fun handleIncomingMessage(
     notification: String
@@ -145,11 +135,10 @@ suspend fun handleIncomingMessage(
                 if (text == "6 часов" || text == "10 часов") {
                     clientsRepository.update(
                         clientId,
-                        newStatus = Status.WAITING_FOR_PAYMENT,
-                        newWeeksPassed = 0,
+                        newStatus = Status.WAITING_FOR_START,
                         newTrainingPlan = TrainingPlan(LocalDate.now().monthValue, if (text == "6 часов") 6 else 10, 0)
                     )
-                    requestPaymentToStart(clientId, amount = 1)
+                    sendTrialMessage(clientId)
                 } else {
                     sendMessage(
                         clientId,
@@ -157,19 +146,7 @@ suspend fun handleIncomingMessage(
                     )
                 }
             }
-            Status.WAITING_FOR_PAYMENT -> {
-                if (text == "228") {
-                    receivePayment(
-                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
-                    )
-                } else if (text != "") {
-                    sendMessage(
-                        clientId,
-                        "Оплатите, пожалуйста, подписку."
-                    )
-                }
-            }
-            Status.WAITING_FOR_START -> {
+            Status.WAITING_FOR_START  -> {
                 if (text == "Начать цикл") {
                     clientsRepository.update(
                         clientId,
@@ -193,7 +170,10 @@ suspend fun handleIncomingMessage(
                     )
                     sendMessage(
                         clientId,
-                        phrases.random()
+                        if (client.trial)
+                            "Поздравляю с окончанием пробной недели!\nДля формирования следующего плана, пройдите, пожалуйста, небольшой опрос."
+                        else
+                            phrases.random()
                     )
                     clientsRepository.update(
                         clientId,
@@ -251,22 +231,32 @@ suspend fun handleIncomingMessage(
                             )
                         }
                         else {
-                            clientsRepository.update(
-                                clientId,
-                                newStatus = Status.WAITING_FOR_START,
-                                newTrainingPlan = nextTrainingPlan,
-                                newInterviewResults = mutableListOf()
-                            )
-                            val phrases = listOf(
-                                "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план.\n" +
-                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\".",
-                                "Опрос подошел к концу. Спасибо за Ваши ответы! На основании них для Вас был подобран уникальный тренировочный план.\n" +
-                                        "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
-                            )
-                            sendMessage(
-                                clientId,
-                                phrases.random()
-                            )
+                            if (client.trial) {
+                                clientsRepository.update(
+                                    clientId,
+                                    newTrial = false,
+                                    newStatus = Status.WAITING_FOR_PAYMENT
+                                )
+                                requestPaymentToStart(clientId)
+                            }
+                            else {
+                                clientsRepository.update(
+                                    clientId,
+                                    newStatus = Status.WAITING_FOR_START,
+                                    newTrainingPlan = nextTrainingPlan,
+                                    newInterviewResults = mutableListOf()
+                                )
+                                val phrases = listOf(
+                                    "Опрос завершен! На основании его результатов для Вас был подобран уникальный тренировочный план.\n" +
+                                            "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\".",
+                                    "Опрос подошел к концу. Спасибо за Ваши ответы! На основании них для Вас был подобран уникальный тренировочный план.\n" +
+                                            "Чтобы увидеть его и начать тренировочный процесс, нажмите \"Начать цикл\"."
+                                )
+                                sendMessage(
+                                    clientId,
+                                    phrases.random()
+                                )
+                            }
                         }
                     } else {
                         sendInterviewQuestion(
@@ -274,6 +264,18 @@ suspend fun handleIncomingMessage(
                             updatedClient.interviewResults.size
                         )
                     }
+                }
+            }
+            Status.WAITING_FOR_PAYMENT -> {
+                if (text == "228") {
+                    receivePayment(
+                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
+                    )
+                } else if (text != "") {
+                    sendMessage(
+                        clientId,
+                        "Оплатите, пожалуйста, подписку."
+                    )
                 }
             }
         }
@@ -294,6 +296,41 @@ fun isOurProduct(attachment: String): Boolean {
             Json {
                 ignoreUnknownKeys = true
             }.decodeFromString<MarketAttachment>(attachment).market.category.id == productId
+}
+
+suspend fun sendGreetings(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
+                "Если у Вас есть вопросы о том, как тут все работает, жмите на \"Краткое руководство\". " +
+                "Специально для Вас мы написали подробную статью, чтобы процесс взаимодействия с чат-ботом был простым и удобным 👍\n" +
+                "Если же вы все поняли и готовы начинать, жмите \"Старт!\".",
+        keyboard = pressStartKeyboard
+    )
+}
+
+suspend fun sendMainKeyboard(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
+        keyboard = mainKeyboard
+    )
+}
+
+suspend fun sendSelectTrainingPlan(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Сколько часов в неделю у Вас есть возможность тренироваться?",
+        keyboard = selectHoursKeyboard
+    )
+}
+
+suspend fun sendTrialMessage(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Хорошие новости! Специально для Вас пробная неделя в подарок 🎁\nНажмите \"Начать цикл\", чтобы получить план и начать недельный цикл. " +
+                "После прохождения плана нажмите \"Закончить цикл\" и пройдите опрос. Надеемся, Вам понравится тренировочный процесс, и Вы продолжите тренировки!"
+    )
 }
 
 suspend fun sendPlan(client: Client) {
@@ -317,143 +354,16 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
     )
 }
 
-suspend fun requestPaymentToStart(peerId: Int, toGroup: Int = groupId, amount: Int = 500) {
+suspend fun requestPaymentToStart(peerId: Int) {
     val phrases = listOf(
-        "Отличный выбор!\nЧтобы увидеть план и начать тренироваться, оплатите месячную подписку.",
-        "Хороший выбор!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",
+        "Опрос завершен!\nДля продолжения тренировочного процесса, оплатите месячную подписку.",
+        "Опрос завершен!\nОсталось только оплатить месячную подписку и Вы можете приступать к тренировкам.",
         "Превосходно!\nВсе, что Вам осталось, это оплатить месячную подписку."
     )
     sendMessage(
         peerId,
         phrases.random(),
-        keyboard = """
-            {
-                "one_time": false,
-                "buttons": [
-                    [
-                        {
-                            "action":{ 
-                                "type":"vkpay", 
-                                "hash":"action=pay-to-group&group_id=$toGroup&amount=$amount&aid=7889001" 
-                             } 
-                        }
-                    ]
-                ],
-                "inline": true
-            }
-        """.trimIndent()
-    )
-}
-
-suspend fun sendGreetings(peerId: Int) {
-    sendMessage(
-        peerId,
-        "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
-                "Если у Вас есть вопросы о том, как тут все работает, жмите на \"Краткое руководство\". " +
-                "Специально для Вас мы написали подробную статью, чтобы процесс взаимодействия с чат-ботом был простым и удобным 👍\n" +
-                "Если же вы все поняли и готовы начинать, жмите на \"Старт!\".",
-        keyboard = """
-            {
-                "one_time":false,
-                "buttons":[
-                     [
-                        {
-                            "action":{
-                                "type":"open_link",
-                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
-                                "label":"Краткое руководство"
-                            }
-                        }, {
-                            "action":{
-                                "type":"text",
-                                "label":"Старт!"
-                            },
-                            "color":"primary"
-                        }
-                     ]
-                ],
-                "inline": false
-            }
-        """.trimIndent()
-    )
-}
-
-suspend fun sendMainKeyboard(peerId: Int) {
-    sendMessage(
-        peerId,
-        "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
-       keyboard = """
-            {
-                "one_time":false,
-                "buttons":[
-                     [
-                        {
-                            "action":{
-                                "type":"open_link",
-                                "link":"https://vk.me/tuchin_a_95",
-                                "label":"Обратная связь"
-                            }
-                        } 
-                     ], [
-                        {
-                            "action":{
-                                "type":"open_link",
-                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
-                                "label":"Краткое руководство"
-                            }
-                        }
-                     ], [   
-                        {
-                            "action":{
-                                "type":"text",
-                                "label":"Начать цикл"
-                            },
-                            "color":"primary"
-                        }, 
-                        {
-                            "action":{
-                                "type":"text",
-                                "label":"Закончить цикл"
-                            },
-                            "color":"primary"
-                        }
-                    ]
-                ],
-                "inline": false
-            }
-        """.trimIndent()
-    )
-}
-
-suspend fun sendSelectTrainingPlan(peerId: Int) {
-    sendMessage(
-        peerId,
-        "Сколько часов в неделю у Вас есть возможность тренироваться?",
-        keyboard = """
-        {
-            "one_time": false, 
-            "buttons":
-            [ 
-                [ 
-                    { 
-                        "action":{ 
-                            "type":"text", 
-                            "label":"6 часов"
-                        },
-                        "color":"primary"
-                    },
-                    { 
-                        "action":{ 
-                            "type":"text", 
-                            "label":"10 часов"
-                        },
-                        "color":"primary"
-                    }
-                ]
-            ],
-            "inline":true
-        }
-    """.trimIndent()
+        keyboard = paymentKeyboard
     )
 }
 

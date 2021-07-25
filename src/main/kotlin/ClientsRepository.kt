@@ -12,6 +12,7 @@ interface ClientsRepository {
     suspend fun getAll(): List<Client>
     suspend fun update(
         id: Int,
+        newTrial: Boolean? = null,
         newStatus: Status? = null,
         newDaysPassed: Int? = null,
         newWeeksPassed: Int? = null,
@@ -37,6 +38,7 @@ class InMemoryClientsRepository : ClientsRepository {
 
     override suspend fun update(
         id: Int,
+        newTrial: Boolean?,
         newStatus: Status?,
         newDaysPassed: Int?,
         newWeeksPassed: Int?,
@@ -45,6 +47,8 @@ class InMemoryClientsRepository : ClientsRepository {
     ) {
         val client = findById(id) ?: return
         clients.remove(client)
+        if (newTrial != null)
+            client.trial = newTrial
         if (newStatus != null) {
             client.previousStatus = client.status
             client.status = newStatus
@@ -86,6 +90,7 @@ class InDataBaseClientsRepository(
                     if (findById(client.id) == null) {
                         Clients.insert {
                             it[id] = client.id
+                            it[trial] = client.trial
                             it[status] = client.status.toString()
                             it[previousStatus] = client.previousStatus.toString()
                             it[daysPassed] = client.daysPassed
@@ -117,6 +122,7 @@ class InDataBaseClientsRepository(
     private fun convertClientToDataClass(client: ResultRow): Client {
         return Client(
             id = client[Clients.id],
+            trial = client[Clients.trial],
             status = Status.valueOf(client[Clients.status]),
             previousStatus = Status.valueOf(client[Clients.previousStatus]),
             daysPassed = client[Clients.daysPassed],
@@ -136,6 +142,7 @@ class InDataBaseClientsRepository(
 
     override suspend fun update(
         id: Int,
+        newTrial: Boolean?,
         newStatus: Status?,
         newDaysPassed: Int?,
         newWeeksPassed: Int?,
@@ -144,6 +151,8 @@ class InDataBaseClientsRepository(
     ) {
         transaction {
             Clients.update({ Clients.id eq id }) {
+                if (newTrial != null)
+                    it[trial] = newTrial
                 if (newStatus != null) {
                     it[previousStatus] = Clients.status
                     it[status] = newStatus.toString()
@@ -170,6 +179,7 @@ class InDataBaseClientsRepository(
 
 object Clients : Table() {
     val id = integer("id")
+    val trial = bool("trial")
     val status = varchar("status", 20)
     val previousStatus = varchar("previous_status", 20)
     val daysPassed = integer("days_passed")

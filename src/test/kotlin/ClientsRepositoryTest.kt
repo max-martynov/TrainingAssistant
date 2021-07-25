@@ -4,11 +4,13 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClientsRepositoryTest {
 
     private val clientsRepository = InDataBaseClientsRepository()
+    //private val clientsRepository = InMemoryClientsRepository()
 
     private val clients = listOf(
         Client(id = 0),
@@ -18,6 +20,7 @@ class ClientsRepositoryTest {
         ),
         Client(
             id = 2,
+            trial = true,
             status = Status.WAITING_FOR_PAYMENT,
             daysPassed = 20,
             weeksPassed = 2,
@@ -70,11 +73,13 @@ class ClientsRepositoryTest {
 
         clientsRepository.update(
             id = 1,
+            newTrial = false,
             newDaysPassed = 31,
             newWeeksPassed = 3,
             newInterviewResults = mutableListOf(0, 1),
             newTrainingPlan = TrainingPlan(10, 11, 12)
         )
+        assertEquals(false, clientsRepository.findById(1)?.trial)
         assertEquals(31, clientsRepository.findById(1)?.daysPassed)
         assertEquals(3, clientsRepository.findById(1)?.weeksPassed)
         assertEquals(mutableListOf(0, 1), clientsRepository.findById(1)?.interviewResults)
