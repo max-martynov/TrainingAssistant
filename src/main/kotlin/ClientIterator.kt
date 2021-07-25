@@ -14,6 +14,9 @@ fun iterateOverClients(
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
+        val t = Thread.getAllStackTraces().keys
+        println(t.size)
+        println(t.joinToString(" "))
         //println(clientsRepository.getAll().size)
         clientsRepository.getAll().forEach {
             checkState(it)
