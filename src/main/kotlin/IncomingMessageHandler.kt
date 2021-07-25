@@ -160,7 +160,7 @@ suspend fun handleIncomingMessage(
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
                     receivePayment(
-                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":217619042,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
+                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":1000,\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
                     )
                 } else if (text != "") {
                     sendMessage(
@@ -348,7 +348,7 @@ suspend fun requestPaymentToStart(peerId: Int, toGroup: Int = groupId, amount: I
 suspend fun sendGreetings(peerId: Int) {
     sendMessage(
         peerId,
-        "Здравствуйте!\nСпасибо, что решили попробовать обновленные тренировки по подписке 🤖\n" +
+        "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
                 "Если у Вас есть вопросы о том, как тут все работает, жмите на \"Краткое руководство\". " +
                 "Специально для Вас мы написали подробную статью, чтобы процесс взаимодействия с чат-ботом был простым и удобным 👍\n" +
                 "Если же вы все поняли и готовы начинать, жмите на \"Старт!\".",
@@ -499,5 +499,10 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
 "payload": "{\"button\": \"1\"}",
 "hash": "action=pay-to-user&amount=5&description=aaaa&user_id=15733972&aid=7889001"
 }
+ *
+ *  - Пробная неделя
+ *  - Добавить постоянную кнопку промокоды
+ *  - 29 июля
+ *
  *
  */
