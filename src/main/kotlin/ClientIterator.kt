@@ -1,7 +1,4 @@
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.h2.util.DateTimeUtils.getDayOfWeek
 import java.time.*
 import java.time.temporal.ChronoUnit
@@ -17,27 +14,32 @@ fun iterateOverClients(
 
     while (true) {
         delay(calculateDifference(nextCheckTime))
-        println(clientsRepository.getAll().size)
-        jobs = clientsRepository.getAll().map {
+        //println(clientsRepository.getAll().size)
+        clientsRepository.getAll().forEach {
+            checkState(it)
+        }
+        /*jobs = clientsRepository.getAll().map {
             launch {
                 checkState(it)
             }
         }
-        jobs.forEach { it.join() }
+        jobs.forEach { it.join() }*/
         nextCheckTime += period
     }
 }
 
-suspend fun checkState(client: Client) {
-    println("${LocalTime.now()}  ${client.status}  ${client.daysPassed}")
+suspend fun checkState(client: Client) = withContext(Dispatchers.Default) {
+    //println("${LocalTime.now()}  ${client.status}  ${client.daysPassed}")
     val activeStatuses = listOf(Status.ACTIVE, Status.WAITING_FOR_START, Status.WAITING_FOR_RESULTS)
     if (activeStatuses.contains(client.status) && !client.trial) {
         if (client.daysPassed == 29) {
-            clientsRepository.update(
-                client.id,
-                newStatus = Status.WAITING_FOR_PAYMENT
-            )
-            requestPaymentToContinue(client.id)
+            GlobalScope.launch {
+                clientsRepository.update(
+                    client.id,
+                    newStatus = Status.WAITING_FOR_PAYMENT
+                )
+                requestPaymentToContinue(client.id)
+            }
         }
         else {
             clientsRepository.update(
