@@ -20,7 +20,9 @@ fun iterateOverClients(
         //clients = clientsRepository.getAll()
         //println(t.joinToString(" "))
         //println(clientsRepository.getAll().size)
-        clientsRepository.getAll().forEach {
+        val clients = clientsRepository.getAll()
+        println(clients)
+        clients.forEach {
             launch {
                 checkState(it)
             }
