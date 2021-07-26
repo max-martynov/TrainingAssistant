@@ -99,22 +99,17 @@ suspend fun receivePayment(notification: String) {
     }
 }
 
-@Serializable
-data class MessageEvent(
-    val type: String,
-    @SerialName("object")
-    val message: IncomingMessage,
-    @SerialName("group_id")
-    val groupId: Long
-)
 
 suspend fun handleIncomingMessage(
-    notification: String
+    messageEvent: MessageEvent
 ) = withContext(Dispatchers.Default) {
-    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
+    //val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
+
+    //println(clientId)
+    //println(text)
 
     val client = clientsRepository.findById(clientId)
 

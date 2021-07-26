@@ -22,17 +22,12 @@ fun iterateOverClients(
         //println(clientsRepository.getAll().size)
         val clients = clientsRepository.getAll()
         println(clients)
-        clients.forEach {
+        val jobs = clients.map {
             launch {
                 checkState(it)
             }
         }
-        /*jobs = clientsRepository.getAll().map {
-            launch {
-                checkState(it)
-            }
-        }
-        jobs.forEach { it.join() }*/
+        jobs.forEach { it.join() }
         nextCheckTime += period
     }
 }
@@ -47,7 +42,6 @@ suspend fun checkState(client: Client) {
                 newStatus = Status.WAITING_FOR_PAYMENT
             )
             requestPaymentToContinue(client.id)
-
         } else {
             clientsRepository.update(
                 client.id,

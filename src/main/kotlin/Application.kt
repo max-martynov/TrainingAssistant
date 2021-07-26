@@ -3,6 +3,7 @@ import io.ktor.features.*
 import io.ktor.serialization.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.repackaged.net.bytebuddy.build.Plugin
+import kotlinx.serialization.json.Json
 import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.LocalTime
@@ -34,7 +35,10 @@ fun Application.module(testing: Boolean = false) {
     clientsRepository.clear()
 
     install(ContentNegotiation) {
-        json()
+        json(Json {
+            ignoreUnknownKeys = true
+        })
+
     }
 
     routing()
