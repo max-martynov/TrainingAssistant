@@ -4,13 +4,15 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 
 interface ClientsRepository {
-    suspend fun add(client: Client)
-    suspend fun findById(clientId: Int): Client?
-    suspend fun getAll(): List<Client>
-    suspend fun update(
+    fun add(client: Client)
+    fun findById(clientId: Int): Client?
+    fun getAll(): List<Client>
+    fun update(
         id: Int,
         newTrial: Boolean? = null,
         newStatus: Status? = null,
@@ -19,24 +21,36 @@ interface ClientsRepository {
         newTrainingPlan: TrainingPlan? = null,
         newInterviewResults: MutableList<Int>? = null
     )
+
     fun clear()
 }
 
 class InMemoryClientsRepository : ClientsRepository {
-    private val clients = Collections.synchronizedList(mutableListOf<Client>())
+    private val clients = mutableListOf<Client>()//Collections.synchronizedList(mutableListOf<Client>())
 
-    override suspend fun add(client: Client) {
-        if (clients.count { it.id == client.id } == 0)
-            clients.add(client)
+    private val lock = ReentrantLock()
+
+    override fun add(client: Client) {
+        lock.withLock{
+            if (clients.count { it.id == client.id } == 0)
+                clients.add(client)
+        }
     }
 
-    override suspend fun findById(clientId: Int): Client? =
-        clients.find { it -> it.id == clientId }
+    override fun findById(clientId: Int): Client? {
+        lock.withLock {
+            return clients.find { it.id == clientId }
+        }
+    }
 
-    override suspend fun getAll(): List<Client> =
-        clients.toList()
+    override fun getAll(): List<Client> {
+        lock.withLock {
+            return clients.toList()
+        }
+    }
 
-    override suspend fun update(
+
+    override fun update(
         id: Int,
         newTrial: Boolean?,
         newStatus: Status?,
@@ -45,23 +59,25 @@ class InMemoryClientsRepository : ClientsRepository {
         newTrainingPlan: TrainingPlan?,
         newInterviewResults: MutableList<Int>?
     ) {
-        val client = findById(id) ?: return
-        clients.remove(client)
-        if (newTrial != null)
-            client.trial = newTrial
-        if (newStatus != null) {
-            client.previousStatus = client.status
-            client.status = newStatus
+        lock.withLock {
+            val client = findById(id) ?: return
+            clients.remove(client)
+            if (newTrial != null)
+                client.trial = newTrial
+            if (newStatus != null) {
+                client.previousStatus = client.status
+                client.status = newStatus
+            }
+            if (newDaysPassed != null)
+                client.daysPassed = newDaysPassed
+            if (newWeeksPassed != null)
+                client.weeksPassed = newWeeksPassed
+            if (newTrainingPlan != null)
+                client.trainingPlan = newTrainingPlan
+            if (newInterviewResults != null)
+                client.interviewResults = newInterviewResults
+            clients.add(client)
         }
-        if (newDaysPassed != null)
-            client.daysPassed = newDaysPassed
-        if (newWeeksPassed != null)
-            client.weeksPassed = newWeeksPassed
-        if (newTrainingPlan != null)
-            client.trainingPlan = newTrainingPlan
-        if (newInterviewResults != null)
-            client.interviewResults = newInterviewResults
-        clients.add(client)
     }
 
     override fun clear() {
@@ -83,30 +99,26 @@ class InDataBaseClientsRepository(
         }
     }
 
-    override suspend fun add(client: Client) {
-        coroutineScope {
-            transaction {
-                runBlocking {
-                    if (findById(client.id) == null) {
-                        Clients.insert {
-                            it[id] = client.id
-                            it[trial] = client.trial
-                            it[status] = client.status.toString()
-                            it[previousStatus] = client.previousStatus.toString()
-                            it[daysPassed] = client.daysPassed
-                            it[weeksPassed] = client.weeksPassed
-                            it[trainingPlanMonth] = client.trainingPlan.month
-                            it[trainingPlanWeek] = client.trainingPlan.week
-                            it[trainingPlanHours] = client.trainingPlan.hours
-                            it[interviewResults] = client.interviewResults.joinToString(separator = "")
-                        }
-                    }
+    override fun add(client: Client) {
+        transaction {
+            if (findById(client.id) == null) {
+                Clients.insert {
+                    it[id] = client.id
+                    it[trial] = client.trial
+                    it[status] = client.status.toString()
+                    it[previousStatus] = client.previousStatus.toString()
+                    it[daysPassed] = client.daysPassed
+                    it[weeksPassed] = client.weeksPassed
+                    it[trainingPlanMonth] = client.trainingPlan.month
+                    it[trainingPlanWeek] = client.trainingPlan.week
+                    it[trainingPlanHours] = client.trainingPlan.hours
+                    it[interviewResults] = client.interviewResults.joinToString(separator = "")
                 }
             }
         }
     }
 
-    override suspend fun findById(clientId: Int): Client? {
+    override fun findById(clientId: Int): Client? {
         return transaction {
             val query = Clients.select { Clients.id eq clientId }
             if (query.empty())
@@ -136,11 +148,11 @@ class InDataBaseClientsRepository(
         )
     }
 
-    override suspend fun getAll(): List<Client> = transaction {
+    override fun getAll(): List<Client> = transaction {
         Clients.selectAll().map { convertClientToDataClass(it) }
     }
 
-    override suspend fun update(
+    override fun update(
         id: Int,
         newTrial: Boolean?,
         newStatus: Status?,

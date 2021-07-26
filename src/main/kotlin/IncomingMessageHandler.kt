@@ -11,12 +11,16 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import java.io.File
+import java.lang.management.ManagementFactory
 import java.time.LocalDate
 import java.util.*
 import kotlin.random.Random.Default.nextInt
@@ -106,13 +110,19 @@ data class MessageEvent(
 
 suspend fun handleIncomingMessage(
     notification: String
-) {
+) = withContext(Dispatchers.Default) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
 
     val client = clientsRepository.findById(clientId)
+
+    println(Thread.activeCount())
+
+    clientsRepository.add(
+        Client(clientId)
+    )
 
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
         clientsRepository.add(
@@ -123,7 +133,9 @@ suspend fun handleIncomingMessage(
             clientId,
             newStatus = Status.NEW_CLIENT
         )
-    } else if (client != null) {
+    }
+
+    else if (client != null) {
         when (client.status) {
             Status.NEW_CLIENT -> {
                 if (text == "Старт!") {
@@ -206,7 +218,7 @@ suspend fun handleIncomingMessage(
                         clientId,
                         "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
                     )
-                    return
+                    return@withContext
                 }
                 val answerNumber = client.interview.findAnswerNumberOnKthQuestion(text, client.interviewResults.size)
                 if (answerNumber == -1) {
