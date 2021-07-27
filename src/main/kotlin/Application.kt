@@ -24,9 +24,6 @@ const val startFromAugust = true
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
-    clientsRepository.add(Client(1))
-    println(ManagementFactory.getRuntimeMXBean().name)
-
     launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
             LocalTime.now().plusSeconds(5),
@@ -42,7 +39,6 @@ fun main(args: Array<String>): Unit = runBlocking {
 fun Application.module(testing: Boolean = false) {
 
     clientsRepository.clear()
-    println(ManagementFactory.getRuntimeMXBean().name)
 
     install(ContentNegotiation) {
         json(Json {
@@ -51,21 +47,5 @@ fun Application.module(testing: Boolean = false) {
 
     }
 
-    /*routing {
-        post("/") {
-            /*try {
-                call.receive()
-            } catch (e: Exception) {
-                println("Unknown event!")
-            }*/
-            call.respondText("ok")
-            println(Thread.activeCount())
-        }
-    }*/
     routing()
 }
-
-/**
- *
-
- */

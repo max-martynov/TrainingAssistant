@@ -13,8 +13,7 @@ fun iterateOverClients(
 
     while (true) {
         sleep(calculateDifference(nextCheckTime))
-        println(Thread.activeCount())
-        //clients = clientsRepository.getAll()
+        //println(Thread.activeCount())
         //println(t.joinToString(" "))
         //println(clientsRepository.getAll().size)
         val clients = clientsRepository.getAll()
