@@ -1,3 +1,5 @@
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -5,6 +7,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import javax.sql.DataSource
 import kotlin.concurrent.withLock
 
 
@@ -86,12 +89,20 @@ class InMemoryClientsRepository : ClientsRepository {
 }
 
 class InDataBaseClientsRepository(
-    connStr: String = "jdbc:h2:~/test",
+    connStr: String = "jdbc:h2:~/newtest",
     driver: String = "org.h2.Driver"
 ) : ClientsRepository {
 
     init {
-        Database.connect(connStr, driver)
+        val config = HikariConfig()
+        config.jdbcUrl = "jdbc:h2:~/mem_test"
+        config.username = "org.h2.Driver"
+        config.password = "aRootPassword"
+        config.driverClassName = "org.h2.Driver"
+        config.maxLifetime = 300000
+
+        Database.connect(HikariDataSource(config))
+        //Database.connect(connStr, driver)
 
         transaction {
             SchemaUtils.create(Clients)

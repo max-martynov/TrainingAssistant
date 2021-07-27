@@ -1,5 +1,4 @@
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
-import com.petersamokhin.vksdk.core.model.event.MessageNew
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.features.json.*
@@ -18,6 +17,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.serializer
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -27,22 +27,22 @@ import kotlin.random.Random.Default.nextInt
 import kotlin.random.Random.Default.nextLong
 
 
-suspend fun receivePayment(notification: String) {
-    @Serializable
-    data class Payment(
-        @SerialName("from_id")
-        val fromId: Int,
-        val amount: Int
-    )
-    @Serializable
-    data class PaymentEvent(
-        val type: String,
-        @SerialName("object")
-        val payment: Payment,
-        @SerialName("group_id")
-        val groupId: Long
-    )
+@Serializable
+data class Payment(
+    @SerialName("from_id")
+    val fromId: Int,
+    val amount: Int
+)
+@Serializable
+data class PaymentEvent(
+    val type: String,
+    @SerialName("object")
+    val payment: Payment,
+    @SerialName("group_id")
+    val groupId: Long
+)
 
+suspend fun receivePayment(notification: String) {
     val paymentInfo = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment
     val fromId = paymentInfo.fromId
     val amount = paymentInfo.amount
@@ -100,20 +100,26 @@ suspend fun receivePayment(notification: String) {
 }
 
 
+@Serializable
+data class MessageEvent(
+    val type: String,
+    @SerialName("object")
+    val message: IncomingMessage,
+    @SerialName("group_id")
+    val groupId: Long
+)
+
+
 suspend fun handleIncomingMessage(
-    messageEvent: MessageEvent
+    notification: String
 ) = withContext(Dispatchers.Default) {
-    //val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
+    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
     val clientId = messageEvent.message.fromId
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
 
-    //println(clientId)
-    //println(text)
-
     val client = clientsRepository.findById(clientId)
 
-    println(Thread.activeCount())
 
     clientsRepository.add(
         Client(clientId)
@@ -303,16 +309,16 @@ suspend fun handleIncomingMessage(
     }
 }
 
-fun isOurProduct(attachment: String): Boolean {
-    @Serializable
-    data class Attachment(val type: String)
-    @Serializable
-    data class Category(val id: Int)
-    @Serializable
-    data class Market(val category: Category)
-    @Serializable
-    data class MarketAttachment(val market: Market)
+@Serializable
+data class Attachment(val type: String)
+@Serializable
+data class Category(val id: Int)
+@Serializable
+data class Market(val category: Category)
+@Serializable
+data class MarketAttachment(val market: Market)
 
+fun isOurProduct(attachment: String): Boolean {
     return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
             Json {
                 ignoreUnknownKeys = true

@@ -10,9 +10,6 @@ fun iterateOverClients(
     period: Duration = Duration.ofDays(1)
 ) = runBlocking {
     var nextCheckTime = checkTime
-    //var cnt = 0L
-    //var jobs: List<Job>
-    //var clients: List<Client>
 
     while (true) {
         sleep(calculateDifference(nextCheckTime))
@@ -21,7 +18,6 @@ fun iterateOverClients(
         //println(t.joinToString(" "))
         //println(clientsRepository.getAll().size)
         val clients = clientsRepository.getAll()
-        println(clients)
         val jobs = clients.map {
             launch {
                 checkState(it)

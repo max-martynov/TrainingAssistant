@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm") version "1.4.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0"
+    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.20"
     application
 }
 group = "projects"
@@ -33,6 +33,8 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-serialization:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+
+    implementation("com.zaxxer:HikariCP:5.0.0")
 
     // vk sdk
     val vk_sdk_version: String by project

@@ -26,29 +26,23 @@ import java.nio.charset.Charset
 import java.time.LocalTime
 
 
-//fun getType(call: String): String =
-  //  call.substring(9, call.indexOf('"', 9))
+fun getType(call: String): String =
+    call.substring(9, call.indexOf('"', 9))
 
-@Serializable
-data class MessageEvent(
-    val type: String,
-    @SerialName("object")
-    val message: IncomingMessage,
-    @SerialName("group_id")
-    val groupId: Long
-)
+
 
 
 fun Application.routing() {
     routing {
         post("/") {
-            try {
-                handleIncomingMessage(call.receive())
+            /*try {
+                call.receive()
             } catch (e: Exception) {
                 println("Unknown event!")
             }
             call.respondText("ok")
-            /*withContext(Dispatchers.IO) {
+            println(Thread.activeCount())*/
+            withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
                     //println(notification)
@@ -63,7 +57,7 @@ fun Application.routing() {
                         call.respondText(responseString)
                     }
                 }
-            }*/
+            }
         }
     }
 }
