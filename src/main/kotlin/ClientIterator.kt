@@ -17,7 +17,7 @@ fun iterateOverClients(
         sleep(calculateDifference(nextCheckTime))
         printCurrentNumberOfThreads()
         val clients = clientsRepository.getAll()
-        println("Total number of clients: ${clients.size}")
+        println("\nTotal number of clients: ${clients.size}")
         val numberActiveClients = AtomicInteger(0)
         val jobs = clients.map {
             launch {
@@ -25,7 +25,7 @@ fun iterateOverClients(
             }
         }
         jobs.forEach { it.join() }
-        println("Number of active clients: $numberActiveClients")
+        println("Number of active clients: $numberActiveClients\n")
         nextCheckTime += period
     }
 }

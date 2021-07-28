@@ -106,7 +106,7 @@ class InDataBaseClientsRepository(
 
         transaction {
             SchemaUtils.create(Clients)
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
         }
     }
 
