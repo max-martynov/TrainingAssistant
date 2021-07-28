@@ -17,7 +17,8 @@ fun iterateOverClients(
         //println(t.joinToString(" "))
         //println(clientsRepository.getAll().size)
         val clients = clientsRepository.getAll()
-        val jobs = clients.map {
+        println(clients)
+	val jobs = clients.map {
             launch {
                 checkState(it)
             }
