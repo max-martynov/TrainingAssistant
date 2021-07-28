@@ -39,7 +39,7 @@ val mainKeyboard = """
                             "action":{
                                 "type":"open_link",
                                 "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
-                                "label":"Краткое руководство"
+                                "label":"Инструкция"
                             }
                         },
                         {
