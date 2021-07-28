@@ -1,9 +1,11 @@
 import kotlinx.coroutines.*
 import org.h2.util.DateTimeUtils.getDayOfWeek
 import java.lang.Thread.sleep
+import java.lang.management.ManagementFactory
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 fun iterateOverClients(
     checkTime: LocalTime = LocalTime.of(18, 0),
@@ -13,26 +15,26 @@ fun iterateOverClients(
 
     while (true) {
         sleep(calculateDifference(nextCheckTime))
-        //println(Thread.activeCount())
-        //println(t.joinToString(" "))
-        //println(clientsRepository.getAll().size)
+        printCurrentNumberOfThreads()
         val clients = clientsRepository.getAll()
-        println(clients)
-	val jobs = clients.map {
+        println("Total number of clients: ${clients.size}")
+        val numberActiveClients = AtomicInteger(0)
+        val jobs = clients.map {
             launch {
-                checkState(it)
+                numberActiveClients.addAndGet(checkState(it))
             }
         }
         jobs.forEach { it.join() }
+        println("Number of active clients: $numberActiveClients")
         nextCheckTime += period
     }
 }
 
-suspend fun checkState(client: Client) {
-    //println("${LocalTime.now()}  ${client.status}  ${client.daysPassed}")
+suspend fun checkState(client: Client): Int {
+    println(client)
     val activeStatuses = listOf(Status.ACTIVE, Status.WAITING_FOR_START, Status.WAITING_FOR_RESULTS)
     if (activeStatuses.contains(client.status) && !client.trial) {
-        if (client.daysPassed == 29) {
+        if (client.daysPassed == 28) {
             clientsRepository.update(
                 client.id,
                 newStatus = Status.WAITING_FOR_PAYMENT
@@ -44,7 +46,9 @@ suspend fun checkState(client: Client) {
                 newDaysPassed = client.daysPassed + 1
             )
         }
+        return 1
     }
+    return 0
 }
 
 suspend fun requestPaymentToContinue(peerId: Int) {

@@ -35,17 +35,9 @@ fun getType(call: String): String =
 fun Application.routing() {
     routing {
         post("/") {
-            /*try {
-                call.receive()
-            } catch (e: Exception) {
-                println("Unknown event!")
-            }
-            call.respondText("ok")
-            println(Thread.activeCount())*/
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
-                    //println(notification)
                     call.respondText("ok")
                     val type = getType(notification)
                     if (type == "message_new") {

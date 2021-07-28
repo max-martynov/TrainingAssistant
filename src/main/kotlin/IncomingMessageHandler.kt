@@ -33,6 +33,7 @@ data class Payment(
     val fromId: Int,
     val amount: Int
 )
+
 @Serializable
 data class PaymentEvent(
     val type: String,
@@ -65,8 +66,7 @@ suspend fun receivePayment(notification: String) {
                 "Подписка успешно оформлена! Спасибо, что решили продолжить тренировки по подписке.\n" +
                         "Нажмите \"Начать цикл\", чтобы получить план и начать следующий цикл."
             )
-        }
-        else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
+        } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
             clientsRepository.update(
                 fromId,
                 newWeeksPassed = 0,
@@ -83,8 +83,7 @@ suspend fun receivePayment(notification: String) {
                 fromId,
                 phrases.random()
             )
-        }
-        else { // for usual clients
+        } else { // for usual clients
             sendMessage(
                 client.id,
                 phrases.random()
@@ -118,8 +117,9 @@ suspend fun handleIncomingMessage(
     val text = messageEvent.message.text
     val attachments = messageEvent.message.attachments
 
-    val client = clientsRepository.findById(clientId)
+    printCurrentNumberOfThreads()
 
+    val client = clientsRepository.findById(clientId)
 
     clientsRepository.add(
         Client(clientId)
@@ -134,9 +134,7 @@ suspend fun handleIncomingMessage(
             clientId,
             newStatus = Status.NEW_CLIENT
         )
-    }
-
-    else if (client != null) {
+    } else if (client != null) {
         when (client.status) {
             Status.NEW_CLIENT -> {
                 if (text == "Старт!") {
@@ -172,7 +170,7 @@ suspend fun handleIncomingMessage(
                     )
                 }
             }
-            Status.WAITING_FOR_START  -> {
+            Status.WAITING_FOR_START -> {
                 if (text == "Начать цикл") {
                     clientsRepository.update(
                         clientId,
@@ -233,14 +231,12 @@ suspend fun handleIncomingMessage(
                             clientId,
                             newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
                         )
-                    }
-                    else if (client.interview.interviewQuestions.size == 3 && client.interviewResults.size == 1 && answerNumber == 1) {
+                    } else if (client.interview.interviewQuestions.size == 3 && client.interviewResults.size == 1 && answerNumber == 1) {
                         clientsRepository.update(
                             clientId,
                             newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
                         )
-                    }
-                    else {
+                    } else {
                         clientsRepository.update(
                             clientId,
                             newInterviewResults = (client.interviewResults + answerNumber).toMutableList()
@@ -255,8 +251,7 @@ suspend fun handleIncomingMessage(
                                 "Опрос заверешен! К сожалению, в данный момент Вы не можете начать цикл, так как за месяц можно получить только 4 плана. " +
                                         "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
                             )
-                        }
-                        else {
+                        } else {
                             if (client.trial) {
                                 clientsRepository.update(
                                     clientId,
@@ -265,8 +260,7 @@ suspend fun handleIncomingMessage(
                                     newInterviewResults = mutableListOf()
                                 )
                                 requestPaymentToStart(clientId)
-                            }
-                            else {
+                            } else {
                                 clientsRepository.update(
                                     clientId,
                                     newStatus = Status.WAITING_FOR_START,
@@ -296,7 +290,7 @@ suspend fun handleIncomingMessage(
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
                     receivePayment(
-                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":${paymentAmount*1000},\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
+                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":${paymentAmount * 1000},\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
                     )
                 } else if (text != "") {
                     sendMessage(
@@ -309,12 +303,19 @@ suspend fun handleIncomingMessage(
     }
 }
 
+fun printCurrentNumberOfThreads() {
+    println("Current number of threads: ${ManagementFactory.getThreadMXBean().threadCount}")
+}
+
 @Serializable
 data class Attachment(val type: String)
+
 @Serializable
 data class Category(val id: Int)
+
 @Serializable
 data class Market(val category: Category)
+
 @Serializable
 data class MarketAttachment(val market: Market)
 
@@ -366,9 +367,13 @@ suspend fun sendPlan(client: Client) {
         "Хороших тренировок!",
         "Удачных тренировок!"
     )
+    val phrase = if (client.trainingPlan.hours == 1)
+                    "Хорошего восстановления!"
+                else
+                    phrases.random()
     sendMessage(
         client.id,
-        phrases.random(),
+        phrase,
         attachment = "doc${ids.first}_${ids.second}"
     )
 }

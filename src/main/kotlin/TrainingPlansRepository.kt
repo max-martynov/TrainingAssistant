@@ -100,6 +100,8 @@ fun determineNextTrainingPlan(client: Client): TrainingPlan? {
         return null
     val month = if (client.trainingPlan.week != 4)
         client.trainingPlan.month
+    else if (client.trainingPlan.month != LocalDate.now().monthValue)
+        LocalDate.now().monthValue
     else
         calculateNextMonth(client.trainingPlan.month)
     val week = calculateNextWeek(client.trainingPlan.week)
