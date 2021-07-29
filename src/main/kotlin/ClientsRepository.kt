@@ -22,7 +22,8 @@ interface ClientsRepository {
         newDaysPassed: Int? = null,
         newWeeksPassed: Int? = null,
         newTrainingPlan: TrainingPlan? = null,
-        newInterviewResults: MutableList<Int>? = null
+        newInterviewResults: MutableList<Int>? = null,
+        newBillId: String? = null
     )
 
     fun clear()
@@ -60,7 +61,8 @@ class InMemoryClientsRepository : ClientsRepository {
         newDaysPassed: Int?,
         newWeeksPassed: Int?,
         newTrainingPlan: TrainingPlan?,
-        newInterviewResults: MutableList<Int>?
+        newInterviewResults: MutableList<Int>?,
+        newBillId: String?
     ) {
         lock.withLock {
             val client = findById(id) ?: return
@@ -79,6 +81,8 @@ class InMemoryClientsRepository : ClientsRepository {
                 client.trainingPlan = newTrainingPlan
             if (newInterviewResults != null)
                 client.interviewResults = newInterviewResults
+            if (newBillId != null)
+                client.billId = newBillId
             clients.add(client)
         }
     }
@@ -124,6 +128,7 @@ class InDataBaseClientsRepository(
                     it[trainingPlanWeek] = client.trainingPlan.week
                     it[trainingPlanHours] = client.trainingPlan.hours
                     it[interviewResults] = client.interviewResults.joinToString(separator = "")
+                    it[billId] = client.billId
                 }
             }
         }
@@ -155,7 +160,8 @@ class InDataBaseClientsRepository(
                 hours = client[Clients.trainingPlanHours],
                 week = client[Clients.trainingPlanWeek],
             ),
-            interviewResults = client[Clients.interviewResults].map { it.toString().toInt() }.toMutableList()
+            interviewResults = client[Clients.interviewResults].map { it.toString().toInt() }.toMutableList(),
+            billId = client[Clients.billId]
         )
     }
 
@@ -170,7 +176,8 @@ class InDataBaseClientsRepository(
         newDaysPassed: Int?,
         newWeeksPassed: Int?,
         newTrainingPlan: TrainingPlan?,
-        newInterviewResults: MutableList<Int>?
+        newInterviewResults: MutableList<Int>?,
+        newBillId: String?
     ) {
         transaction {
             Clients.update({ Clients.id eq id }) {
@@ -188,6 +195,7 @@ class InDataBaseClientsRepository(
                     it[trainingPlanWeek] = newTrainingPlan.week
                 }
                 if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
+                if (newBillId != null) it[billId] = newBillId
             }
         }
     }
@@ -211,6 +219,7 @@ object Clients : Table() {
     val trainingPlanHours = integer("training_plan_hours")
     val trainingPlanWeek = integer("training_plan_week")
     val interviewResults = varchar("interview_results", 10)
+    val billId = varchar("bill_id", 20)
     override val primaryKey = PrimaryKey(id)
 }
 

@@ -21,7 +21,7 @@ const val paymentAmount = 1
 const val startFromAugust = true
 
 
-@OptIn(ObsoleteCoroutinesApi::class)
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
     launch(newSingleThreadContext("Thread for iterators")) {
@@ -38,13 +38,12 @@ fun main(args: Array<String>): Unit = runBlocking {
 
 fun Application.module(testing: Boolean = false) {
 
-   // clientsRepository.clear()
+    clientsRepository.clear()
 
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true
         })
-
     }
 
     routing()

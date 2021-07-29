@@ -38,15 +38,24 @@ fun Application.routing() {
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
-                    call.respondText("ok")
-                    val type = getType(notification)
-                    if (type == "message_new") {
-                        handleIncomingMessage(notification)
-                    } else if (type == "vkpay_transaction") {
-                        receivePayment(notification)
-                    } else if (type == "confirmation") {
-                        val responseString = "be0eac70" // Warning! May change after some time
-                        call.respondText(responseString)
+                    when (getType(notification)) {
+                        "message_new" -> {
+                            call.respondText("ok")
+                            handleIncomingMessage(notification)
+                        }
+                        /*"vkpay_transaction" -> {
+                            call.respondText("ok")
+                            receivePayment(notification)
+                        }*/
+                        "message_event" -> {
+                            call.respondText("ok")
+                            checkPayment(notification)
+                        }
+                        "confirmation" -> {
+                            val responseString = "be0eac70" // Warning! May change after some time
+                            call.respondText(responseString)
+                        }
+                        else -> call.respondText("ok")
                     }
                 }
             }

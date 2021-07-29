@@ -96,16 +96,26 @@ val selectHoursKeyboard = """
         }
     """.trimIndent()
 
-val paymentKeyboard = """
+fun getPaymentKeyboard(link: String): String =
+     """
             {
                 "one_time": false,
                 "buttons": [
                     [
                         {
                             "action":{ 
-                                "type":"vkpay", 
-                                "hash":"action=pay-to-group&group_id=$groupId&amount=$paymentAmount&aid=7889001" 
+                                "type": "open_link", 
+                                "link": "$link",
+                                "label": "Оплатить подписку"
                              } 
+                        }
+                    ], [
+                        {
+                            "action":{ 
+                                "type": "callback", 
+                                "label": "Подтвердить оплату"
+                             },
+                             "color": "positive"
                         }
                     ]
                 ],
@@ -113,3 +123,21 @@ val paymentKeyboard = """
             }
         """.trimIndent()
 
+val confirmPaymentKeyboard =
+     """
+            {
+                "one_time": false,
+                "buttons": [
+                    [
+                        {
+                            "action":{ 
+                                "type": "callback", 
+                                "label": "Подтвердить оплату"
+                             },
+                             "color": "positive"
+                        }
+                    ]
+                ],
+                "inline": true
+            }
+        """.trimIndent()

@@ -27,7 +27,8 @@ data class Client(
     var daysPassed: Int = -1,
     var weeksPassed: Int = -1,
     var trainingPlan: TrainingPlan = TrainingPlan(-1, -1, -1),
-    var interviewResults: MutableList<Int> = mutableListOf()
+    var interviewResults: MutableList<Int> = mutableListOf(),
+    var billId: String = ""
 ) {
     val interview: Interview
         get() = when (trainingPlan.hours) {
@@ -39,4 +40,22 @@ data class Client(
     fun completedInterview(): Boolean = interviewResults.size == interview.interviewQuestions.size
 
     fun isNew(): Boolean = daysPassed == -1
+
+    var bill = Bill(billId)
+
+    fun updateBill(): Unit {
+        billId = generateBillId()
+        clientsRepository.update(
+            id,
+            newBillId = billId
+        )
+        bill = Bill(billId)
+    }
+
+    private fun generateBillId(length: Int = 10): String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '_' + '-'
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
+    }
 }

@@ -11,96 +11,117 @@ import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.serializer
-import java.io.File
 import java.lang.management.ManagementFactory
 import java.time.LocalDate
 import java.util.*
-import kotlin.random.Random.Default.nextInt
-import kotlin.random.Random.Default.nextLong
 
 
 @Serializable
-data class Payment(
-    @SerialName("from_id")
-    val fromId: Int,
-    val amount: Int
-)
-
-@Serializable
-data class PaymentEvent(
+data class Event(
     val type: String,
     @SerialName("object")
-    val payment: Payment,
+    val messageEvent: MessageEvent,
     @SerialName("group_id")
     val groupId: Long
 )
 
-suspend fun receivePayment(notification: String) {
-    val paymentInfo = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment
-    val fromId = paymentInfo.fromId
-    val amount = paymentInfo.amount
-    val client = clientsRepository.findById(fromId) ?: return
-    if (amount == paymentAmount * 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
-        val phrases = listOf(
-            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
-            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
+@Serializable
+data class MessageEvent(
+    @SerialName("user_id")
+    val userId: Int,
+    @SerialName("peer_id")
+    val peerId: Int,
+    @SerialName("event_id")
+    val eventId: String
+)
+
+suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default) {
+    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
+    val client = clientsRepository.findById(messageEvent.userId) ?: return@withContext
+    if (client.bill.isPaid()) {
+        confirmPayment(client, messageEvent)
+    }
+    else {
+        sendMessageEventAnswer(
+            messageEvent,
+            getShowSnackbarString("К сожалению, данные об оплате еще не поступили! Попробуйте позже.")
         )
-        if (client.trial) { // for clients after trial
-            clientsRepository.update(
-                fromId,
-                newTrial = false,
-                newStatus = Status.WAITING_FOR_START,
-                newWeeksPassed = 0,
-                newDaysPassed = 0
-            )
-            sendMessage(
-                fromId,
-                "Подписка успешно оформлена! Спасибо, что решили продолжить тренировки по подписке.\n" +
-                        "Нажмите \"Начать цикл\", чтобы получить план и начать следующий цикл."
-            )
-        } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
-            clientsRepository.update(
-                fromId,
-                newWeeksPassed = 0,
-                newDaysPassed = 0
-            )
-            val updatedClient = clientsRepository.findById(fromId)!!
-            clientsRepository.update(
-                fromId,
-                newStatus = Status.WAITING_FOR_START,
-                newTrainingPlan = determineNextTrainingPlan(updatedClient),
-                newInterviewResults = mutableListOf()
-            )
-            sendMessage(
-                fromId,
-                phrases.random()
-            )
-        } else { // for usual clients
-            sendMessage(
-                client.id,
-                phrases.random()
-            )
-            clientsRepository.update(
-                fromId,
-                newStatus = client.previousStatus,
-                newDaysPassed = 0,
-                newWeeksPassed = 0
-            )
-        }
     }
 }
 
+suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
+    updateClient(client)
+    val phrase =
+        if (client.trial)
+            "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
+        else
+            "Оплата подтверждена! Надеюсь, Вам понравятся тренировки в этом месяце."
+    if (messageEvent != null)
+        sendMessageEventAnswer(messageEvent, getShowSnackbarString(phrase))
+}
+
+fun updateClient(client: Client) {
+    if (client.trial) { // for clients after trial
+        clientsRepository.update(
+            client.id,
+            newTrial = false,
+            newStatus = Status.WAITING_FOR_START,
+            newWeeksPassed = 0,
+            newDaysPassed = 0
+        )
+    } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
+        clientsRepository.update(
+            client.id,
+            newWeeksPassed = 0,
+            newDaysPassed = 0
+        )
+        val updatedClient = clientsRepository.findById(client.id)!!
+        clientsRepository.update(
+            client.id,
+            newStatus = Status.WAITING_FOR_START,
+            newTrainingPlan = determineNextTrainingPlan(updatedClient),
+            newInterviewResults = mutableListOf()
+        )
+    } else { // for usual clients
+        clientsRepository.update(
+            client.id,
+            newStatus = client.previousStatus,
+            newDaysPassed = 0,
+            newWeeksPassed = 0
+        )
+    }
+}
+
+fun getShowSnackbarString(text: String): String =
+    """
+        {
+            "type": "show_snackbar", 
+            "text": "$text"
+        }
+    """.trimIndent()
+
+
+suspend fun sendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
+    val httpClient: HttpClient = HttpClient()
+    val response = httpClient.post<HttpResponse>(
+        "https://api.vk.com/method/messages.send?"
+    ) {
+        parameter("access_token", accessToken)
+        parameter("event_id", messageEvent.eventId)
+        parameter("user_id", messageEvent.userId)
+        parameter("peer_id", messageEvent.peerId)
+        parameter("event_data", eventData)
+        parameter("v", "5.81")
+    }
+}
 
 @Serializable
-data class MessageEvent(
+data class EventWithMessage(
     val type: String,
     @SerialName("object")
     val message: IncomingMessage,
@@ -109,13 +130,11 @@ data class MessageEvent(
 )
 
 
-suspend fun handleIncomingMessage(
-    notification: String
-) = withContext(Dispatchers.Default) {
-    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<MessageEvent>(notification)
-    val clientId = messageEvent.message.fromId
-    val text = messageEvent.message.text
-    val attachments = messageEvent.message.attachments
+suspend fun handleIncomingMessage(notification: String) = withContext(Dispatchers.Default) {
+    val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
+    val clientId = event.message.fromId
+    val text = event.message.text
+    val attachments = event.message.attachments
 
     printCurrentNumberOfThreads()
 
@@ -259,7 +278,8 @@ suspend fun handleIncomingMessage(
                                     newTrainingPlan = nextTrainingPlan,
                                     newInterviewResults = mutableListOf()
                                 )
-                                requestPaymentToStart(clientId)
+                                client.updateBill()
+                                requestPaymentToStart(client)
                             } else {
                                 clientsRepository.update(
                                     clientId,
@@ -289,13 +309,11 @@ suspend fun handleIncomingMessage(
             }
             Status.WAITING_FOR_PAYMENT -> {
                 if (text == "228") {
-                    receivePayment(
-                        "{\"type\":\"vkpay_transaction\",\"object\":{\"amount\":${paymentAmount * 1000},\"from_id\":$clientId,\"description\":\"\",\"date\":1626875771},\"group_id\":205462754,\"event_id\":\"cbfb3d0db7480848dd90cdb2134d4d99387f61e6\",\"secret\":\"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM\"}"
-                    )
-                } else if (text != "") {
+                    confirmPayment(client, null)
+                } else {
                     sendMessage(
                         clientId,
-                        "Оплатите, пожалуйста, подписку."
+                        "С помощью платежной формы оплатите, пожалуйста, подписку. Далее нажмите \"Подтвердить оплату\"."
                     )
                 }
             }
@@ -368,9 +386,9 @@ suspend fun sendPlan(client: Client) {
         "Удачных тренировок!"
     )
     val phrase = if (client.trainingPlan.hours == 1)
-                    "Хорошего восстановления!"
-                else
-                    phrases.random()
+        "Хорошего восстановления!"
+    else
+        phrases.random()
     sendMessage(
         client.id,
         phrase,
@@ -386,12 +404,18 @@ suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
     )
 }
 
-suspend fun requestPaymentToStart(peerId: Int) {
+suspend fun requestPaymentToStart(client: Client) {
     sendMessage(
-        peerId,
-        "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!",
-        keyboard = paymentKeyboard
+        client.id,
+        "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!\n" +
+                "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
+        keyboard = getPaymentKeyboard(client.bill.getPayUrl())
     )
+    /*sendMessage(
+        client.id,
+        "После того, как оплатили подписку, нажмите, пожалуйста, эту кнопку.",
+        keyboard = confirmPaymentKeyboard
+    )*/
 }
 
 suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
@@ -406,7 +430,7 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
         parameter("attachment", attachment)
         parameter("v", "5.81")
     }
-    println(response.content.readUTF8Line())
+    //println(response.content.readUTF8Line())
 }
 
 
@@ -443,3 +467,77 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
  *
  *
  */
+
+
+/*
+@Serializable
+data class Payment(
+    @SerialName("from_id")
+    val fromId: Int,
+    val amount: Int
+)
+
+@Serializable
+data class PaymentEvent(
+    val type: String,
+    @SerialName("object")
+    val payment: Payment,
+    @SerialName("group_id")
+    val groupId: Long
+)
+
+suspend fun receivePayment(notification: String) {
+    val paymentInfo = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment
+    val fromId = paymentInfo.fromId
+    val amount = paymentInfo.amount
+    val client = clientsRepository.findById(fromId) ?: return
+    if (amount == paymentAmount * 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
+        val phrases = listOf(
+            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
+            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
+        )
+        if (client.trial) { // for clients after trial
+            clientsRepository.update(
+                fromId,
+                newTrial = false,
+                newStatus = Status.WAITING_FOR_START,
+                newWeeksPassed = 0,
+                newDaysPassed = 0
+            )
+            sendMessage(
+                fromId,
+                "Подписка успешно оформлена! Спасибо, что решили продолжить тренировки по подписке.\n" +
+                        "Нажмите \"Начать цикл\", чтобы получить план и начать следующий цикл."
+            )
+        } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
+            clientsRepository.update(
+                fromId,
+                newWeeksPassed = 0,
+                newDaysPassed = 0
+            )
+            val updatedClient = clientsRepository.findById(fromId)!!
+            clientsRepository.update(
+                fromId,
+                newStatus = Status.WAITING_FOR_START,
+                newTrainingPlan = determineNextTrainingPlan(updatedClient),
+                newInterviewResults = mutableListOf()
+            )
+            sendMessage(
+                fromId,
+                phrases.random()
+            )
+        } else { // for usual clients
+            sendMessage(
+                client.id,
+                phrases.random()
+            )
+            clientsRepository.update(
+                fromId,
+                newStatus = client.previousStatus,
+                newDaysPassed = 0,
+                newWeeksPassed = 0
+            )
+        }
+    }
+}
+*/

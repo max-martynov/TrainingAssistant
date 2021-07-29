@@ -58,8 +58,8 @@ suspend fun requestPaymentToContinue(peerId: Int) {
     )
     sendMessage(
         peerId,
-        phrases.random(),
-        keyboard = paymentKeyboard
+        phrases.random()//,
+       // keyboard = paymentKeyboard
     )
 }
 
