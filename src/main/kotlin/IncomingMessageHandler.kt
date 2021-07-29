@@ -109,7 +109,7 @@ fun getShowSnackbarString(text: String): String =
 suspend fun sendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
     val httpClient: HttpClient = HttpClient()
     val response = httpClient.post<HttpResponse>(
-        "https://api.vk.com/method/messages.send?"
+        "https://api.vk.com/method/messages.sendMessageEventAnswer?"
     ) {
         parameter("access_token", accessToken)
         parameter("event_id", messageEvent.eventId)
@@ -313,7 +313,8 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
                 } else {
                     sendMessage(
                         clientId,
-                        "С помощью платежной формы оплатите, пожалуйста, подписку. Далее нажмите \"Подтвердить оплату\"."
+                        "Если Вы хотите продолжить тренировки, оплатите, пожалуйста, подписку. " +
+                                "Для этого нажмите \"Оплатить подписку\", а после завершения платежа - \"Подтвердить оплату\""
                     )
                 }
             }

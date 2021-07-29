@@ -39,7 +39,7 @@ suspend fun checkState(client: Client): Int {
                 client.id,
                 newStatus = Status.WAITING_FOR_PAYMENT
             )
-            requestPaymentToContinue(client.id)
+            requestPaymentToContinue(client)
         } else {
             clientsRepository.update(
                 client.id,
@@ -51,15 +51,16 @@ suspend fun checkState(client: Client): Int {
     return 0
 }
 
-suspend fun requestPaymentToContinue(peerId: Int) {
+suspend fun requestPaymentToContinue(client: Client) {
     val phrases = listOf(
         "К сожалению, месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс.",
         "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
     )
+    client.updateBill()
     sendMessage(
-        peerId,
-        phrases.random()//,
-       // keyboard = paymentKeyboard
+        client.id,
+        phrases.random(),
+        keyboard = getPaymentKeyboard(client.bill.getPayUrl())
     )
 }
 
