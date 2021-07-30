@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-fun iterateOverClients(
+suspend fun iterateOverClients(
     checkTime: LocalTime = LocalTime.of(18, 0),
     period: Duration = Duration.ofDays(1)
 ) {
@@ -18,7 +18,7 @@ fun iterateOverClients(
         printCurrentNumberOfThreads()
         val clients = clientsRepository.getAll()
         println("\nTotal number of clients: ${clients.size}")
-        /*coroutineScope {
+        coroutineScope {
             val numberActiveClients = AtomicInteger(0)
             val jobs = clients.map {
                 launch(Dispatchers.Default) {
@@ -27,7 +27,7 @@ fun iterateOverClients(
             }
             jobs.forEach { it.cancelAndJoin() }
             println("Number of active clients: $numberActiveClients\n")
-        }*/
+        }
         nextCheckTime += period
     }
 }

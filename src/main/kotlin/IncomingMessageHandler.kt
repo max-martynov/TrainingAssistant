@@ -44,6 +44,8 @@ data class MessageEvent(
 suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
     val client = clientsRepository.findById(messageEvent.userId) ?: return@withContext
+    if (client.status != Status.WAITING_FOR_PAYMENT)
+        return@withContext
     if (client.bill.isPaid()) {
         confirmPayment(client, messageEvent)
     }

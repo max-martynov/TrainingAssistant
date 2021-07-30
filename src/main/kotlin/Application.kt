@@ -25,18 +25,18 @@ const val startFromAugust = true
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 fun main(args: Array<String>): Unit  = runBlocking {
 
-    /*launch(Dispatchers.Default) {
+    launch(Dispatchers.Default) {
         iterateOverClients(
             LocalTime.now().plusSeconds(5),
             Duration.ofSeconds(5)
         )
-    }*/
-    thread {
+    }
+    /*thread {
         iterateOverClients(
             LocalTime.now().plusSeconds(5),
             Duration.ofSeconds(40)
         )
-    }
+    }*/
 
     /*launch(newSingleThreadContext("Thread for iterators")) {
         iterateOverClients(
@@ -45,9 +45,9 @@ fun main(args: Array<String>): Unit  = runBlocking {
         )
     }*/
 
-    //launch {
+    launch(Dispatchers.Main) {
         EngineMain.main(args)
-    //}
+    }
 }
 
 fun Application.module(testing: Boolean = false) {

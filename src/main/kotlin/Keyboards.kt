@@ -38,14 +38,14 @@ val mainKeyboard = """
                         {
                             "action":{
                                 "type":"open_link",
-                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
+                                "link":"vk.com/@club_prosto_o_trenirovkah-trenirovki-po-podpiske-20",
                                 "label":"Инструкция"
                             }
                         },
                         {
                             "action":{
                                 "type":"open_link",
-                                "link":"https://vk.com/@-205462754-chat-bot-kratkoe-rukovodstvo",
+                                "link":"http://vk.com/@club_prosto_o_trenirovkah-skidki-dlya-uchastnikov-kluba",
                                 "label":"Промокоды"
                             }
                         }
