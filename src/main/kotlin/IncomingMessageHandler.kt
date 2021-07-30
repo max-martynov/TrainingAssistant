@@ -59,6 +59,7 @@ suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default
 }
 
 suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
+    updateClient(client)
     val phrase =
         if (client.trial)
             "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
