@@ -44,9 +44,10 @@ data class MessageEvent(
 suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default) {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
     val client = clientsRepository.findById(messageEvent.userId) ?: return@withContext
-    if (client.status != Status.WAITING_FOR_PAYMENT)
-        return@withContext
-    if (client.bill.isPaid()) {
+    if (client.status != Status.WAITING_FOR_PAYMENT) {
+        sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
+    }
+    else if (client.bill.isPaid()) {
         confirmPayment(client, messageEvent)
     }
     else {
@@ -58,7 +59,6 @@ suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default
 }
 
 suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
-    updateClient(client)
     val phrase =
         if (client.trial)
             "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
