@@ -47,10 +47,10 @@ fun Application.routing() {
                             call.respondText("ok")
                             receivePayment(notification)
                         }*/
-                        /*"message_event" -> {
+                        "message_event" -> {
                             call.respondText("ok")
                             checkPayment(notification)
-                        }*/
+                        }
                         "confirmation" -> {
                             val responseString = "be0eac70" // Warning! May change after some time
                             call.respondText(responseString)
