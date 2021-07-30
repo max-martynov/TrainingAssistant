@@ -1,13 +1,12 @@
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import org.h2.jdbcx.JdbcDataSource
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import javax.sql.DataSource
+import javax.naming.Context
+import javax.naming.InitialContext
 import kotlin.concurrent.withLock
 
 
@@ -106,7 +105,6 @@ class InDataBaseClientsRepository(
         config.maxLifetime = 300000
 
         Database.connect(HikariDataSource(config))
-        //Database.connect(connStr, driver)
 
         transaction {
             SchemaUtils.create(Clients)

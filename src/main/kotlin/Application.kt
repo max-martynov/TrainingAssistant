@@ -12,6 +12,7 @@ import routing
 import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.LocalTime
+import kotlin.concurrent.thread
 
 val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
 const val accessToken = "8d8088feeb18744bc2e5a7ed11067faf9cf495fce1c99c6c430e59b7e093f6a45ff827bc0333dd1bd2172" // "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e" for Fake Community
@@ -22,18 +23,31 @@ const val startFromAugust = true
 
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-fun main(args: Array<String>): Unit = runBlocking {
+fun main(args: Array<String>): Unit  = runBlocking {
 
-    launch(newSingleThreadContext("Thread for iterators")) {
+    /*launch(Dispatchers.Default) {
         iterateOverClients(
             LocalTime.now().plusSeconds(5),
             Duration.ofSeconds(5)
         )
+    }*/
+    thread {
+        iterateOverClients(
+            LocalTime.now().plusSeconds(5),
+            Duration.ofSeconds(40)
+        )
     }
 
-    launch {
+    /*launch(newSingleThreadContext("Thread for iterators")) {
+        iterateOverClients(
+            LocalTime.now().plusSeconds(5),
+            Duration.ofSeconds(5)
+        )
+    }*/
+
+    //launch {
         EngineMain.main(args)
-    }
+    //}
 }
 
 fun Application.module(testing: Boolean = false) {

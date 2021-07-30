@@ -11,6 +11,7 @@ import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -140,19 +141,15 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
 
     val client = clientsRepository.findById(clientId)
 
-    clientsRepository.add(
-        Client(clientId)
-    )
-
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
-        clientsRepository.add(
-            Client(clientId)
-        )
-        sendGreetings(clientId)
-        clientsRepository.update(
-            clientId,
-            newStatus = Status.NEW_CLIENT
-        )
+        launch {
+            clientsRepository.add(
+                Client(clientId)
+            )
+        }
+        launch {
+            sendGreetings(clientId)
+        }
     } else if (client != null) {
         when (client.status) {
             Status.NEW_CLIENT -> {

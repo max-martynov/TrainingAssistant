@@ -22,7 +22,7 @@ enum class Status {
 data class Client(
     val id: Int,
     var trial: Boolean = true,
-    var status: Status = Status.WAITING_FOR_PLAN,
+    var status: Status = Status.NEW_CLIENT,
     var previousStatus: Status = status,
     var daysPassed: Int = -1,
     var weeksPassed: Int = -1,

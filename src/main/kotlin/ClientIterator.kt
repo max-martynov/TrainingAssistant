@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 fun iterateOverClients(
     checkTime: LocalTime = LocalTime.of(18, 0),
     period: Duration = Duration.ofDays(1)
-) = runBlocking {
+) {
     var nextCheckTime = checkTime
 
     while (true) {
@@ -18,14 +18,16 @@ fun iterateOverClients(
         printCurrentNumberOfThreads()
         val clients = clientsRepository.getAll()
         println("\nTotal number of clients: ${clients.size}")
-        val numberActiveClients = AtomicInteger(0)
-        val jobs = clients.map {
-            launch {
-                numberActiveClients.addAndGet(checkState(it))
+        /*coroutineScope {
+            val numberActiveClients = AtomicInteger(0)
+            val jobs = clients.map {
+                launch(Dispatchers.Default) {
+                    numberActiveClients.addAndGet(checkState(it))
+                }
             }
-        }
-        jobs.forEach { it.join() }
-        println("Number of active clients: $numberActiveClients\n")
+            jobs.forEach { it.cancelAndJoin() }
+            println("Number of active clients: $numberActiveClients\n")
+        }*/
         nextCheckTime += period
     }
 }
