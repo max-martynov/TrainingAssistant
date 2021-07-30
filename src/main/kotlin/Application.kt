@@ -27,8 +27,8 @@ fun main(args: Array<String>): Unit  = runBlocking {
 
     launch(Dispatchers.Default) {
         iterateOverClients(
-            LocalTime.now().plusSeconds(5),
-            Duration.ofSeconds(5)
+           // LocalTime.now().plusSeconds(5),
+         //   Duration.ofSeconds(5)
         )
     }
     /*thread {

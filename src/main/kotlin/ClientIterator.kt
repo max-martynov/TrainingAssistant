@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 suspend fun iterateOverClients(
-    checkTime: LocalTime = LocalTime.of(18, 0),
+    checkTime: LocalTime = LocalTime.of(23, 59),
     period: Duration = Duration.ofDays(1)
 ) {
     var nextCheckTime = checkTime
