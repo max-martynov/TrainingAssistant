@@ -65,7 +65,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
                         clientId,
                         newStatus = Status.WAITING_FOR_START,
                         newTrainingPlan = TrainingPlan(
-                            LocalDate.now().monthValue,
+                            maxOf(8, LocalDate.now().monthValue),
                             if (text == "6 часов") 6 else 10,
                             0
                         )
