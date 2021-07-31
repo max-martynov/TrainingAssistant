@@ -1,6 +1,7 @@
 import VkAPI.sendMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -27,9 +28,9 @@ data class MessageEvent(
     val eventId: String
 )
 
-suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default) {
+suspend fun checkPayment(notification: String) = coroutineScope {
     val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
-    val client = clientsRepository.findById(messageEvent.userId) ?: return@withContext
+    val client = clientsRepository.findById(messageEvent.userId) ?: return@coroutineScope
     if (client.status != Status.WAITING_FOR_PAYMENT) {
         VkAPI.sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
     }
@@ -47,12 +48,12 @@ suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default
 }
 
 suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
-    updateClient(client)
     val phrase =
         if (client.trial)
             "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
         else
             "Оплата подтверждена! Надеюсь, Вам понравятся тренировки в этом месяце."
+    updateClient(client)
     if (messageEvent != null)
         VkAPI.sendMessageEventAnswer(messageEvent, getShowSnackbarString(phrase))
 }
