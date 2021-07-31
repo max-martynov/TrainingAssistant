@@ -1,3 +1,4 @@
+import VkAPI.sendMessage
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import io.ktor.application.*
 import io.ktor.client.*
@@ -10,9 +11,7 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -21,111 +20,8 @@ import java.lang.management.ManagementFactory
 import java.time.LocalDate
 import java.util.*
 
-
 @Serializable
-data class Event(
-    val type: String,
-    @SerialName("object")
-    val messageEvent: MessageEvent,
-    @SerialName("group_id")
-    val groupId: Long
-)
-
-@Serializable
-data class MessageEvent(
-    @SerialName("user_id")
-    val userId: Int,
-    @SerialName("peer_id")
-    val peerId: Int,
-    @SerialName("event_id")
-    val eventId: String
-)
-
-suspend fun checkPayment(notification: String) = withContext(Dispatchers.Default) {
-    val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
-    val client = clientsRepository.findById(messageEvent.userId) ?: return@withContext
-    if (client.status != Status.WAITING_FOR_PAYMENT) {
-        sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
-    }
-    else if (client.bill.isPaid()) {
-        confirmPayment(client, messageEvent)
-    }
-    else {
-        sendMessageEventAnswer(
-            messageEvent,
-            getShowSnackbarString("К сожалению, данные об оплате еще не поступили! Попробуйте позже.")
-        )
-    }
-}
-
-suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
-    updateClient(client)
-    val phrase =
-        if (client.trial)
-            "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
-        else
-            "Оплата подтверждена! Надеюсь, Вам понравятся тренировки в этом месяце."
-    if (messageEvent != null)
-        sendMessageEventAnswer(messageEvent, getShowSnackbarString(phrase))
-}
-
-fun updateClient(client: Client) {
-    if (client.trial) { // for clients after trial
-        clientsRepository.update(
-            client.id,
-            newTrial = false,
-            newStatus = Status.WAITING_FOR_START,
-            newWeeksPassed = 0,
-            newDaysPassed = 0
-        )
-    } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
-        clientsRepository.update(
-            client.id,
-            newWeeksPassed = 0,
-            newDaysPassed = 0
-        )
-        val updatedClient = clientsRepository.findById(client.id)!!
-        clientsRepository.update(
-            client.id,
-            newStatus = Status.WAITING_FOR_START,
-            newTrainingPlan = determineNextTrainingPlan(updatedClient),
-            newInterviewResults = mutableListOf()
-        )
-    } else { // for usual clients
-        clientsRepository.update(
-            client.id,
-            newStatus = client.previousStatus,
-            newDaysPassed = 0,
-            newWeeksPassed = 0
-        )
-    }
-}
-
-fun getShowSnackbarString(text: String): String =
-    """
-        {
-            "type": "show_snackbar", 
-            "text": "$text"
-        }
-    """.trimIndent()
-
-
-suspend fun sendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
-    val httpClient: HttpClient = HttpClient()
-    val response = httpClient.post<HttpResponse>(
-        "https://api.vk.com/method/messages.sendMessageEventAnswer?"
-    ) {
-        parameter("access_token", accessToken)
-        parameter("event_id", messageEvent.eventId)
-        parameter("user_id", messageEvent.userId)
-        parameter("peer_id", messageEvent.peerId)
-        parameter("event_data", eventData)
-        parameter("v", "5.81")
-    }
-}
-
-@Serializable
-data class EventWithMessage(
+private data class EventWithMessage(
     val type: String,
     @SerialName("object")
     val message: IncomingMessage,
@@ -133,36 +29,29 @@ data class EventWithMessage(
     val groupId: Long
 )
 
-
-suspend fun handleIncomingMessage(notification: String) = withContext(Dispatchers.Default) {
+suspend fun handleIncomingMessage(notification: String) = coroutineScope {
     val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
     val clientId = event.message.fromId
     val text = event.message.text
     val attachments = event.message.attachments
 
-    printCurrentNumberOfThreads()
+    println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}")
 
     val client = clientsRepository.findById(clientId)
 
     if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
-        launch {
-            clientsRepository.add(
-                Client(clientId)
-            )
-        }
-        launch {
-            sendGreetings(clientId)
-        }
+        async { clientsRepository.add(Client(clientId)) }
+        async { sendGreetings(clientId) }
     } else if (client != null) {
         when (client.status) {
             Status.NEW_CLIENT -> {
                 if (text == "Старт!") {
-                    sendMainKeyboard(clientId)
-                    sendSelectTrainingPlan(clientId)
-                    clientsRepository.update(
+                    async { sendMainKeyboard(clientId) }
+                    async { sendSelectTrainingPlan(clientId) }
+                    async { clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_PLAN
-                    )
+                    ) }
                 } else {
                     sendMessage(
                         clientId,
@@ -172,7 +61,7 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
             }
             Status.WAITING_FOR_PLAN -> {
                 if (text == "6 часов" || text == "10 часов") {
-                    clientsRepository.update(
+                    async { clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_START,
                         newTrainingPlan = TrainingPlan(
@@ -180,8 +69,8 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
                             if (text == "6 часов") 6 else 10,
                             0
                         )
-                    )
-                    sendTrialMessage(clientId)
+                    ) }
+                    async { sendTrialMessage(clientId) }
                 } else {
                     sendMessage(
                         clientId,
@@ -191,12 +80,12 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
             }
             Status.WAITING_FOR_START -> {
                 if (text == "Начать цикл") {
-                    clientsRepository.update(
+                    async { clientsRepository.update(
                         clientId,
                         newStatus = Status.ACTIVE,
                         newWeeksPassed = client.weeksPassed + 1
-                    )
-                    sendPlan(client)
+                    ) }
+                    async { sendPlan(client) }
                 } else {
                     sendMessage(
                         clientId,
@@ -211,18 +100,18 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
                         "Отличная работа!\nДля формирования плана на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
                         "Недельный цикл успешно завершен! Пройдите, пожалуйста, небольшой опрос, чтобы сформировать план на следующую неделю."
                     )
-                    sendMessage(
+                    async { sendMessage(
                         clientId,
                         if (client.trial)
                             "Поздравляю с окончанием пробной недели!\nДля формирования следующего плана, пройдите, пожалуйста, небольшой опрос."
                         else
                             phrases.random()
-                    )
-                    clientsRepository.update(
+                    ) }
+                    async { clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_RESULTS
-                    )
-                    sendInterviewQuestion(client, 0)
+                    ) }
+                    async { sendInterviewQuestion(client, 0) }
                 } else {
                     sendMessage(
                         clientId,
@@ -236,7 +125,7 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
                         clientId,
                         "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
                     )
-                    return@withContext
+                    return@coroutineScope
                 }
                 val answerNumber = client.interview.findAnswerNumberOnKthQuestion(text, client.interviewResults.size)
                 if (answerNumber == -1) {
@@ -320,10 +209,6 @@ suspend fun handleIncomingMessage(notification: String) = withContext(Dispatcher
             }
         }
     }
-}
-
-fun printCurrentNumberOfThreads() {
-    println("Current number of threads: ${ManagementFactory.getThreadMXBean().threadCount}")
 }
 
 @Serializable
@@ -412,28 +297,7 @@ suspend fun requestPaymentToStart(client: Client) {
                 "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
         keyboard = getPaymentKeyboard(client.bill.getPayUrl())
     )
-    /*sendMessage(
-        client.id,
-        "После того, как оплатили подписку, нажмите, пожалуйста, эту кнопку.",
-        keyboard = confirmPaymentKeyboard
-    )*/
 }
-
-suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
-    val httpClient: HttpClient = HttpClient()
-    val response = httpClient.post<HttpResponse>(
-        "https://api.vk.com/method/messages.send?"
-    ) {
-        parameter("access_token", accessToken)
-        parameter("peer_id", peerId)
-        parameter("message", text)
-        parameter("keyboard", keyboard)
-        parameter("attachment", attachment)
-        parameter("v", "5.81")
-    }
-    //println(response.content.readUTF8Line())
-}
-
 
 /**
  * 1. Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?
@@ -468,77 +332,3 @@ suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attach
  *
  *
  */
-
-
-/*
-@Serializable
-data class Payment(
-    @SerialName("from_id")
-    val fromId: Int,
-    val amount: Int
-)
-
-@Serializable
-data class PaymentEvent(
-    val type: String,
-    @SerialName("object")
-    val payment: Payment,
-    @SerialName("group_id")
-    val groupId: Long
-)
-
-suspend fun receivePayment(notification: String) {
-    val paymentInfo = Json { ignoreUnknownKeys = true }.decodeFromString<PaymentEvent>(notification).payment
-    val fromId = paymentInfo.fromId
-    val amount = paymentInfo.amount
-    val client = clientsRepository.findById(fromId) ?: return
-    if (amount == paymentAmount * 1000 && client.status == Status.WAITING_FOR_PAYMENT) {
-        val phrases = listOf(
-            "Подписка успешно продлена! Впереди месяц разнообразных тренировок.",
-            "Подписка успешно продлена! Надеюсь, Вам понравятся тренировки в этом месяце."
-        )
-        if (client.trial) { // for clients after trial
-            clientsRepository.update(
-                fromId,
-                newTrial = false,
-                newStatus = Status.WAITING_FOR_START,
-                newWeeksPassed = 0,
-                newDaysPassed = 0
-            )
-            sendMessage(
-                fromId,
-                "Подписка успешно оформлена! Спасибо, что решили продолжить тренировки по подписке.\n" +
-                        "Нажмите \"Начать цикл\", чтобы получить план и начать следующий цикл."
-            )
-        } else if (client.previousStatus == Status.WAITING_FOR_RESULTS && client.completedInterview()) { // for those who completed month too fast
-            clientsRepository.update(
-                fromId,
-                newWeeksPassed = 0,
-                newDaysPassed = 0
-            )
-            val updatedClient = clientsRepository.findById(fromId)!!
-            clientsRepository.update(
-                fromId,
-                newStatus = Status.WAITING_FOR_START,
-                newTrainingPlan = determineNextTrainingPlan(updatedClient),
-                newInterviewResults = mutableListOf()
-            )
-            sendMessage(
-                fromId,
-                phrases.random()
-            )
-        } else { // for usual clients
-            sendMessage(
-                client.id,
-                phrases.random()
-            )
-            clientsRepository.update(
-                fromId,
-                newStatus = client.previousStatus,
-                newDaysPassed = 0,
-                newWeeksPassed = 0
-            )
-        }
-    }
-}
-*/

@@ -15,25 +15,29 @@ repositories {
 }
 
 dependencies {
-    // ktor
     val ktor_version: String by project
     val logback_version: String by project
+    // ktor server
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-server-host-common:$ktor_version")
-    implementation("io.ktor:ktor-jackson:$ktor_version")
-    implementation("io.ktor:ktor-network:$ktor_version")
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-json:$ktor_version")
+    implementation("io.ktor:ktor-serialization:$ktor_version")
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+
+    // ktor client
+    implementation("io.ktor:ktor-client-core:1.6.2")
+    implementation("io.ktor:ktor-client-jetty:1.6.2")
+    //implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
+
+    /*implementation("io.ktor:ktor-client-json:$ktor_version")
     implementation("io.ktor:ktor-websockets:$ktor_version")
     implementation("io.ktor:ktor-client-websockets:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
-    implementation("io.ktor:ktor-serialization:$ktor_version")
-    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    testImplementation("io.ktor:ktor-server-tests:$ktor_version")*/
 
+    // Hikari
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     // vk sdk
@@ -60,6 +64,7 @@ dependencies {
     // tests
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     testImplementation(kotlin("test-junit5"))
+
 }
 
 tasks.withType<Test>().all {

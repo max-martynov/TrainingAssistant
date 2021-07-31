@@ -2,6 +2,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.h2.jdbcx.JdbcDataSource
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -11,10 +12,10 @@ import kotlin.concurrent.withLock
 
 
 interface ClientsRepository {
-    fun add(client: Client)
-    fun findById(clientId: Int): Client?
-    fun getAll(): List<Client>
-    fun update(
+    suspend fun add(client: Client)
+    suspend fun findById(clientId: Int): Client?
+    suspend fun getAll(): List<Client>
+    suspend fun update(
         id: Int,
         newTrial: Boolean? = null,
         newStatus: Status? = null,
@@ -33,26 +34,26 @@ class InMemoryClientsRepository : ClientsRepository {
 
     private val lock = ReentrantLock()
 
-    override fun add(client: Client) {
+    override suspend fun add(client: Client) {
         lock.withLock{
             if (clients.count { it.id == client.id } == 0)
                 clients.add(client)
         }
     }
 
-    override fun findById(clientId: Int): Client? {
+    override suspend fun findById(clientId: Int): Client? {
         lock.withLock {
             return clients.find { it.id == clientId }
         }
     }
 
-    override fun getAll(): List<Client> {
+    override suspend fun getAll(): List<Client> {
         lock.withLock {
             return clients.toList()
         }
     }
 
-    override fun update(
+    override suspend fun update(
         id: Int,
         newTrial: Boolean?,
         newStatus: Status?,
@@ -62,8 +63,8 @@ class InMemoryClientsRepository : ClientsRepository {
         newInterviewResults: MutableList<Int>?,
         newBillId: String?
     ) {
+        val client = findById(id) ?: return
         lock.withLock {
-            val client = findById(id) ?: return
             clients.remove(client)
             if (newTrial != null)
                 client.trial = newTrial
@@ -99,18 +100,18 @@ class InDataBaseClientsRepository() : ClientsRepository {
         config.password = "aRootPassword"
         config.driverClassName = "org.h2.Driver"
         config.maxLifetime = 300000
-        config.maximumPoolSize = 3
+        config.maximumPoolSize = 10
 
         Database.connect(HikariDataSource(config))
 
         transaction {
             SchemaUtils.create(Clients)
-            //addLogger(StdOutSqlLogger)
+            addLogger(StdOutSqlLogger)
         }
     }
 
-    override fun add(client: Client) {
-        transaction {
+    override suspend fun add(client: Client) {
+        newSuspendedTransaction {
             if (findById(client.id) == null) {
                 Clients.insert {
                     it[id] = client.id
@@ -129,12 +130,12 @@ class InDataBaseClientsRepository() : ClientsRepository {
         }
     }
 
-    override fun findById(clientId: Int): Client? {
-        return transaction {
+    override suspend fun findById(clientId: Int): Client? {
+        return newSuspendedTransaction {
             val query = Clients.select { Clients.id eq clientId }
             if (query.empty())
-                return@transaction null
-            return@transaction try {
+                return@newSuspendedTransaction null
+            return@newSuspendedTransaction try {
                 convertClientToDataClass(query.toList()[0])
             } catch (e: Exception) {
                 null
@@ -160,11 +161,11 @@ class InDataBaseClientsRepository() : ClientsRepository {
         )
     }
 
-    override fun getAll(): List<Client> = transaction {
+    override suspend fun getAll(): List<Client> = newSuspendedTransaction {
         Clients.selectAll().map { convertClientToDataClass(it) }
     }
 
-    override fun update(
+    override suspend fun update(
         id: Int,
         newTrial: Boolean?,
         newStatus: Status?,
@@ -174,7 +175,7 @@ class InDataBaseClientsRepository() : ClientsRepository {
         newInterviewResults: MutableList<Int>?,
         newBillId: String?
     ) {
-        transaction {
+        newSuspendedTransaction {
             Clients.update({ Clients.id eq id }) {
                 if (newTrial != null)
                     it[trial] = newTrial

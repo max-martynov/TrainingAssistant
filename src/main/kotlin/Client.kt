@@ -43,7 +43,7 @@ data class Client(
 
     var bill = Bill(billId)
 
-    fun updateBill(): Unit {
+    suspend fun updateBill(): Unit {
         billId = generateBillId()
         clientsRepository.update(
             id,

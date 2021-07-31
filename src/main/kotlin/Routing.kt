@@ -29,9 +29,6 @@ import java.time.LocalTime
 fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
 
-
-
-
 fun Application.routing() {
     routing {
         post("/") {

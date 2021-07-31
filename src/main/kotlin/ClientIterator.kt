@@ -14,9 +14,10 @@ suspend fun iterateOverClients(
     var nextCheckTime = checkTime
 
     while (true) {
-        printCurrentNumberOfThreads()
         delay(calculateDifference(nextCheckTime))
-        /*val clients = clientsRepository.getAll()
+        printInfo()
+        val clients = clientsRepository.getAll()
+        println("Total number of clients = ${clients.size}\n")
         coroutineScope {
             val numberActiveClients = AtomicInteger(0)
             val jobs = clients.map {
@@ -24,11 +25,12 @@ suspend fun iterateOverClients(
                     numberActiveClients.addAndGet(checkState(it))
                 }
             }
-            jobs.forEach { it.cancelAndJoin() }
-            println("Number of active clients: $numberActiveClients\n")
-        }*/
+            jobs.forEach { it.join() }
+            println("\nNumber of active clients = $numberActiveClients")
+        }
+        println("\n------------------------------------------------------\n")
         nextCheckTime += period
-        clientsRepository.add(Client((0..10000).random()))
+        //clientsRepository.add(Client((0..10000).random()))
     }
 }
 
@@ -59,11 +61,15 @@ suspend fun requestPaymentToContinue(client: Client) {
         "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
     )
     client.updateBill()
-    sendMessage(
+    VkAPI.sendMessage(
         client.id,
         phrases.random(),
         keyboard = getPaymentKeyboard(client.bill.getPayUrl())
     )
+}
+
+private fun printInfo() {
+    println("${LocalDate.now()}\nCurrent number of threads = ${ManagementFactory.getThreadMXBean().threadCount}\n")
 }
 
 private fun calculateDifference(requiredTime: LocalTime) =

@@ -19,79 +19,9 @@ data class TrainingPlan(
     private val pathToFile = "$pathToDirectory/$month/$hours/$week.pdf"
 
     suspend fun prepareAsAttachment(peerId: Int): Pair<Int, Int> {
-        val uploadUrl = getMessagesUploadServer(peerId)
-        val file = uploadFile(uploadUrl)
-        return saveDoc(file)
-    }
-
-    private val httpClient: HttpClient = HttpClient() {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
-        }
-    }
-
-    @Serializable
-    data class Response(
-        @SerialName("upload_url")
-        val uploadUrl: String
-    )
-
-    @Serializable
-    data class ResponseJson(val response: Response)
-
-    private suspend fun getMessagesUploadServer(peerId: Int): String {
-
-        return httpClient.post<ResponseJson>(
-            "https://api.vk.com/method/docs.getMessagesUploadServer?"
-        ) {
-            parameter("access_token", accessToken)
-            parameter("type", "doc")
-            parameter("peer_id", peerId)
-            parameter("v", "5.81")
-        }.response.uploadUrl
-    }
-
-    @Serializable
-    data class FileResponse(val file: String)
-
-    private suspend fun uploadFile(address: String): String {
-
-
-        val response: FileResponse = httpClient.submitFormWithBinaryData(
-            url = address,
-            formData = formData {
-                append("file", File(pathToFile).readBytes(), Headers.build {
-                    append(HttpHeaders.ContentType, "application/pdf")
-                    append(HttpHeaders.ContentDisposition, "filename=TrainingPlan.pdf")
-                })
-            }
-        )
-        return response.file
-    }
-
-    @Serializable
-    data class Doc(
-        val id: Int,
-        @SerialName("owner_id")
-        val ownerId: Int
-    )
-
-    @Serializable
-    data class Responses(val response: List<Doc>)
-
-    private suspend fun saveDoc(file: String): Pair<Int, Int> {
-        val response = httpClient.post<Responses>(
-            "https://api.vk.com/method/docs.save?"
-        ) {
-            parameter("access_token", accessToken)
-            parameter("file", file)
-            parameter("v", "5.81")
-        }
-        return Pair(response.response[0].ownerId, response.response[0].id)
+        val uploadUrl = VkAPI.getMessagesUploadServer(peerId)
+        val file = VkAPI.uploadFile(uploadUrl, pathToFile)
+        return VkAPI.saveDoc(file)
     }
 }
 
