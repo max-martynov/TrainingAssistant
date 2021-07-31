@@ -100,13 +100,13 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
                         "Отличная работа!\nДля формирования плана на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
                         "Недельный цикл успешно завершен! Пройдите, пожалуйста, небольшой опрос, чтобы сформировать план на следующую неделю."
                     )
-                    async { sendMessage(
+                    sendMessage(
                         clientId,
                         if (client.trial)
                             "Поздравляю с окончанием пробной недели!\nДля формирования следующего плана, пройдите, пожалуйста, небольшой опрос."
                         else
                             phrases.random()
-                    ) }
+                    )
                     async { clientsRepository.update(
                         clientId,
                         newStatus = Status.WAITING_FOR_RESULTS
@@ -295,7 +295,7 @@ suspend fun requestPaymentToStart(client: Client) {
         client.id,
         "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!\n" +
                 "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
-        keyboard = getPaymentKeyboard(client.bill.getPayUrl())
+        keyboard = getPaymentKeyboard(QiwiAPI.getPayUrl(client.billId))
     )
 }
 

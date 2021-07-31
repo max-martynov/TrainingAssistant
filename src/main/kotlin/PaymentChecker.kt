@@ -34,7 +34,7 @@ suspend fun checkPayment(notification: String) = coroutineScope {
     if (client.status != Status.WAITING_FOR_PAYMENT) {
         VkAPI.sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
     }
-    else if (client.bill.isPaid()) {
+    else if (QiwiAPI.isPaid(client.billId)) {
         async { confirmPayment(client, messageEvent) }
         async { sendMessage(client.id, "Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".") }
     }

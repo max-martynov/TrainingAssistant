@@ -64,7 +64,7 @@ suspend fun requestPaymentToContinue(client: Client) {
     VkAPI.sendMessage(
         client.id,
         phrases.random(),
-        keyboard = getPaymentKeyboard(client.bill.getPayUrl())
+        keyboard = getPaymentKeyboard(QiwiAPI.getPayUrl(client.billId))
     )
 }
 

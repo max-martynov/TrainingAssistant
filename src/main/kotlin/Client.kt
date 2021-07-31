@@ -41,15 +41,12 @@ data class Client(
 
     fun isNew(): Boolean = daysPassed == -1
 
-    var bill = Bill(billId)
-
     suspend fun updateBill(): Unit {
         billId = generateBillId()
         clientsRepository.update(
             id,
             newBillId = billId
         )
-        bill = Bill(billId)
     }
 
     private fun generateBillId(length: Int = 10): String {
