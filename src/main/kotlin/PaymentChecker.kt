@@ -36,7 +36,9 @@ suspend fun checkPayment(notification: String) = coroutineScope {
     }
     else if (QiwiAPI.isPaid(client.billId)) {
         async { confirmPayment(client, messageEvent) }
-        async { sendMessage(client.id, "Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".") }
+        if (client.trial)
+            async { sendMessage(client.id, "Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".") }
+        // TODO - process other states and send appropriate message
     }
     else {
         VkAPI.sendMessageEventAnswer(

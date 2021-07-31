@@ -21,10 +21,7 @@ import kotlin.concurrent.thread
 
 val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
 const val productId = 8 // 803 for Fake Community
-const val groupId = 136349636 // 205462754 for Fake Community
 const val paymentAmount = 1
-const val startFromAugust = true
-
 
 fun main(args: Array<String>): Unit = runBlocking {
 

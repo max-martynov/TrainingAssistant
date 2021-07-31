@@ -46,7 +46,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
         when (client.status) {
             Status.NEW_CLIENT -> {
                 if (text == "Старт!") {
-                    async { sendMainKeyboard(clientId) }
+                    sendMainKeyboard(clientId)
                     async { sendSelectTrainingPlan(clientId) }
                     async { clientsRepository.update(
                         clientId,
@@ -65,7 +65,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
                         clientId,
                         newStatus = Status.WAITING_FOR_START,
                         newTrainingPlan = TrainingPlan(
-                            if (startFromAugust) 8 else LocalDate.now().monthValue,
+                            LocalDate.now().monthValue,
                             if (text == "6 часов") 6 else 10,
                             0
                         )
