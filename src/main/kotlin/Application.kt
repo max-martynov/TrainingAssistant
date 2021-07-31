@@ -30,8 +30,8 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     launch(context) {
         iterateOverClients(
-            LocalTime.now().plusSeconds(5),
-            Duration.ofSeconds(5)
+          //  LocalTime.now().plusSeconds(5),
+          //  Duration.ofSeconds(5)
         )
     }
 
