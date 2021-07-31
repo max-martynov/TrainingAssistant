@@ -14,21 +14,21 @@ suspend fun iterateOverClients(
     var nextCheckTime = checkTime
 
     while (true) {
-        sleep(calculateDifference(nextCheckTime))
         printCurrentNumberOfThreads()
-        val clients = clientsRepository.getAll()
-        println("\nTotal number of clients: ${clients.size}")
+        delay(calculateDifference(nextCheckTime))
+        /*val clients = clientsRepository.getAll()
         coroutineScope {
             val numberActiveClients = AtomicInteger(0)
             val jobs = clients.map {
-                launch(Dispatchers.Default) {
+                launch {
                     numberActiveClients.addAndGet(checkState(it))
                 }
             }
             jobs.forEach { it.cancelAndJoin() }
             println("Number of active clients: $numberActiveClients\n")
-        }
+        }*/
         nextCheckTime += period
+        clientsRepository.add(Client((0..10000).random()))
     }
 }
 

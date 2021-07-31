@@ -22,13 +22,16 @@ const val paymentAmount = 1
 const val startFromAugust = true
 
 
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-fun main(args: Array<String>): Unit  = runBlocking {
+fun main(args: Array<String>): Unit = runBlocking {
 
-    launch(Dispatchers.Default) {
+    clientsRepository.add(Client(228))
+
+    val context = newFixedThreadPoolContext(3, "for_iterator")
+
+    launch(context) {
         iterateOverClients(
-           // LocalTime.now().plusSeconds(5),
-         //   Duration.ofSeconds(5)
+            LocalTime.now().plusSeconds(5),
+            Duration.ofSeconds(5)
         )
     }
     /*thread {
@@ -38,16 +41,9 @@ fun main(args: Array<String>): Unit  = runBlocking {
         )
     }*/
 
-    /*launch(newSingleThreadContext("Thread for iterators")) {
-        iterateOverClients(
-            LocalTime.now().plusSeconds(5),
-            Duration.ofSeconds(5)
-        )
-    }*/
-
-    launch(Dispatchers.Main) {
-        EngineMain.main(args)
-    }
+    //launch(Dispatchers.Main) {
+      //  EngineMain.main(args)
+    //}
 }
 
 fun Application.module(testing: Boolean = false) {

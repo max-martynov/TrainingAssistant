@@ -52,7 +52,6 @@ class InMemoryClientsRepository : ClientsRepository {
         }
     }
 
-
     override fun update(
         id: Int,
         newTrial: Boolean?,
@@ -91,10 +90,7 @@ class InMemoryClientsRepository : ClientsRepository {
     }
 }
 
-class InDataBaseClientsRepository(
-    connStr: String = "jdbc:h2:~/newtest",
-    driver: String = "org.h2.Driver"
-) : ClientsRepository {
+class InDataBaseClientsRepository() : ClientsRepository {
 
     init {
         val config = HikariConfig()
@@ -103,6 +99,7 @@ class InDataBaseClientsRepository(
         config.password = "aRootPassword"
         config.driverClassName = "org.h2.Driver"
         config.maxLifetime = 300000
+        config.maximumPoolSize = 3
 
         Database.connect(HikariDataSource(config))
 
