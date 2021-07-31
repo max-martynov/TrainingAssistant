@@ -1,0 +1,237 @@
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619042,"id":466,"out":0,"peer_id":217619042,"text":"привет","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Старт!","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"10 часов","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"228","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Начать цикл","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Закончить цикл","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Устал / утомился","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Нет","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+
+
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619041,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619043,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619044,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619045,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619046,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619047,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619048,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619049,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619050,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619051,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619052,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619053,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619054,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619055,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619056,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619057,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619058,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619059,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619060,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619061,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619062,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619063,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619064,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619065,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619066,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619067,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619068,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619069,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619070,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1625899520,"from_id":217619071,"id":466,"out":0,"peer_id":217619041,"text":"fuck you","conversation_message_id":435,"fwd_messages":[],"important":false,"random_id":0,"attachments":[{"type":"market","market":{"availability":0,"category":{"id":8,"name":"????????? ? ??????","section":{"id":8,"name":"????? ? ?????"}},"description":"????? ????????? ? ????? ????? ?????","id":4486738,"owner_id":-205462754,"price":{"amount":"1000","currency":{"id":643,"name":"RUB","title":"???."},"text":"500??"},"title":"?????????? ?? ????????","date":1624865793,"thumb_photo":"https:\/\/sun9-84.userapi.com\/impg\/SUf0Thl_HvL8wp51_1skSpE3IbB8iJ-bBYSffQ\/XEFXm-gOnT8.jpg?size=400x0&crop=0.016,0.227,0.969,0.545&quality=95&sign=96bede0901e5d58acd7c5ded58383f3c&c_uniq_tag=L3In-hTf7CKtHx4HA0oiKw0bvIjv5uEpTNjcDTsE1nU"}}],"is_hidden":false},"group_id":205462754,"event_id":"fbea8ea87e876408373c4faa6bcacf34ddb8945c","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
