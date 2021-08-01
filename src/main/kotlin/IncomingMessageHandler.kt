@@ -197,7 +197,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
                 }
             }
             Status.WAITING_FOR_PAYMENT -> {
-                if (text == "228") {
+                if (text == "228 337") {
                     confirmPayment(client, null)
                 } else {
                     sendMessage(
