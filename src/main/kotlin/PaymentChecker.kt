@@ -37,7 +37,7 @@ suspend fun checkPayment(notification: String) = coroutineScope {
     else if (QiwiAPI.isPaid(client.billId)) {
         async { confirmPayment(client, messageEvent) }
         if (client.trial)
-            async { sendMessage(client.id, "Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".") }
+            async { sendMainKeyboardWithPromocodes(client.id) }
         // TODO - process other states and send appropriate message
     }
     else {
@@ -99,3 +99,12 @@ fun getShowSnackbarString(text: String): String =
             "text": "$text"
         }
     """.trimIndent()
+
+suspend fun sendMainKeyboardWithPromocodes(peerId: Int) {
+    sendMessage(
+        peerId,
+        "Впереди месяц интересных тренировок! Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".\n" +
+                "Также не забывайте, что Вам теперь доступны промокоды 🎁",
+        keyboard = mainKeyboardWithPromocodes
+    )
+}

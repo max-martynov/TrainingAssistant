@@ -46,7 +46,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
         when (client.status) {
             Status.NEW_CLIENT -> {
                 if (text == "Старт!") {
-                    sendMainKeyboard(clientId)
+                    sendMainKeyboardWithoutPromocodes(clientId)
                     async { sendSelectTrainingPlan(clientId) }
                     async { clientsRepository.update(
                         clientId,
@@ -65,7 +65,7 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
                         clientId,
                         newStatus = Status.WAITING_FOR_START,
                         newTrainingPlan = TrainingPlan(
-                            maxOf(8, LocalDate.now().monthValue),
+                            LocalDate.now().monthValue,
                             if (text == "6 часов") 6 else 10,
                             0
                         )
@@ -241,11 +241,11 @@ suspend fun sendGreetings(peerId: Int) {
     )
 }
 
-suspend fun sendMainKeyboard(peerId: Int) {
+suspend fun sendMainKeyboardWithoutPromocodes(peerId: Int) {
     sendMessage(
         peerId,
         "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
-        keyboard = mainKeyboard
+        keyboard = mainKeyboardWithoutPromocodes
     )
 }
 
