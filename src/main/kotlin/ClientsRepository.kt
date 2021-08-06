@@ -25,6 +25,7 @@ interface ClientsRepository {
         newInterviewResults: MutableList<Int>? = null,
         newBillId: String? = null
     )
+    suspend fun delete(clientId: Int)
 
     fun clear()
 }
@@ -83,6 +84,12 @@ class InMemoryClientsRepository : ClientsRepository {
             if (newBillId != null)
                 client.billId = newBillId
             clients.add(client)
+        }
+    }
+
+    override suspend fun delete(clientId: Int) {
+        lock.withLock {
+            clients.remove(clients.find { it.id == clientId })
         }
     }
 
@@ -193,6 +200,12 @@ class InDataBaseClientsRepository() : ClientsRepository {
                 if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
                 if (newBillId != null) it[billId] = newBillId
             }
+        }
+    }
+
+    override suspend fun delete(clientId: Int) {
+        newSuspendedTransaction {
+            Clients.deleteWhere { Clients.id eq clientId }
         }
     }
 

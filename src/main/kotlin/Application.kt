@@ -26,6 +26,9 @@ const val paymentAmount = 500
 
 fun main(args: Array<String>): Unit = runBlocking {
 
+    //    clientsRepository.clear()
+    clientsRepository.delete(217619042)
+
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
     launch(context) {
@@ -41,8 +44,6 @@ fun main(args: Array<String>): Unit = runBlocking {
 }
 
 fun Application.module(testing: Boolean = false) {
-
-//    clientsRepository.clear()
 
     install(ContentNegotiation) {
         json(Json {
