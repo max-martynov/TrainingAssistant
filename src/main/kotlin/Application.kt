@@ -28,7 +28,9 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     //    clientsRepository.clear()
     //clientsRepository.delete(217619042)
-    clientsRepository.delete(15733972)
+    //clientsRepository.delete(15733972)
+    val client = clientsRepository.findById(247100783)
+    println(client)
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
