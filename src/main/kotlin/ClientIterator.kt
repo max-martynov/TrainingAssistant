@@ -1,3 +1,4 @@
+import io.ktor.client.features.*
 import kotlinx.coroutines.*
 import org.h2.util.DateTimeUtils.getDayOfWeek
 import java.lang.Thread.sleep
@@ -13,6 +14,8 @@ suspend fun iterateOverClients(
 ) {
     var nextCheckTime = checkTime
 
+    val vkApiClient = VKApiClient()
+
     while (true) {
         delay(calculateDifference(nextCheckTime))
         printInfo()
@@ -22,7 +25,7 @@ suspend fun iterateOverClients(
             val numberActiveClients = AtomicInteger(0)
             val jobs = clients.map {
                 launch {
-                    numberActiveClients.addAndGet(checkState(it))
+                    numberActiveClients.addAndGet(checkState(it, vkApiClient))
                 }
             }
             jobs.forEach { it.join() }
@@ -30,11 +33,10 @@ suspend fun iterateOverClients(
         }
         println("\n------------------------------------------------------\n")
         nextCheckTime += period
-        //clientsRepository.add(Client((0..10000).random()))
     }
 }
 
-suspend fun checkState(client: Client): Int {
+suspend fun checkState(client: Client, vkApiClient: VKApiClient): Int {
     println(client)
     val activeStatuses = listOf(Status.ACTIVE, Status.WAITING_FOR_START, Status.WAITING_FOR_RESULTS)
     if (activeStatuses.contains(client.status) && !client.trial) {
@@ -43,7 +45,7 @@ suspend fun checkState(client: Client): Int {
                 client.id,
                 newStatus = Status.WAITING_FOR_PAYMENT
             )
-            requestPaymentToContinue(client)
+            requestPaymentToContinue(client, vkApiClient)
         } else {
             clientsRepository.update(
                 client.id,
@@ -55,13 +57,13 @@ suspend fun checkState(client: Client): Int {
     return 0
 }
 
-suspend fun requestPaymentToContinue(client: Client) {
+suspend fun requestPaymentToContinue(client: Client, vkApiClient: VKApiClient) {
     val phrases = listOf(
         "К сожалению, месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс.",
         "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
     )
     client.updateBill()
-    VkAPI.sendMessage(
+    vkApiClient.sendMessage(
         client.id,
         phrases.random(),
         keyboard = getPaymentKeyboard(QiwiAPI.getPayUrl(client.billId))
@@ -78,3 +80,4 @@ private fun calculateDifference(requiredTime: LocalTime) =
     else
         TimeUnit.DAYS.toMillis(1) - LocalTime.of(0, 0).until(LocalTime.now(), ChronoUnit.MILLIS) +
                 LocalTime.of(0, 0).until(requiredTime, ChronoUnit.MILLIS)
+

@@ -1,5 +1,6 @@
 import io.ktor.application.*
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.features.*
@@ -29,23 +30,25 @@ fun main(args: Array<String>): Unit = runBlocking {
     //    clientsRepository.clear()
     //clientsRepository.delete(217619042)
     //clientsRepository.delete(15733972)
-    val client = clientsRepository.findById(247100783)!!
-    client.updateBill()
-    requestPaymentToStart(client)
+    //val client = clientsRepository.findById(247100783)!!
+    //client.updateBill()
+    //requestPaymentToStart(client)
 
+    //sendMessage(1625899520, "Тест")
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
-    launch(context) {
+/*    launch(context) {
         iterateOverClients(
           //  LocalTime.now().plusSeconds(5),
           //  Duration.ofSeconds(5)
         )
-    }
+    }*/
 
+    /*
     launch(Dispatchers.Main) {
         EngineMain.main(args)
-    }
+    }*/
 }
 
 fun Application.module(testing: Boolean = false) {

@@ -19,9 +19,9 @@ data class TrainingPlan(
     private val pathToFile = "$pathToDirectory/$month/$hours/$week.pdf"
 
     suspend fun prepareAsAttachment(peerId: Int): Pair<Int, Int> {
-        val uploadUrl = VkAPI.getMessagesUploadServer(peerId)
-        val file = VkAPI.uploadFile(uploadUrl, pathToFile)
-        return VkAPI.saveDoc(file)
+        val uploadUrl = getMessagesUploadServer(peerId)
+        val file = uploadFile(uploadUrl, pathToFile)
+        return saveDoc(file)
     }
 }
 

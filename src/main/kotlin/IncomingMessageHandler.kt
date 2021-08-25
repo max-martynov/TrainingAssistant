@@ -1,4 +1,3 @@
-import VkAPI.sendMessage
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import io.ktor.application.*
 import io.ktor.client.*
@@ -16,19 +15,98 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import stateHandlers.*
 import java.lang.management.ManagementFactory
 import java.time.LocalDate
 import java.util.*
 
-@Serializable
-private data class EventWithMessage(
-    val type: String,
-    @SerialName("object")
-    val message: IncomingMessage,
-    @SerialName("group_id")
-    val groupId: Long
-)
 
+class IncomingMessageHandler(
+    private val clientsRepository: ClientsRepository,
+    private val vKApiClient: VKApiClient
+) {
+
+    suspend fun receiveMessage(notification: String) {
+        val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
+        val clientId = event.message.fromId
+        val text = event.message.text
+        val attachments = event.message.attachments
+
+        println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}")
+
+        val client = clientsRepository.findById(clientId)
+
+        if (client == null && attachments.isNotEmpty() && isOurProduct(attachments[0].toString())) {
+            registerNewClient(clientId)
+        }
+        else if (client != null) {
+            getAppropriateHandler(client).handle(client, text)
+        }
+    }
+
+    private fun isOurProduct(attachment: String): Boolean {
+        return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
+                Json {
+                    ignoreUnknownKeys = true
+                }.decodeFromString<MarketAttachment>(attachment).market.category.id == productId
+    }
+
+    private suspend fun registerNewClient(clientId: Int): Unit = coroutineScope {
+        async { clientsRepository.add(Client(clientId)) }
+        async { sendGreetings(clientId) }
+    }
+
+    private suspend fun sendGreetings(peerId: Int) {
+        vKApiClient.sendMessage(
+            peerId,
+            "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
+                    "🔹 Если у Вас внизу не отображаются кнопки \"Старт\" и \"Инструкция\", нажмите на значок чуть правее поля для ввода сообещния.\n" +
+                    "🔹 Если у Вас есть вопросы о том, как тут все работает, жмите на \"Инструкция\".\n" +
+                    "🔹 Если же Вы все поняли и готовы начинать, жмите \"Старт!\".",
+            keyboard = pressStartKeyboard
+        )
+    }
+
+    private fun getAppropriateHandler(client: Client): StateHandler {
+        return when(client.status) {
+            Status.NEW_CLIENT -> NewClientHandler(clientsRepository, vKApiClient)
+            Status.WAITING_FOR_PLAN -> WaitingForPlanHandler(clientsRepository, vKApiClient)
+            Status.WAITING_FOR_START -> WaitingForStartHandler(clientsRepository, vKApiClient)
+            Status.ACTIVE -> ActiveClientHandler(clientsRepository, vKApiClient)
+            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient)
+            else -> WaitingForPaymentHandler(clientsRepository, vKApiClient)
+        }
+    }
+
+    companion object {
+        @Serializable
+        private data class EventWithMessage(
+            val type: String,
+            @SerialName("object")
+            val message: IncomingMessage,
+            @SerialName("group_id")
+            val groupId: Long
+        )
+
+        @Serializable
+        data class Attachment(val type: String)
+
+        @Serializable
+        data class MarketAttachment(val market: Market) {
+            @Serializable
+            data class Market(val category: Category) {
+                @Serializable
+                data class Category(val id: Int)
+            }
+        }
+    }
+}
+
+
+
+
+
+/*
 suspend fun handleIncomingMessage(notification: String) = coroutineScope {
     val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
     val clientId = event.message.fromId
@@ -211,35 +289,9 @@ suspend fun handleIncomingMessage(notification: String) = coroutineScope {
     }
 }
 
-@Serializable
-data class Attachment(val type: String)
 
-@Serializable
-data class Category(val id: Int)
 
-@Serializable
-data class Market(val category: Category)
 
-@Serializable
-data class MarketAttachment(val market: Market)
-
-fun isOurProduct(attachment: String): Boolean {
-    return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
-            Json {
-                ignoreUnknownKeys = true
-            }.decodeFromString<MarketAttachment>(attachment).market.category.id == productId
-}
-
-suspend fun sendGreetings(peerId: Int) {
-    sendMessage(
-        peerId,
-        "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
-                "🔹 Если у Вас внизу не отображаются кнопки \"Старт\" и \"Инструкция\", нажмите на значок чуть правее поля для ввода сообещния.\n" +
-                "🔹 Если у Вас есть вопросы о том, как тут все работает, жмите на \"Инструкция\".\n" +
-                "🔹 Если же Вы все поняли и готовы начинать, жмите \"Старт!\".",
-        keyboard = pressStartKeyboard
-    )
-}
 
 suspend fun sendMainKeyboardWithoutPromocodes(peerId: Int) {
     sendMessage(
@@ -297,7 +349,7 @@ suspend fun requestPaymentToStart(client: Client) {
                 "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
         keyboard = getPaymentKeyboard(QiwiAPI.getPayUrl(client.billId))
     )
-}
+}*/
 
 /**
  * 1. Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?
