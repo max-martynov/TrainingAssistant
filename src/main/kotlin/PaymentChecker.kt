@@ -1,25 +1,24 @@
-import kotlinx.coroutines.Dispatchers
+import ApiClients.VKApiClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.lang.management.ManagementFactory
 
 
 class PaymentChecker(
     private val clientsRepository: ClientsRepository,
-    private val vKApiClient: VKApiClient
+    private val vKApiClient: VKApiClient,
+    private val trainingPlansRepository: TrainingPlansRepository,
+    private val qiwiApiClient: QiwiApiClient
 ) {
-
     suspend fun checkPayment(notification: String) = coroutineScope {
         val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
         val client = clientsRepository.findById(messageEvent.userId) ?: return@coroutineScope
         if (client.status != Status.WAITING_FOR_PAYMENT) {
             vKApiClient.sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
-        } else if (QiwiAPI.isPaid(client.billId)) {
+        } else if (qiwiApiClient.isBillPaid(client.billId)) {
             async { confirmPayment(client, messageEvent) }
             if (client.trial)
                 async { sendMainKeyboardWithPromocodes(client.id) }
@@ -32,7 +31,7 @@ class PaymentChecker(
         }
     }
 
-    private suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
+    private suspend fun confirmPayment(client: Client, messageEvent: VKApiClient.MessageEvent?) {
         val phrase =
             if (client.trial)
                 "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
@@ -43,7 +42,7 @@ class PaymentChecker(
             vKApiClient.sendMessageEventAnswer(messageEvent, getShowSnackbarString(phrase))
     }
 
-    private suspend fun updateClient(client: Client) {
+    suspend fun updateClient(client: Client) {
         if (client.trial) { // for clients after trial
             clientsRepository.update(
                 client.id,
@@ -62,7 +61,7 @@ class PaymentChecker(
             clientsRepository.update(
                 client.id,
                 newStatus = Status.WAITING_FOR_START,
-                newTrainingPlan = determineNextTrainingPlan(updatedClient),
+                newTrainingPlan = trainingPlansRepository.determineNextTrainingPlan(updatedClient),
                 newInterviewResults = mutableListOf()
             )
         } else { // for usual clients
@@ -84,7 +83,7 @@ class PaymentChecker(
     """.trimIndent()
 
     private suspend fun sendMainKeyboardWithPromocodes(peerId: Int) {
-        vKApiClient.sendMessage(
+        vKApiClient.sendMessageSafely(
             peerId,
             "Впереди месяц интересных тренировок! Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".\n" +
                     "Также не забывайте, что Вам теперь доступны промокоды 🎁",
@@ -92,24 +91,13 @@ class PaymentChecker(
         )
     }
 
-    companion object {
-        @Serializable
-        private data class Event(
-            val type: String,
-            @SerialName("object")
-            val messageEvent: MessageEvent,
-            @SerialName("group_id")
-            val groupId: Long
-        )
+    @Serializable
+    private data class Event(
+        val type: String,
+        @SerialName("object")
+        val messageEvent: VKApiClient.MessageEvent,
+        @SerialName("group_id")
+        val groupId: Long
+    )
 
-        @Serializable
-        data class MessageEvent(
-            @SerialName("user_id")
-            val userId: Int,
-            @SerialName("peer_id")
-            val peerId: Int,
-            @SerialName("event_id")
-            val eventId: String
-        )
-    }
 }

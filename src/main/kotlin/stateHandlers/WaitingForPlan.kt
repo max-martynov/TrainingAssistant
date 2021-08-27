@@ -3,7 +3,7 @@ package stateHandlers
 import Client
 import ClientsRepository
 import TrainingPlan
-import VKApiClient
+import ApiClients.VKApiClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.time.LocalDate
@@ -26,7 +26,7 @@ class WaitingForPlanHandler(
             ) }
             async { sendTrialMessage(client.id) }
         } else {
-            vkApiClient.sendMessage(
+            vkApiClient.sendMessageSafely(
                 client.id,
                 "Выберите, пожалуйста, сколько часов в неделю хотите тренироваться."
             )
@@ -34,7 +34,7 @@ class WaitingForPlanHandler(
     }
 
     private suspend fun sendTrialMessage(peerId: Int) {
-        vkApiClient.sendMessage(
+        vkApiClient.sendMessageSafely(
             peerId,
             "Хорошие новости! Чтобы Вы попробовали обновленные тренировки по подписке, не рискую своими деньгами, первая неделя у нас в подарок 🎁\n" +
                     "Нажмите \"Начать цикл\", чтобы получить план и начать недельный цикл."

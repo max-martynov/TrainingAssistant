@@ -29,7 +29,10 @@ import java.time.LocalTime
 fun getType(call: String): String =
     call.substring(9, call.indexOf('"', 9))
 
-fun Application.routing() {
+fun Application.routing(
+    incomingMessageHandler: IncomingMessageHandler,
+    paymentChecker: PaymentChecker
+) {
     routing {
         post("/") {
             withContext(Dispatchers.IO) {
@@ -38,7 +41,7 @@ fun Application.routing() {
                     when (getType(notification)) {
                         "message_new" -> {
                             call.respondText("ok")
-                            handleIncomingMessage(notification)
+                            incomingMessageHandler.receiveMessage(notification)
                         }
                         /*"vkpay_transaction" -> {
                             call.respondText("ok")
@@ -46,7 +49,7 @@ fun Application.routing() {
                         }*/
                         "message_event" -> {
                             call.respondText("ok")
-                            checkPayment(notification)
+                            paymentChecker.checkPayment(notification)
                         }
                         "confirmation" -> {
                             val responseString = "be0eac70" // Warning! May change after some time

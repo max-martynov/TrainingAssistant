@@ -2,7 +2,7 @@ package stateHandlers
 
 import Client
 import ClientsRepository
-import VKApiClient
+import ApiClients.VKApiClient
 
 abstract class StateHandler(
     private val clientsRepository: ClientsRepository,

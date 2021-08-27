@@ -1,3 +1,7 @@
+package ApiClients
+
+import Client
+import createHttpClient
 import io.ktor.client.*
 import io.ktor.client.engine.jetty.*
 import io.ktor.client.features.*
@@ -11,7 +15,6 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.LocalDateTime
 
@@ -19,25 +22,25 @@ class VKApiClient {
     private val accessToken =
         "8d8088feeb18744bc2e5a7ed11067faf9cf495fce1c99c6c430e59b7e093f6a45ff827bc0333dd1bd2172" // "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e" for Fake Community
     private val apiVersion = "5.81"
-    private val client = createHttpClient()
+    private val httpClient = createHttpClient()
 
 
-    suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
+    suspend fun sendMessageSafely(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
         try {
-            tryToSendMessage(peerId, text, keyboard, attachment)
+            sendMessage(peerId, text, keyboard, attachment)
         } catch (e: ResponseException) {
             println("${LocalDateTime.now()}: Exception while sending a message - ${e.message}\nRetrying...")
             delay(1000L)
             try {
-                tryToSendMessage(peerId, text, keyboard, attachment)
+                sendMessage(peerId, text, keyboard, attachment)
             } catch (e: ResponseException) {
                 println("${LocalDateTime.now()}: Still exception - ${e.message}\n")
             }
         }
     }
 
-    private suspend fun tryToSendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
-        client.post<HttpResponse>(
+    private suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
+        httpClient.post<HttpResponse>(
             "https://api.vk.com/method/messages.send?"
         ) {
             parameter("access_token", accessToken)
@@ -64,7 +67,7 @@ class VKApiClient {
     }
 
     private suspend fun tryToSendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
-        client.post<HttpResponse>(
+        httpClient.post<HttpResponse>(
             "https://api.vk.com/method/messages.sendMessageEventAnswer?"
         ) {
             parameter("access_token", accessToken)
@@ -72,19 +75,26 @@ class VKApiClient {
             parameter("user_id", messageEvent.userId)
             parameter("peer_id", messageEvent.peerId)
             parameter("event_data", eventData)
-            parameter("v", "5.81")
+            parameter("v", apiVersion)
         }
 
     }
 
-    suspend fun getMessagesUploadServer(peerId: Int): String {
-        return client.post<ResponseWithUrl>(
+    suspend fun convertFileToAttachment(pathToFile: String, client: Client): String {
+        val uploadUrl = getMessagesUploadServer(client.id)
+        val file = uploadFile(uploadUrl, pathToFile)
+        val ids = saveDoc(file)
+        return "doc${ids.first}_${ids.second}"
+    }
+
+    private suspend fun getMessagesUploadServer(peerId: Int): String {
+        return httpClient.post<ResponseWithUrl>(
             "https://api.vk.com/method/docs.getMessagesUploadServer?"
         ) {
             parameter("access_token", accessToken)
             parameter("type", "doc")
             parameter("peer_id", peerId)
-            parameter("v", "5.81")
+            parameter("v", apiVersion)
         }.response.uploadUrl
     }
 
@@ -97,8 +107,8 @@ class VKApiClient {
         )
     }
 
-    suspend fun uploadFile(address: String, pathToFile: String): String {
-        val response: ResponseWithFile = client.submitFormWithBinaryData(
+    private suspend fun uploadFile(address: String, pathToFile: String): String {
+        val response: ResponseWithFile = httpClient.submitFormWithBinaryData(
             url = address,
             formData = formData {
                 append("file", File(pathToFile).readBytes(), Headers.build {
@@ -113,13 +123,13 @@ class VKApiClient {
     @Serializable
     private data class ResponseWithFile(val file: String)
 
-    suspend fun saveDoc(file: String): Pair<Int, Int> {
-        val response = client.post<ResponseWithDocs>(
+    private suspend fun saveDoc(file: String): Pair<Int, Int> {
+        val response = httpClient.post<ResponseWithDocs>(
             "https://api.vk.com/method/docs.save?"
         ) {
             parameter("access_token", accessToken)
             parameter("file", file)
-            parameter("v", "5.81")
+            parameter("v", apiVersion)
         }
         return Pair(response.docs[0].ownerId, response.docs[0].id)
     }
@@ -133,6 +143,16 @@ class VKApiClient {
             val ownerId: Int
         )
     }
+
+    @Serializable
+    data class MessageEvent(
+        @SerialName("user_id")
+        val userId: Int,
+        @SerialName("peer_id")
+        val peerId: Int,
+        @SerialName("event_id")
+        val eventId: String
+    )
 }
 
 /*

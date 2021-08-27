@@ -13,62 +13,61 @@ data class TrainingPlan(
     val month: Int,
     val hours: Int,
     val week: Int,
+)
+
+
+class TrainingPlansRepository(
+    private val pathToDirectory: String
 ) {
-    private val pathToDirectory = "src/main/resources/TrainingPlans"
 
-    private val pathToFile = "$pathToDirectory/$month/$hours/$week.pdf"
+    fun getPathToFile(trainingPlan: TrainingPlan) =
+        "$pathToDirectory/${trainingPlan.month}/${trainingPlan.hours}/${trainingPlan.week}.pdf"
 
-    suspend fun prepareAsAttachment(peerId: Int): Pair<Int, Int> {
-        val uploadUrl = getMessagesUploadServer(peerId)
-        val file = uploadFile(uploadUrl, pathToFile)
-        return saveDoc(file)
-    }
-}
-
-fun determineNextTrainingPlan(client: Client): TrainingPlan? {
-    if (client.weeksPassed == 4)
-        return null
-    val month = if (client.trainingPlan.week != 4)
-        client.trainingPlan.month
-    else if (client.trainingPlan.month != LocalDate.now().monthValue)
-        LocalDate.now().monthValue
-    else
-        calculateNextMonth(client.trainingPlan.month)
-    val week = calculateNextWeek(client.trainingPlan.week)
-    return TrainingPlan(month, determineNextHours(client), week)
-}
-
-fun determineNextHours(client: Client): Int =
-    when (client.trainingPlan.hours) {
-        1 -> {
-            if (client.interviewResults[1] == 1)
-                1
-            else if (client.interviewResults[2] == 0)
-                6
-            else
-                10
-        }
-        6 -> {
-            if (client.interviewResults[3] == 0)
-                1
-            else if (client.interviewResults[1] == 0)
-                10
-            else
-                6
-        }
-        10 -> {
-            if (client.interviewResults[3] == 0)
-                1
-            else if (client.interviewResults[1] == 0)
-                6
-            else
-                10
-        }
-        else -> -1
+    fun determineNextTrainingPlan(client: Client): TrainingPlan? {
+        if (client.weeksPassed == 4)
+            return null
+        val month = if (client.trainingPlan.week != 4)
+            client.trainingPlan.month
+        else if (client.trainingPlan.month != LocalDate.now().monthValue)
+            LocalDate.now().monthValue
+        else
+            calculateNextMonth(client.trainingPlan.month)
+        val week = calculateNextWeek(client.trainingPlan.week)
+        return TrainingPlan(month, determineNextHours(client), week)
     }
 
-fun calculateNextWeek(currentWeek: Int): Int =
-    maxOf(1, (currentWeek + 1) % 5)
+    private fun determineNextHours(client: Client): Int =
+        when (client.trainingPlan.hours) {
+            1 -> {
+                if (client.interviewResults[1] == 1)
+                    1
+                else if (client.interviewResults[2] == 0)
+                    6
+                else
+                    10
+            }
+            6 -> {
+                if (client.interviewResults[3] == 0)
+                    1
+                else if (client.interviewResults[1] == 0)
+                    10
+                else
+                    6
+            }
+            10 -> {
+                if (client.interviewResults[3] == 0)
+                    1
+                else if (client.interviewResults[1] == 0)
+                    6
+                else
+                    10
+            }
+            else -> -1
+        }
 
-fun calculateNextMonth(currentMonth: Int): Int =
-    maxOf(1, (currentMonth + 1) % 13)
+    private fun calculateNextWeek(currentWeek: Int): Int =
+        maxOf(1, (currentWeek + 1) % 5)
+
+    private fun calculateNextMonth(currentMonth: Int): Int =
+        maxOf(1, (currentMonth + 1) % 13)
+}

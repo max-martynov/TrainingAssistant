@@ -1,3 +1,5 @@
+import ApiClients.VKApiClient
+import com.petersamokhin.vksdk.core.client.VkApiClient
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.features.*
@@ -15,13 +17,14 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.repackaged.net.bytebuddy.build.Plugin
 import kotlinx.serialization.json.Json
 import routing
+import java.io.InputStream
 import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlin.concurrent.thread
 
-val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
+//val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
 const val productId = 8 // 803 for Fake Community
 const val paymentAmount = 500
 
@@ -38,6 +41,67 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
+    val clientsRepository = InDataBaseClientsRepository()
+    val vkApiClient = VKApiClient()
+    val trainingPlansRepository = TrainingPlansRepository(
+        "src/main/resources/TrainingPlans"
+    )
+    val qiwiApiClient = QiwiApiClient()
+
+    val paymentChecker = PaymentChecker(
+        clientsRepository,
+        vkApiClient,
+        trainingPlansRepository,
+        qiwiApiClient
+    )
+
+    val incomingMessageHandler = IncomingMessageHandler(
+        clientsRepository,
+        vkApiClient,
+        trainingPlansRepository,
+        paymentChecker
+    )
+
+    embeddedServer(Netty, port = 8080, configure = {
+        runningLimit = 20
+        shareWorkGroup = true
+    }) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+        routing(incomingMessageHandler, paymentChecker)
+        /*routing {
+            post("/") {
+                withContext(Dispatchers.IO) {
+                    call.receive<InputStream>().use {
+                        val notification = it.readBytes().decodeToString()
+                        when (getType(notification)) {
+                            "message_new" -> {
+                                call.respondText("ok")
+                               incomingMessageHandler.receiveMessage(notification)
+                            }
+                            /*"vkpay_transaction" -> {
+                                call.respondText("ok")
+                                receivePayment(notification)
+                            }*/
+                            "message_event" -> {
+                                call.respondText("ok")
+                                paymentChecker.checkPayment(notification)
+                            }
+                            "confirmation" -> {
+                                val responseString = "be0eac70" // Warning! May change after some time
+                                call.respondText(responseString)
+                            }
+                            else -> call.respondText("ok")
+                        }
+                    }
+                }
+            }
+        }*/
+    }.start(true)
+
 /*    launch(context) {
         iterateOverClients(
           //  LocalTime.now().plusSeconds(5),
@@ -51,13 +115,11 @@ fun main(args: Array<String>): Unit = runBlocking {
     }*/
 }
 
+/*
 fun Application.module(testing: Boolean = false) {
 
-    install(ContentNegotiation) {
-        json(Json {
-            ignoreUnknownKeys = true
-        })
-    }
+
 
     routing()
 }
+*/

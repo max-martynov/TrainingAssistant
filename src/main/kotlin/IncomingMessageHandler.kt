@@ -1,15 +1,5 @@
+import ApiClients.VKApiClient
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
-import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,13 +7,13 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import stateHandlers.*
 import java.lang.management.ManagementFactory
-import java.time.LocalDate
-import java.util.*
 
 
 class IncomingMessageHandler(
     private val clientsRepository: ClientsRepository,
-    private val vKApiClient: VKApiClient
+    private val vKApiClient: VKApiClient,
+    private val trainingPlansRepository: TrainingPlansRepository,
+    private val paymentChecker: PaymentChecker
 ) {
 
     suspend fun receiveMessage(notification: String) {
@@ -57,7 +47,7 @@ class IncomingMessageHandler(
     }
 
     private suspend fun sendGreetings(peerId: Int) {
-        vKApiClient.sendMessage(
+        vKApiClient.sendMessageSafely(
             peerId,
             "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
                     "🔹 Если у Вас внизу не отображаются кнопки \"Старт\" и \"Инструкция\", нажмите на значок чуть правее поля для ввода сообещния.\n" +
@@ -71,9 +61,9 @@ class IncomingMessageHandler(
         return when(client.status) {
             Status.NEW_CLIENT -> NewClientHandler(clientsRepository, vKApiClient)
             Status.WAITING_FOR_PLAN -> WaitingForPlanHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_START -> WaitingForStartHandler(clientsRepository, vKApiClient)
+            Status.WAITING_FOR_START -> WaitingForStartHandler(clientsRepository, vKApiClient, trainingPlansRepository)
             Status.ACTIVE -> ActiveClientHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient)
+            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient, trainingPlansRepository)
             else -> WaitingForPaymentHandler(clientsRepository, vKApiClient)
         }
     }

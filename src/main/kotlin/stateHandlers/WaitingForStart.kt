@@ -2,14 +2,16 @@ package stateHandlers
 
 import Client
 import ClientsRepository
-import VKApiClient
+import TrainingPlansRepository
+import ApiClients.VKApiClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 
 class WaitingForStartHandler(
     private val clientsRepository: ClientsRepository,
-    private val vkApiClient: VKApiClient
+    private val vkApiClient: VKApiClient,
+    private val trainingPlansRepository: TrainingPlansRepository
 ) : StateHandler(clientsRepository, vkApiClient) {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
@@ -21,7 +23,7 @@ class WaitingForStartHandler(
             ) }
             async { sendPlan(client) }
         } else {
-            vkApiClient.sendMessage(
+            vkApiClient.sendMessageSafely(
                 client.id,
                 "Для того, чтобы получить план и начать недельный цикл, нажмите \"Начать цикл\"."
             )
@@ -29,7 +31,6 @@ class WaitingForStartHandler(
     }
 
     private suspend fun sendPlan(client: Client) {
-        val ids = client.trainingPlan.prepareAsAttachment(client.id)
         val phrases = listOf(
             "Хороших тренировок!",
             "Удачных тренировок!"
@@ -38,10 +39,14 @@ class WaitingForStartHandler(
             "Хорошего восстановления!"
         else
             phrases.random()
-        vkApiClient.sendMessage(
+        val attachment = vkApiClient.convertFileToAttachment(
+            trainingPlansRepository.getPathToFile(client.trainingPlan),
+            client
+        )
+        vkApiClient.sendMessageSafely(
             client.id,
             phrase,
-            attachment = "doc${ids.first}_${ids.second}"
+            attachment = attachment
         )
     }
 }

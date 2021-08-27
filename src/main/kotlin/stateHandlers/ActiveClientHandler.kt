@@ -2,7 +2,7 @@ package stateHandlers
 
 import Client
 import ClientsRepository
-import VKApiClient
+import ApiClients.VKApiClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -18,7 +18,7 @@ class ActiveClientHandler(
                 "Отличная работа!\nДля формирования плана на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
                 "Недельный цикл успешно завершен! Пройдите, пожалуйста, небольшой опрос, чтобы сформировать план на следующую неделю."
             )
-            vkApiClient.sendMessage(
+            vkApiClient.sendMessageSafely(
                 client.id,
                 if (client.trial)
                     "Поздравляю с окончанием пробной недели!\nДля формирования следующего плана, пройдите, пожалуйста, небольшой опрос."
@@ -31,7 +31,7 @@ class ActiveClientHandler(
             ) }
             async { sendInterviewQuestion(client, 0) }
         } else {
-            vkApiClient.sendMessage(
+            vkApiClient.sendMessageSafely(
                 client.id,
                 "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\"."
             )
@@ -39,7 +39,7 @@ class ActiveClientHandler(
     }
 
     private suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
-        vkApiClient.sendMessage(
+        vkApiClient.sendMessageSafely(
             client.id,
             client.interview.interviewQuestions[questionNumber].question,
             keyboard = client.interview.interviewQuestions[questionNumber].toString()
