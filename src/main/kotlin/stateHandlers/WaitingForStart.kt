@@ -3,7 +3,7 @@ package stateHandlers
 import Client
 import ClientsRepository
 import TrainingPlansRepository
-import ApiClients.VKApiClient
+import api.vk.VKApiClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 

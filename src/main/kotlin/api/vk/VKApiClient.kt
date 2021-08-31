@@ -1,17 +1,12 @@
-package ApiClients
+package api.vk
 
 import Client
 import createHttpClient
-import io.ktor.client.*
-import io.ktor.client.engine.jetty.*
 import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -77,7 +72,6 @@ class VKApiClient {
             parameter("event_data", eventData)
             parameter("v", apiVersion)
         }
-
     }
 
     suspend fun convertFileToAttachment(pathToFile: String, client: Client): String {
@@ -135,24 +129,7 @@ class VKApiClient {
     }
 
     @Serializable
-    private data class ResponseWithDocs(val docs: List<Doc>) {
-        @Serializable
-        data class Doc(
-            val id: Int,
-            @SerialName("owner_id")
-            val ownerId: Int
-        )
-    }
-
-    @Serializable
-    data class MessageEvent(
-        @SerialName("user_id")
-        val userId: Int,
-        @SerialName("peer_id")
-        val peerId: Int,
-        @SerialName("event_id")
-        val eventId: String
-    )
+    private data class ResponseWithDocs(val docs: List<Doc>)
 }
 
 /*

@@ -1,9 +1,11 @@
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+package api.qiwi
+
+import Client
+import ClientsRepository
+import createHttpClient
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import paymentAmount
 import java.time.OffsetDateTime
 
 
@@ -39,24 +41,39 @@ class QiwiApiClient {
         return response.status.value == "PAID"
     }
 
-    @Serializable
-    data class CustomFields(val themeCode: String)
+    suspend fun updateBill(client: Client, clientsRepository: ClientsRepository): Unit {
+        client.billId = generateBillId()
+        clientsRepository.update(
+            client.id,
+            newBillId = client.billId
+        )
+    }
+
+    private fun generateBillId(length: Int = 10): String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '_' + '-'
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
+    }
 
     @Serializable
-    data class Amount(val value: Int, val currency: String)
-
-    @Serializable
-    data class Bill(
+    private data class Bill(
         val amount: Amount,
         val expirationDateTime: String,
         val customFields: CustomFields
     )
 
     @Serializable
-    data class Status(val value: String, val changedDateTime: String)
+    private data class Amount(val value: Int, val currency: String)
 
     @Serializable
-    data class Response(val status: Status, val payUrl: String)
+    private data class CustomFields(val themeCode: String)
+
+    @Serializable
+    private data class Response(val status: Status, val payUrl: String) {
+        @Serializable
+        data class Status(val value: String, val changedDateTime: String)
+    }
 }
 
 /*

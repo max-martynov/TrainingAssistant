@@ -15,7 +15,6 @@ data class TrainingPlan(
     val week: Int,
 )
 
-
 class TrainingPlansRepository(
     private val pathToDirectory: String
 ) {

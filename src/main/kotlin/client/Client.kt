@@ -40,19 +40,4 @@ data class Client(
     fun completedInterview(): Boolean = interviewResults.size == interview.interviewQuestions.size
 
     fun isNew(): Boolean = daysPassed == -1
-
-    suspend fun updateBill(): Unit {
-        billId = generateBillId()
-        clientsRepository.update(
-            id,
-            newBillId = billId
-        )
-    }
-
-    private fun generateBillId(length: Int = 10): String {
-        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '_' + '-'
-        return (1..length)
-            .map { allowedChars.random() }
-            .joinToString("")
-    }
 }

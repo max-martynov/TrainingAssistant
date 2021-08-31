@@ -1,28 +1,14 @@
-import ApiClients.VKApiClient
-import com.petersamokhin.vksdk.core.client.VkApiClient
+import eventHandlers.IncomingMessageHandler
+import eventHandlers.MessageEventHandler
+import api.qiwi.QiwiApiClient
+import api.vk.VKApiClient
 import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.features.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
 import io.ktor.serialization.*
-import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.repackaged.net.bytebuddy.build.Plugin
 import kotlinx.serialization.json.Json
-import routing
-import java.io.InputStream
-import java.lang.management.ManagementFactory
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.LocalTime
-import kotlin.concurrent.thread
 
 //val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
 const val productId = 8 // 803 for Fake Community
@@ -48,7 +34,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     )
     val qiwiApiClient = QiwiApiClient()
 
-    val paymentChecker = PaymentChecker(
+    val paymentChecker = MessageEventHandler(
         clientsRepository,
         vkApiClient,
         trainingPlansRepository,
@@ -58,8 +44,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     val incomingMessageHandler = IncomingMessageHandler(
         clientsRepository,
         vkApiClient,
-        trainingPlansRepository,
-        paymentChecker
+        trainingPlansRepository
     )
 
     embeddedServer(Netty, port = 8080, configure = {
@@ -72,34 +57,6 @@ fun main(args: Array<String>): Unit = runBlocking {
             })
         }
         routing(incomingMessageHandler, paymentChecker)
-        /*routing {
-            post("/") {
-                withContext(Dispatchers.IO) {
-                    call.receive<InputStream>().use {
-                        val notification = it.readBytes().decodeToString()
-                        when (getType(notification)) {
-                            "message_new" -> {
-                                call.respondText("ok")
-                               incomingMessageHandler.receiveMessage(notification)
-                            }
-                            /*"vkpay_transaction" -> {
-                                call.respondText("ok")
-                                receivePayment(notification)
-                            }*/
-                            "message_event" -> {
-                                call.respondText("ok")
-                                paymentChecker.checkPayment(notification)
-                            }
-                            "confirmation" -> {
-                                val responseString = "be0eac70" // Warning! May change after some time
-                                call.respondText(responseString)
-                            }
-                            else -> call.respondText("ok")
-                        }
-                    }
-                }
-            }
-        }*/
     }.start(true)
 
 /*    launch(context) {

@@ -1,4 +1,11 @@
-import ApiClients.VKApiClient
+package client
+
+import Client
+import ClientsRepository
+import Status
+import api.qiwi.QiwiApiClient
+import api.vk.VKApiClient
+import getPaymentKeyboard
 import kotlinx.coroutines.*
 import java.lang.management.ManagementFactory
 import java.time.*
@@ -64,7 +71,7 @@ class ClientIterator(
             "К сожалению, месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс.",
             "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
         )
-        client.updateBill()
+        qiwiApiClient.updateBill(client, clientsRepository)
         vkApiClient.sendMessageSafely(
             client.id,
             phrases.random(),

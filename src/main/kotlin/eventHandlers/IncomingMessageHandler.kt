@@ -1,10 +1,16 @@
-import ApiClients.VKApiClient
+package eventHandlers
+
+import Client
+import ClientsRepository
+import Status
+import TrainingPlansRepository
+import api.vk.*
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import kotlinx.coroutines.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import pressStartKeyboard
+import productId
 import stateHandlers.*
 import java.lang.management.ManagementFactory
 
@@ -13,14 +19,13 @@ class IncomingMessageHandler(
     private val clientsRepository: ClientsRepository,
     private val vKApiClient: VKApiClient,
     private val trainingPlansRepository: TrainingPlansRepository,
-    private val paymentChecker: PaymentChecker
 ) {
 
-    suspend fun receiveMessage(notification: String) {
-        val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
-        val clientId = event.message.fromId
-        val text = event.message.text
-        val attachments = event.message.attachments
+    suspend fun receiveMessage(incomingMessage: IncomingMessage) {
+        //val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
+        val clientId = incomingMessage.fromId
+        val text = incomingMessage.text
+        val attachments = incomingMessage.attachments
 
         println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}")
 
@@ -65,29 +70,6 @@ class IncomingMessageHandler(
             Status.ACTIVE -> ActiveClientHandler(clientsRepository, vKApiClient)
             Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient, trainingPlansRepository)
             else -> WaitingForPaymentHandler(clientsRepository, vKApiClient)
-        }
-    }
-
-    companion object {
-        @Serializable
-        private data class EventWithMessage(
-            val type: String,
-            @SerialName("object")
-            val message: IncomingMessage,
-            @SerialName("group_id")
-            val groupId: Long
-        )
-
-        @Serializable
-        data class Attachment(val type: String)
-
-        @Serializable
-        data class MarketAttachment(val market: Market) {
-            @Serializable
-            data class Market(val category: Category) {
-                @Serializable
-                data class Category(val id: Int)
-            }
         }
     }
 }

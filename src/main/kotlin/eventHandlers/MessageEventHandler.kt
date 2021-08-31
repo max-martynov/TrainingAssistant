@@ -1,20 +1,22 @@
-import ApiClients.VKApiClient
+package eventHandlers
+
+import Client
+import ClientsRepository
+import Status
+import TrainingPlansRepository
+import api.qiwi.QiwiApiClient
+import api.vk.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import mainKeyboardWithPromocodes
 
-
-class PaymentChecker(
+class MessageEventHandler(
     private val clientsRepository: ClientsRepository,
     private val vKApiClient: VKApiClient,
     private val trainingPlansRepository: TrainingPlansRepository,
     private val qiwiApiClient: QiwiApiClient
 ) {
-    suspend fun checkPayment(notification: String) = coroutineScope {
-        val messageEvent = Json { ignoreUnknownKeys = true }.decodeFromString<Event>(notification).messageEvent
+    suspend fun checkPayment(messageEvent: MessageEvent) = coroutineScope {
         val client = clientsRepository.findById(messageEvent.userId) ?: return@coroutineScope
         if (client.status != Status.WAITING_FOR_PAYMENT) {
             vKApiClient.sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
@@ -31,7 +33,7 @@ class PaymentChecker(
         }
     }
 
-    private suspend fun confirmPayment(client: Client, messageEvent: VKApiClient.MessageEvent?) {
+    private suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
         val phrase =
             if (client.trial)
                 "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
@@ -90,14 +92,4 @@ class PaymentChecker(
             keyboard = mainKeyboardWithPromocodes
         )
     }
-
-    @Serializable
-    private data class Event(
-        val type: String,
-        @SerialName("object")
-        val messageEvent: VKApiClient.MessageEvent,
-        @SerialName("group_id")
-        val groupId: Long
-    )
-
 }
