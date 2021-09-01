@@ -19,7 +19,6 @@ class VKApiClient {
     private val apiVersion = "5.81"
     private val httpClient = createHttpClient()
 
-
     suspend fun sendMessageSafely(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
         try {
             sendMessage(peerId, text, keyboard, attachment)
@@ -76,13 +75,25 @@ class VKApiClient {
 
     suspend fun convertFileToAttachment(pathToFile: String, client: Client): String {
         val uploadUrl = getMessagesUploadServer(client.id)
+        println(uploadUrl)
         val file = uploadFile(uploadUrl, pathToFile)
-        val ids = saveDoc(file)
-        return "doc${ids.first}_${ids.second}"
+        println(file)
+        val doc = saveDoc(file)
+        val res = "doc${doc.ownerId}_${doc.id}"
+        println(res)
+        return res
     }
 
+    @Serializable
+    data class Response(
+        @SerialName("upload_url")
+        val uploadUrl: String
+    )
+    @Serializable
+    data class ResponseJson(val response: Response)
+
     private suspend fun getMessagesUploadServer(peerId: Int): String {
-        return httpClient.post<ResponseWithUrl>(
+        return createHttpClient().post<ResponseJson>(
             "https://api.vk.com/method/docs.getMessagesUploadServer?"
         ) {
             parameter("access_token", accessToken)
@@ -92,17 +103,8 @@ class VKApiClient {
         }.response.uploadUrl
     }
 
-    @Serializable
-    private data class ResponseWithUrl(val response: Response) {
-        @Serializable
-        data class Response(
-            @SerialName("upload_url")
-            val uploadUrl: String
-        )
-    }
-
     private suspend fun uploadFile(address: String, pathToFile: String): String {
-        val response: ResponseWithFile = httpClient.submitFormWithBinaryData(
+        val response: ResponseWithFile = createHttpClient().submitFormWithBinaryData(
             url = address,
             formData = formData {
                 append("file", File(pathToFile).readBytes(), Headers.build {
@@ -117,15 +119,15 @@ class VKApiClient {
     @Serializable
     private data class ResponseWithFile(val file: String)
 
-    private suspend fun saveDoc(file: String): Pair<Int, Int> {
-        val response = httpClient.post<ResponseWithDocs>(
+    private suspend fun saveDoc(file: String): Doc {
+        return createHttpClient().post<ResponseWithDocs>(
             "https://api.vk.com/method/docs.save?"
         ) {
             parameter("access_token", accessToken)
             parameter("file", file)
             parameter("v", apiVersion)
-        }
-        return Pair(response.docs[0].ownerId, response.docs[0].id)
+        }.docs[0]
+        //return Pair(response.docs[0].ownerId, response.docs[0].id)
     }
 
     @Serializable

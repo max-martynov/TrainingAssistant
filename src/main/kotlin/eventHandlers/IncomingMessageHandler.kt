@@ -4,6 +4,7 @@ import Client
 import ClientsRepository
 import Status
 import TrainingPlansRepository
+import api.qiwi.QiwiApiClient
 import api.vk.*
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
 import kotlinx.coroutines.*
@@ -19,10 +20,10 @@ class IncomingMessageHandler(
     private val clientsRepository: ClientsRepository,
     private val vKApiClient: VKApiClient,
     private val trainingPlansRepository: TrainingPlansRepository,
+    private val qiwiApiClient: QiwiApiClient
 ) {
 
     suspend fun receiveMessage(incomingMessage: IncomingMessage) {
-        //val event = Json { ignoreUnknownKeys = true }.decodeFromString<EventWithMessage>(notification)
         val clientId = incomingMessage.fromId
         val text = incomingMessage.text
         val attachments = incomingMessage.attachments
@@ -68,7 +69,7 @@ class IncomingMessageHandler(
             Status.WAITING_FOR_PLAN -> WaitingForPlanHandler(clientsRepository, vKApiClient)
             Status.WAITING_FOR_START -> WaitingForStartHandler(clientsRepository, vKApiClient, trainingPlansRepository)
             Status.ACTIVE -> ActiveClientHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient, trainingPlansRepository)
+            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient, trainingPlansRepository, qiwiApiClient)
             else -> WaitingForPaymentHandler(clientsRepository, vKApiClient)
         }
     }

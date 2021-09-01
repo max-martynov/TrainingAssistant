@@ -10,7 +10,6 @@ import io.ktor.server.netty.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 
-//val clientsRepository: ClientsRepository = InDataBaseClientsRepository()
 const val productId = 8 // 803 for Fake Community
 const val paymentAmount = 500
 
@@ -25,16 +24,18 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     //sendMessage(1625899520, "Тест")
 
-    val context = newFixedThreadPoolContext(3, "for_iterator")
+   // val context = newFixedThreadPoolContext(3, "for_iterator")
 
     val clientsRepository = InDataBaseClientsRepository()
+    clientsRepository.clear()
+
     val vkApiClient = VKApiClient()
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
     val qiwiApiClient = QiwiApiClient()
 
-    val paymentChecker = MessageEventHandler(
+    val messageEventHandler = MessageEventHandler(
         clientsRepository,
         vkApiClient,
         trainingPlansRepository,
@@ -44,7 +45,8 @@ fun main(args: Array<String>): Unit = runBlocking {
     val incomingMessageHandler = IncomingMessageHandler(
         clientsRepository,
         vkApiClient,
-        trainingPlansRepository
+        trainingPlansRepository,
+        qiwiApiClient
     )
 
     embeddedServer(Netty, port = 8080, configure = {
@@ -56,7 +58,7 @@ fun main(args: Array<String>): Unit = runBlocking {
                 ignoreUnknownKeys = true
             })
         }
-        routing(incomingMessageHandler, paymentChecker)
+        routing(incomingMessageHandler, messageEventHandler)
     }.start(true)
 
 /*    launch(context) {

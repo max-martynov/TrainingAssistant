@@ -28,6 +28,7 @@ dependencies {
     // ktor client
     implementation("io.ktor:ktor-client-core:1.6.2")
     implementation("io.ktor:ktor-client-jetty:1.6.2")
+    implementation("io.ktor:ktor-client-apache:$ktor_version")
     //implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
 
@@ -82,5 +83,5 @@ kotlin.sourceSets.all {
 }
 
 application {
-    mainClassName = "ApplicationKt"
+    mainClassName = "ApplicationnnKt"
 }

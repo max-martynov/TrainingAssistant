@@ -3,6 +3,7 @@ package stateHandlers
 import Client
 import ClientsRepository
 import TrainingPlansRepository
+import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
 import getPaymentKeyboard
 import kotlinx.coroutines.coroutineScope
@@ -10,7 +11,8 @@ import kotlinx.coroutines.coroutineScope
 class WaitingForResultsHandler(
     private val clientsRepository: ClientsRepository,
     private val vkApiClient: VKApiClient,
-    private val trainingPlansRepository: TrainingPlansRepository
+    private val trainingPlansRepository: TrainingPlansRepository,
+    private val qiwiApiClient: QiwiApiClient
 ) : StateHandler(clientsRepository, vkApiClient) {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
@@ -61,7 +63,7 @@ class WaitingForResultsHandler(
                             newTrainingPlan = nextTrainingPlan,
                             newInterviewResults = mutableListOf()
                         )
-                        client.updateBill()
+                        qiwiApiClient.updateBill(client, clientsRepository)
                         requestPaymentToStart(client)
                     } else {
                         clientsRepository.update(
@@ -96,7 +98,7 @@ class WaitingForResultsHandler(
             client.id,
             "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!\n" +
                     "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
-            keyboard = getPaymentKeyboard(QiwiAPI.getPayUrl(client.billId))
+            keyboard = getPaymentKeyboard(qiwiApiClient.getPayUrl(client.billId))
         )
     }
 

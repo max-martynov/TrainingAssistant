@@ -31,6 +31,7 @@ class WaitingForStartHandler(
     }
 
     private suspend fun sendPlan(client: Client) {
+        println("In the beginning!")
         val phrases = listOf(
             "Хороших тренировок!",
             "Удачных тренировок!"
@@ -43,10 +44,12 @@ class WaitingForStartHandler(
             trainingPlansRepository.getPathToFile(client.trainingPlan),
             client
         )
+        println("In the middle!\n$attachment")
         vkApiClient.sendMessageSafely(
             client.id,
             phrase,
             attachment = attachment
         )
+        println("At the end!")
     }
 }
