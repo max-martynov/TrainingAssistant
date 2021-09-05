@@ -33,7 +33,7 @@ class VKApiClient {
         }
     }
 
-    private suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
+    suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
         httpClient.post<HttpResponse>(
             "https://api.vk.com/method/messages.send?"
         ) {
@@ -93,14 +93,15 @@ class VKApiClient {
     data class ResponseJson(val response: Response)
 
     private suspend fun getMessagesUploadServer(peerId: Int): String {
-        return createHttpClient().post<ResponseJson>(
+        val responseJson = httpClient.post<ResponseJson>(
             "https://api.vk.com/method/docs.getMessagesUploadServer?"
         ) {
             parameter("access_token", accessToken)
             parameter("type", "doc")
             parameter("peer_id", peerId)
             parameter("v", apiVersion)
-        }.response.uploadUrl
+        }
+        return responseJson.response.uploadUrl
     }
 
     private suspend fun uploadFile(address: String, pathToFile: String): String {
@@ -131,7 +132,10 @@ class VKApiClient {
     }
 
     @Serializable
-    private data class ResponseWithDocs(val docs: List<Doc>)
+    private data class ResponseWithDocs(
+        @SerialName("response")
+        val docs: List<Doc>
+    )
 }
 
 /*

@@ -27,7 +27,11 @@ fun main(args: Array<String>): Unit = runBlocking {
    // val context = newFixedThreadPoolContext(3, "for_iterator")
 
     val clientsRepository = InDataBaseClientsRepository()
-    clientsRepository.clear()
+    val client = clientsRepository.findById(217619042)!!
+    val vkApiClient = VKApiClient()
+    //vkApiClient.sendMessage(217619042, "j")
+    vkApiClient.convertFileToAttachment("src/main/resources/TrainingPlans/8/10/0.pdf", client)
+    /*clientsRepository.clear()
 
     val vkApiClient = VKApiClient()
     val trainingPlansRepository = TrainingPlansRepository(
@@ -60,7 +64,7 @@ fun main(args: Array<String>): Unit = runBlocking {
         }
         routing(incomingMessageHandler, messageEventHandler)
     }.start(true)
-
+*/
 /*    launch(context) {
         iterateOverClients(
           //  LocalTime.now().plusSeconds(5),

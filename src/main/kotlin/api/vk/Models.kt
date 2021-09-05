@@ -67,6 +67,6 @@ data class MarketAttachment(val market: Market) {
 @Serializable
 data class Doc(
     val id: Int,
-    @SerialName("owner_id")
+    //@SerialName("owner_id")
     val ownerId: Int
 )
