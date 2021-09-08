@@ -21,10 +21,8 @@ class MessageEventHandler(
         if (client.status != Status.WAITING_FOR_PAYMENT) {
             vKApiClient.sendMessageEventAnswerSafely(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
         } else if (qiwiApiClient.isBillPaid(client.billId)) {
-            async { confirmPayment(client, messageEvent) }
-            if (client.trial)
-                async { sendMainKeyboardWithPromocodes(client.id) }
-            // TODO - process other states and send appropriate message
+            sendThanks(client)
+            confirmPayment(client, messageEvent)
         } else {
             vKApiClient.sendMessageEventAnswerSafely(
                 messageEvent,
@@ -44,7 +42,7 @@ class MessageEventHandler(
             vKApiClient.sendMessageEventAnswerSafely(messageEvent, getShowSnackbarString(phrase))
     }
 
-    suspend fun updateClient(client: Client) {
+    private suspend fun updateClient(client: Client) {
         if (client.trial) { // for clients after trial
             clientsRepository.update(
                 client.id,
@@ -84,12 +82,22 @@ class MessageEventHandler(
         }
     """.trimIndent()
 
-    private suspend fun sendMainKeyboardWithPromocodes(peerId: Int) {
-        vKApiClient.sendMessageSafely(
-            peerId,
-            "Впереди месяц интересных тренировок! Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".\n" +
-                    "Также не забывайте, что Вам теперь доступны промокоды 🎁",
-            keyboard = MainKeyboardWithPromocodes().keyboard
-        )
+    private suspend fun sendThanks(client: Client) {
+        if (client.trial) {
+            vKApiClient.sendMessageSafely(
+                client.id,
+                "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и за это время Вы сможете получить ровно 4 плана.\n" +
+                        "Для того, чтобы начать тренировочный процесс, нажмите \"Начать цикл\" (если Вы не видите этой кнопки, нажмите на кнопку чуть правее поля для ввода сообщения).\n" +
+                        "Также не забывайте, что Вам теперь доступны промокоды 🎁",
+                keyboard = MainKeyboardWithPromocodes().keyboard
+            )
+        }
+        else {
+            vKApiClient.sendMessageSafely(
+                client.id,
+                "Спасибо, что продолжайте тренироваться с нами! Подписка будет действовать 28 дней и за это время Вы сможете получить ровно 4 плана.\n" +
+                        "Для того, чтобы начать тренировочный процесс, нажмите \"Начать цикл\".\n"
+            )
+        }
     }
 }

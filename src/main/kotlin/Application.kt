@@ -4,20 +4,31 @@ import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
 import client.ClientIterator
 import io.ktor.application.*
+import io.ktor.client.features.logging.*
 import io.ktor.features.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
+import org.slf4j.event.Level
 import java.time.Duration
 import java.time.LocalTime
+
 
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
     val clientsRepository = InDataBaseClientsRepository()
-    clientsRepository.clear()
+    //clientsRepository.clear()
+    clientsRepository.update(
+        217619042,
+        newStatus = Status.WAITING_FOR_RESULTS,
+        newInterviewResults = mutableListOf(1, 2, 2, 2),
+        newTrial = false,
+        newWeeksPassed = 4,
+        newDaysPassed = 26
+    )
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
@@ -62,6 +73,7 @@ fun main(args: Array<String>): Unit = runBlocking {
                     ignoreUnknownKeys = true
                 })
             }
+            install(CallLogging)
             routing(incomingMessageHandler, messageEventHandler)
         }.start(true)
     }

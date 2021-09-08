@@ -5,6 +5,7 @@ import io.ktor.client.engine.jetty.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.logging.*
 import io.ktor.client.statement.*
 import io.ktor.features.*
 import io.ktor.util.*
@@ -25,6 +26,7 @@ fun createHttpClient(): HttpClient {
                 isLenient = true
             })
         }
+        install(Logging)
         engine {
             threadsCount = 4
         }

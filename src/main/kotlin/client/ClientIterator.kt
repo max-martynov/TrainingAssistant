@@ -11,7 +11,6 @@ import java.lang.management.ManagementFactory
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 class ClientIterator(
     private val clientsRepository: ClientsRepository,
@@ -68,8 +67,10 @@ class ClientIterator(
 
     private suspend fun requestPaymentToContinue(client: Client, vkApiClient: VKApiClient) {
         val phrases = listOf(
-            "К сожалению, месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс.",
-            "К сожалению, месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренировочный процесс.",
+            "Месячная подписка истекла! Продлите ее, если Вам понравился тренировочный процесс и Вы бы хотели продолжить двигаться к своей цели!\n" +
+                    "Для того, чтобы продлить подписку, нажмите \"Оплатить подписку\", а после завершения платежа - \"Подтвердить оплату\"",
+            "Месячная подписка истекла! Но Вы можете продлить ее, чтобы продолжить тренироваться по персональным планам!\n" +
+                    "Для того, чтобы продлить подписку, нажмите \"Оплатить подписку\", а после завершения платежа - \"Подтвердить оплату\"",
         )
         qiwiApiClient.updateBill(client, clientsRepository)
         vkApiClient.sendMessageSafely(

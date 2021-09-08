@@ -33,7 +33,9 @@ class NewClientHandler(
     private suspend fun sendMainKeyboardWithoutPromocodes(peerId: Int) {
         vkApiClient.sendMessageSafely(
             peerId,
-            "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
+            "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов:\n" +
+                    "\uD83D\uDD38 Выбирайте 6 часов, если Вы хотите разнообразные и сбалансированные тренировки, которые помогут Вам улучшить выносливость, скоростные навыки и общую физическую форму\n" +
+                    "\uD83D\uDD38 Выбирайте 10 часов, если Вы уверены в своих силах, планируете подготовиться к серьезным соревнованиям и просто хотите выйти на новый уровень",
             keyboard = MainKeyboardWithoutPromocodes().keyboard
         )
     }
@@ -41,7 +43,7 @@ class NewClientHandler(
     private suspend fun sendSelectTrainingPlan(peerId: Int) {
         vkApiClient.sendMessageSafely(
             peerId,
-            "Сколько часов в неделю у Вас есть возможность тренироваться?",
+            "Сколько часов в неделю Вы хотели бы тренироваться? (для ответа просто нажмите на соответствующую синюю кнопку)",
             keyboard = SelectHoursKeyboard().keyboard
         )
     }

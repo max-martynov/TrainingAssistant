@@ -7,6 +7,8 @@ import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
 import keyboards.PaymentKeyboard
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
+import java.time.LocalTime
 
 class WaitingForResultsHandler(
     private val clientsRepository: ClientsRepository,
@@ -19,7 +21,7 @@ class WaitingForResultsHandler(
         if (client.interviewResults.size == client.interview.interviewQuestions.size) { // he's already received 4 plans -> should wait until end of month
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
+                "Вы сможете продлить подписку и продолжить тренировки ${calculateEndDateOfSubscription(client.daysPassed)}."
             )
             return@coroutineScope
         }
@@ -52,9 +54,10 @@ class WaitingForResultsHandler(
                 if (nextTrainingPlan == null) {
                     vkApiClient.sendMessageSafely(
                         client.id,
-                        "Опрос заверешен! К сожалению, в данный момент Вы не можете начать цикл, так как за месяц можно получить только 4 плана. " +
-                                "Пожалуйста, дождитесь окончания месяца и продлите подписку, чтобы продолжить тренироваться."
+                        "Опрос заверешен! К сожалению, в данный момент Вы не можете начать цикл, так как за время одной подписки можно получить только 4 плана. " +
+                                "Вы сможете продлить подписку и продолжить тренировки ${calculateEndDateOfSubscription(client.daysPassed)}."
                     )
+                    client.daysPassed
                 } else {
                     if (client.trial) {
                         clientsRepository.update(
@@ -108,5 +111,17 @@ class WaitingForResultsHandler(
             client.interview.interviewQuestions[questionNumber].question,
             keyboard = client.interview.interviewQuestions[questionNumber].toString()
         )
+    }
+
+    private fun calculateEndDateOfSubscription(daysPassed: Int): String {
+        val leftDays = mapOf(
+            setOf(1, 21) to "день",
+            setOf(2, 3, 4, 22, 23, 24) to "дня",
+            setOf(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 17, 19, 20, 25, 26, 27, 28) to "дней"
+        )
+        val daysLeft = 28 - daysPassed + if (LocalTime.now().isAfter(LocalTime.of(12, 0))) 1 else 0
+        if (daysLeft == 0)
+            return "уже сегодня"
+        return "через $daysLeft ${leftDays[leftDays.keys.find { it.contains(daysLeft) }]}"
     }
 }

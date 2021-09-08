@@ -26,10 +26,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
     // ktor client
-    implementation("io.ktor:ktor-client-core:1.6.2")
-    implementation("io.ktor:ktor-client-jetty:1.6.2")
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-jetty:$ktor_version")
     implementation("io.ktor:ktor-client-apache:$ktor_version")
-    //implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
 
     /*implementation("io.ktor:ktor-client-json:$ktor_version")
@@ -83,5 +84,5 @@ kotlin.sourceSets.all {
 }
 
 application {
-    mainClassName = "ApplicationnnKt"
+    mainClassName = "ApplicationKt"
 }
