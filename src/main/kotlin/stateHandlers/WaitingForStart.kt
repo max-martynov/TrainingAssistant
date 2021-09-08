@@ -4,8 +4,11 @@ import Client
 import ClientsRepository
 import TrainingPlansRepository
 import api.vk.VKApiClient
+import io.ktor.client.features.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import java.time.LocalDateTime
 
 
 class WaitingForStartHandler(
@@ -31,7 +34,6 @@ class WaitingForStartHandler(
     }
 
     private suspend fun sendPlan(client: Client) {
-        println("In the beginning!")
         val phrases = listOf(
             "Хороших тренировок!",
             "Удачных тренировок!"
@@ -40,16 +42,28 @@ class WaitingForStartHandler(
             "Хорошего восстановления!"
         else
             phrases.random()
-        val attachment = vkApiClient.convertFileToAttachment(
-            trainingPlansRepository.getPathToFile(client.trainingPlan),
-            client
-        )
-        println("In the middle!\n$attachment")
+        var attachment = ""
+        try {
+            attachment = vkApiClient.convertFileToAttachment(
+                trainingPlansRepository.getPathToFile(client.trainingPlan),
+                client
+            )
+        } catch (e: ResponseException) {
+            println("${LocalDateTime.now()}: Exception while loading a document event answer - ${e.message}\nRetrying...")
+            delay(1000L)
+            try {
+                attachment = vkApiClient.convertFileToAttachment(
+                    trainingPlansRepository.getPathToFile(client.trainingPlan),
+                    client
+                )
+            } catch (e: ResponseException) {
+                println("${LocalDateTime.now()}: Still exception - ${e.message}\n")
+            }
+        }
         vkApiClient.sendMessageSafely(
             client.id,
             phrase,
             attachment = attachment
         )
-        println("At the end!")
     }
 }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import pressStartKeyboard
-import productId
 import stateHandlers.*
 import java.lang.management.ManagementFactory
 
@@ -22,6 +21,7 @@ class IncomingMessageHandler(
     private val trainingPlansRepository: TrainingPlansRepository,
     private val qiwiApiClient: QiwiApiClient
 ) {
+    private val productId = 8 // 803 for Fake Community
 
     suspend fun receiveMessage(incomingMessage: IncomingMessage) {
         val clientId = incomingMessage.fromId

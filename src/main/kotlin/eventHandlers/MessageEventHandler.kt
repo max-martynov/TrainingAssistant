@@ -19,14 +19,14 @@ class MessageEventHandler(
     suspend fun checkPayment(messageEvent: MessageEvent) = coroutineScope {
         val client = clientsRepository.findById(messageEvent.userId) ?: return@coroutineScope
         if (client.status != Status.WAITING_FOR_PAYMENT) {
-            vKApiClient.sendMessageEventAnswer(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
+            vKApiClient.sendMessageEventAnswerSafely(messageEvent, getShowSnackbarString("Оплата прошла успешно. Хороших тренировок!"))
         } else if (qiwiApiClient.isBillPaid(client.billId)) {
             async { confirmPayment(client, messageEvent) }
             if (client.trial)
                 async { sendMainKeyboardWithPromocodes(client.id) }
             // TODO - process other states and send appropriate message
         } else {
-            vKApiClient.sendMessageEventAnswer(
+            vKApiClient.sendMessageEventAnswerSafely(
                 messageEvent,
                 getShowSnackbarString("К сожалению, данные об оплате еще не поступили! Попробуйте позже.")
             )
@@ -41,7 +41,7 @@ class MessageEventHandler(
                 "Оплата подтверждена! Надеюсь, Вам понравятся тренировки в этом месяце."
         updateClient(client)
         if (messageEvent != null)
-            vKApiClient.sendMessageEventAnswer(messageEvent, getShowSnackbarString(phrase))
+            vKApiClient.sendMessageEventAnswerSafely(messageEvent, getShowSnackbarString(phrase))
     }
 
     suspend fun updateClient(client: Client) {

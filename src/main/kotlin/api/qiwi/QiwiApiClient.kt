@@ -5,14 +5,13 @@ import ClientsRepository
 import createHttpClient
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
-import paymentAmount
 import java.time.OffsetDateTime
 
 
 class QiwiApiClient {
     private val secretKey =
         "eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6IjRzN2c0My0wMCIsInVzZXJfaWQiOiI3OTUzNTQ4NjMzMCIsInNlY3JldCI6ImNmYWU3YWM1MDQ1ODdlNGE3NjhkOTIzYzZiMGY0NTM0MmIwNTk4MTQyMGQ2YWQzYjg5OWU2NDFjMzRmYzgwYTcifX0="
-
+    private val moneyAmount = 500
     private val httpClient = createHttpClient()
 
     suspend fun getPayUrl(billId: String): String {
@@ -23,7 +22,7 @@ class QiwiApiClient {
                 append("Accept", "application/json")
             }
             body = Bill(
-                Amount(paymentAmount, "RUB"),
+                Amount(moneyAmount, "RUB"),
                 OffsetDateTime.now().plusYears(3).toString(),
                 CustomFields("Maksym-MgT6FuGqP7")
             )

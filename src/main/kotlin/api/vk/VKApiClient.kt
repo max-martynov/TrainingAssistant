@@ -18,6 +18,7 @@ class VKApiClient {
         "8d8088feeb18744bc2e5a7ed11067faf9cf495fce1c99c6c430e59b7e093f6a45ff827bc0333dd1bd2172" // "b65e586155b0c081d9c7fc9e7b2ac2add8cf1cf79a1aa5efe9d8e2fe5a1da6b9aa5c563206850f25d8a4e" for Fake Community
     private val apiVersion = "5.81"
     private val httpClient = createHttpClient()
+    private val responseValidator = ResponseValidator()
 
     suspend fun sendMessageSafely(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
         try {
@@ -33,8 +34,8 @@ class VKApiClient {
         }
     }
 
-    suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
-        httpClient.post<HttpResponse>(
+    private suspend fun sendMessage(peerId: Int, text: String, keyboard: String = "", attachment: String = "") {
+        val httpResponse = httpClient.post<HttpResponse>(
             "https://api.vk.com/method/messages.send?"
         ) {
             parameter("access_token", accessToken)
@@ -44,24 +45,25 @@ class VKApiClient {
             parameter("attachment", attachment)
             parameter("v", apiVersion)
         }
+        responseValidator.validate(httpResponse)
     }
 
-    suspend fun sendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
+    suspend fun sendMessageEventAnswerSafely(messageEvent: MessageEvent, eventData: String) {
         try {
-            tryToSendMessageEventAnswer(messageEvent, eventData)
+            sendMessageEventAnswer(messageEvent, eventData)
         } catch (e: ResponseException) {
             println("${LocalDateTime.now()}: Exception while sending a message event answer - ${e.message}\nRetrying...")
             delay(1000L)
             try {
-                tryToSendMessageEventAnswer(messageEvent, eventData)
+                sendMessageEventAnswer(messageEvent, eventData)
             } catch (e: ResponseException) {
                 println("${LocalDateTime.now()}: Still exception - ${e.message}\n")
             }
         }
     }
 
-    private suspend fun tryToSendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
-        httpClient.post<HttpResponse>(
+    private suspend fun sendMessageEventAnswer(messageEvent: MessageEvent, eventData: String) {
+        val httpResponse = httpClient.post<HttpResponse>(
             "https://api.vk.com/method/messages.sendMessageEventAnswer?"
         ) {
             parameter("access_token", accessToken)
@@ -71,16 +73,14 @@ class VKApiClient {
             parameter("event_data", eventData)
             parameter("v", apiVersion)
         }
+        responseValidator.validate(httpResponse)
     }
 
     suspend fun convertFileToAttachment(pathToFile: String, client: Client): String {
         val uploadUrl = getMessagesUploadServer(client.id)
-        println(uploadUrl)
         val file = uploadFile(uploadUrl, pathToFile)
-        println(file)
         val doc = saveDoc(file)
         val res = "doc${doc.ownerId}_${doc.id}"
-        println(res)
         return res
     }
 
