@@ -5,7 +5,7 @@ import ClientsRepository
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
-import getPaymentKeyboard
+import keyboards.PaymentKeyboard
 import kotlinx.coroutines.coroutineScope
 
 class WaitingForResultsHandler(
@@ -98,7 +98,7 @@ class WaitingForResultsHandler(
             client.id,
             "Опрос завершен!\nОсталось только оплатить месячную подписку, и Вы можете приступать к тренировкам!\n" +
                     "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". После совершения платежа нажмите \"Подтвердить оплату\".",
-            keyboard = getPaymentKeyboard(qiwiApiClient.getPayUrl(client.billId))
+            keyboard = PaymentKeyboard(qiwiApiClient.getPayUrl(client.billId)).keyboard
         )
     }
 

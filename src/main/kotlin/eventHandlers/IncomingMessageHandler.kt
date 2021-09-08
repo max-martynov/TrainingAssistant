@@ -7,10 +7,10 @@ import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.*
 import com.petersamokhin.vksdk.core.model.event.IncomingMessage
+import keyboards.PressStartKeyboard
 import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import pressStartKeyboard
 import stateHandlers.*
 import java.lang.management.ManagementFactory
 
@@ -57,9 +57,9 @@ class IncomingMessageHandler(
             peerId,
             "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
                     "🔹 Если у Вас внизу не отображаются кнопки \"Старт\" и \"Инструкция\", нажмите на значок чуть правее поля для ввода сообещния.\n" +
-                    "🔹 Если у Вас есть вопросы о том, как тут все работает, жмите на \"Инструкция\".\n" +
+                    "🔹 Если у Вас есть вопросы о том, как тут все работает, жмите \"Инструкция\".\n" +
                     "🔹 Если же Вы все поняли и готовы начинать, жмите \"Старт!\".",
-            keyboard = pressStartKeyboard
+            keyboard = PressStartKeyboard().keyboard
         )
     }
 

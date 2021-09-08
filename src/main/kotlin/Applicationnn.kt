@@ -13,53 +13,46 @@ import kotlinx.serialization.json.Json
 import java.time.Duration
 import java.time.LocalTime
 
+@OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
     val clientsRepository = InDataBaseClientsRepository()
     clientsRepository.clear()
-   // val client = clientsRepository.findById(217619042)!!
-    val vkApiClient = VKApiClient()
-    /*vkApiClient.sendMessage(217619042, "")
-
-    vkApiClient.convertFileToAttachment("src/main/resources/TrainingPlans/8/10/0.pdf", client)
-    vkApiClient.sendMessageSafely(217619042, "")*/
-    //clientsRepository.clear()
-
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
+    val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
-
-    val messageEventHandler = MessageEventHandler(
-        clientsRepository,
-        vkApiClient,
-        trainingPlansRepository,
-        qiwiApiClient
-    )
-
-    val incomingMessageHandler = IncomingMessageHandler(
-        clientsRepository,
-        vkApiClient,
-        trainingPlansRepository,
-        qiwiApiClient
-    )
-
-    val clientsIterator = ClientIterator(
-        clientsRepository,
-        vkApiClient,
-        qiwiApiClient
-    )
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
     launch(context) {
+        val clientsIterator = ClientIterator(
+            clientsRepository,
+            vkApiClient,
+            qiwiApiClient
+        )
         clientsIterator.iterateOverClients(
             LocalTime.now().plusSeconds(5),
-            Duration.ofSeconds(5)
+            Duration.ofSeconds(10)
         )
     }
 
     launch(Dispatchers.Main) {
+        val messageEventHandler = MessageEventHandler(
+            clientsRepository,
+            vkApiClient,
+            trainingPlansRepository,
+            qiwiApiClient
+        )
+
+        val incomingMessageHandler = IncomingMessageHandler(
+            clientsRepository,
+            vkApiClient,
+            trainingPlansRepository,
+            qiwiApiClient
+        )
+
         embeddedServer(Netty, port = 8080, configure = {
             runningLimit = 20
             shareWorkGroup = true
@@ -72,21 +65,4 @@ fun main(args: Array<String>): Unit = runBlocking {
             routing(incomingMessageHandler, messageEventHandler)
         }.start(true)
     }
-
-
-
-
-    /*
-    launch(Dispatchers.Main) {
-        EngineMain.main(args)
-    }*/
 }
-
-/*
-fun Application.module(testing: Boolean = false) {
-
-
-
-    routing()
-}
-*/

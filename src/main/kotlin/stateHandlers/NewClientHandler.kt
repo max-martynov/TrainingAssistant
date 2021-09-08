@@ -3,10 +3,11 @@ package stateHandlers
 import Client
 import ClientsRepository
 import api.vk.VKApiClient
+import keyboards.MainKeyboardWithoutPromocodes
+import keyboards.SelectHoursKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import mainKeyboardWithoutPromocodes
-import selectHoursKeyboard
+
 
 class NewClientHandler(
     private val clientsRepository: ClientsRepository,
@@ -33,7 +34,7 @@ class NewClientHandler(
         vkApiClient.sendMessageSafely(
             peerId,
             "Отлично! Для начала нужно выбрать нагруженность недельного цикла: пока что есть 2 опции - 6 или 10 часов.",
-            keyboard = mainKeyboardWithoutPromocodes
+            keyboard = MainKeyboardWithoutPromocodes().keyboard
         )
     }
 
@@ -41,7 +42,7 @@ class NewClientHandler(
         vkApiClient.sendMessageSafely(
             peerId,
             "Сколько часов в неделю у Вас есть возможность тренироваться?",
-            keyboard = selectHoursKeyboard
+            keyboard = SelectHoursKeyboard().keyboard
         )
     }
 }

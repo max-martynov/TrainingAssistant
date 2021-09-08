@@ -5,7 +5,7 @@ import ClientsRepository
 import Status
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
-import getPaymentKeyboard
+import keyboards.PaymentKeyboard
 import kotlinx.coroutines.*
 import java.lang.management.ManagementFactory
 import java.time.*
@@ -75,7 +75,7 @@ class ClientIterator(
         vkApiClient.sendMessageSafely(
             client.id,
             phrases.random(),
-            keyboard = getPaymentKeyboard(qiwiApiClient.getPayUrl(client.billId))
+            keyboard = PaymentKeyboard(qiwiApiClient.getPayUrl(client.billId)).keyboard
         )
     }
 

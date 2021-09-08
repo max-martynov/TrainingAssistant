@@ -16,17 +16,6 @@ import kotlinx.serialization.json.JsonNames
 import java.lang.Error
 import java.nio.ByteBuffer
 
-@Serializable
-private data class ResponseError(val error: Error = Error(0, "")) {
-    @Serializable
-    data class Error(
-        @SerialName("error_code")
-        val code: Int,
-        @SerialName("error_msg")
-        val message: String
-    )
-}
-
 fun createHttpClient(): HttpClient {
     return HttpClient(Jetty) {
         install(JsonFeature) {

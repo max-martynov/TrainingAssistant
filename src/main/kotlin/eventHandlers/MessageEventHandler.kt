@@ -6,9 +6,9 @@ import Status
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.*
+import keyboards.MainKeyboardWithPromocodes
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import mainKeyboardWithPromocodes
 
 class MessageEventHandler(
     private val clientsRepository: ClientsRepository,
@@ -89,7 +89,7 @@ class MessageEventHandler(
             peerId,
             "Впереди месяц интересных тренировок! Чтобы получить недельный план и начать тренировочный процесс, нажмите \"Начать цикл\".\n" +
                     "Также не забывайте, что Вам теперь доступны промокоды 🎁",
-            keyboard = mainKeyboardWithPromocodes
+            keyboard = MainKeyboardWithPromocodes().keyboard
         )
     }
 }
