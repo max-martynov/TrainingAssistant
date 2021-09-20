@@ -57,7 +57,6 @@ class WaitingForResultsHandler(
                         "Опрос заверешен! К сожалению, в данный момент Вы не можете начать цикл, так как за время одной подписки можно получить только 4 плана. " +
                                 "Вы сможете продлить подписку и продолжить тренировки ${calculateEndDateOfSubscription(client.daysPassed)}."
                     )
-                    client.daysPassed
                 } else {
                     if (client.trial) {
                         clientsRepository.update(

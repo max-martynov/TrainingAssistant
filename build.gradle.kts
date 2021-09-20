@@ -28,16 +28,11 @@ dependencies {
     // ktor client
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-jetty:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-apache:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
-
-    /*implementation("io.ktor:ktor-client-json:$ktor_version")
-    implementation("io.ktor:ktor-websockets:$ktor_version")
-    implementation("io.ktor:ktor-client-websockets:$ktor_version")
-    implementation("io.ktor:ktor-client-logging:$ktor_version")
-    testImplementation("io.ktor:ktor-server-tests:$ktor_version")*/
 
     // Hikari
     implementation("com.zaxxer:HikariCP:5.0.0")

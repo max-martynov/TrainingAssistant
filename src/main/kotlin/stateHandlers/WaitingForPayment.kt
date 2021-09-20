@@ -3,6 +3,7 @@ package stateHandlers
 import Client
 import ClientsRepository
 import api.vk.VKApiClient
+import keyboards.PaymentKeyboard
 import kotlinx.coroutines.coroutineScope
 
 class WaitingForPaymentHandler(

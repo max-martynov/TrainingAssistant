@@ -1,6 +1,7 @@
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.apache.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.jetty.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -18,7 +19,7 @@ import java.lang.Error
 import java.nio.ByteBuffer
 
 fun createHttpClient(): HttpClient {
-    return HttpClient(Jetty) {
+    return HttpClient(CIO) {
         install(JsonFeature) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                 ignoreUnknownKeys = true
@@ -29,6 +30,12 @@ fun createHttpClient(): HttpClient {
         install(Logging)
         engine {
             threadsCount = 4
+            maxConnectionsCount = 20
+            endpoint {
+                maxConnectionsPerRoute = 10
+                keepAliveTime = 10000
+                connectTimeout = 10000
+            }
         }
     }
 }
