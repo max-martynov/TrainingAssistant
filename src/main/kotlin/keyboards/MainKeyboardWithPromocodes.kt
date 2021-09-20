@@ -13,20 +13,25 @@ class MainKeyboardWithPromocodes() : Keyboard() {
                                 "link":"https://vk.me/tuchin_a_95",
                                 "label":"Обратная связь"
                             }
-                        } 
-                     ], [
-                        {
+                        }, {
                             "action":{
                                 "type":"open_link",
                                 "link":"https://vk.com/@club_prosto_o_trenirovkah-trenirovki-po-podpiske-20",
                                 "label":"Инструкция"
                             }
-                        },
+                        }
+                     ], [
                         {
                             "action":{
                                 "type":"open_link",
                                 "link":"https://vk.com/@club_prosto_o_trenirovkah-skidki-dlya-uchastnikov-kluba",
-                                "label":"Промокоды"
+                                "label":"Промокоды 🎁"
+                            }
+                        }, {
+                            "action":{
+                                "type":"open_link",
+                                "link":"https://vk.com/@club_prosto_o_trenirovkah-motivacionnye-filmy",
+                                "label":"Мотивация 🏆"
                             }
                         }
                      ], [   

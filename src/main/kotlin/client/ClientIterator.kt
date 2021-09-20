@@ -87,12 +87,8 @@ class ClientIterator(
         val numberOfActiveClients = clients.count { it.status in activeStatuses }
         println("Total number of active clients: $numberOfActiveClients\n\nList of all clients:\n")
         clients.forEach { println(it) }
-        printInfo()
-        println("------------------------------------\n")
-    }
-
-    private fun printInfo() {
         println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}\n")
+        println("------------------------------------\n")
     }
 }
 

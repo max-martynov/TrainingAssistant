@@ -3,6 +3,7 @@ package stateHandlers
 import Client
 import ClientsRepository
 import api.vk.VKApiClient
+import keyboards.MainKeyboardWithPromocodes
 import keyboards.MainKeyboardWithoutPromocodes
 import keyboards.SelectHoursKeyboard
 import kotlinx.coroutines.async
