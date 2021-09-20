@@ -13,7 +13,16 @@ data class TrainingPlan(
     val month: Int,
     val hours: Int,
     val week: Int,
-)
+) {
+    private var numberOfReviews: Int = 0
+    private var sum: Int = 0
+    val rating: Double
+        get() = if (numberOfReviews == 0) 0.0 else sum * 1.0 / numberOfReviews
+    fun processReview(newReview: Int) {
+        numberOfReviews++
+        sum += newReview
+    }
+}
 
 class TrainingPlansRepository(
     private val pathToDirectory: String

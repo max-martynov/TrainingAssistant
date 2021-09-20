@@ -2,6 +2,7 @@ package stateHandlers
 
 import Client
 import ClientsRepository
+import ReviewKeyboard
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
@@ -21,7 +22,7 @@ class WaitingForResultsHandler(
         if (client.interviewResults.size == client.interview.interviewQuestions.size) { // he's already received 4 plans -> should wait until end of month
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Вы сможете продлить подписку и продолжить тренировки ${calculateEndDateOfSubscription(client.daysPassed)}."
+                "Вы сможете продлить подписку и продолжить тренировки ${calculateEndDateOfSubscription(client.daysPassed)}!"
             )
             return@coroutineScope
         }
@@ -32,12 +33,12 @@ class WaitingForResultsHandler(
                 "Выберите, пожалуйста, один из предложенных вариантов ответа."
             )
         } else {
-            if (client.interview.interviewQuestions.size == 4 && client.interviewResults.size == 2 && answerNumber == 1) {
+            if (client.interview.interviewQuestions.size == 5 && client.interviewResults.size == 2 && answerNumber == 1) {
                 clientsRepository.update(
                     client.id,
                     newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
                 )
-            } else if (client.interview.interviewQuestions.size == 3 && client.interviewResults.size == 1 && answerNumber == 1) {
+            } else if (client.interview.interviewQuestions.size == 4 && client.interviewResults.size == 1 && answerNumber == 1) {
                 clientsRepository.update(
                     client.id,
                     newInterviewResults = (client.interviewResults + 1 + 1).toMutableList()
@@ -50,6 +51,7 @@ class WaitingForResultsHandler(
             }
             val updatedClient = clientsRepository.findById(client.id) ?: throw Exception()
             if (updatedClient.interviewResults.size == client.interview.interviewQuestions.size) {
+                logReview(updatedClient)
                 val nextTrainingPlan = trainingPlansRepository.determineNextTrainingPlan(updatedClient)
                 if (nextTrainingPlan == null) {
                     vkApiClient.sendMessageSafely(
@@ -122,5 +124,9 @@ class WaitingForResultsHandler(
         if (daysLeft == 0)
             return "уже сегодня"
         return "через $daysLeft ${leftDays[leftDays.keys.find { it.contains(daysLeft) }]}"
+    }
+
+    private fun logReview(client: Client) {
+        println("----\nNew review from client with id ${client.id} on training plan ${client.trainingPlan}: ${client.interviewResults.last() + 1}\n----")
     }
 }

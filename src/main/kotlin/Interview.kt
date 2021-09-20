@@ -32,7 +32,24 @@ data class InterviewQuestion(val question: String, val interviewButtons: List<In
             }
             """.trimIndent()
         }
-        else {
+        else if (interviewButtons.size == 5) {
+            return  """
+                {
+                    "one_time": false,
+                    "buttons":
+                    [
+                        [
+                            ${interviewButtons[0]},
+                            ${interviewButtons[1]},
+                            ${interviewButtons[2]},
+                            ${interviewButtons[3]},
+                            ${interviewButtons[4]}
+                        ]
+                    ],
+                    "inline":true
+            }
+            """.trimIndent()
+        } else {
             var res =  """
                 {
                     "one_time": false,
@@ -57,6 +74,17 @@ data class InterviewQuestion(val question: String, val interviewButtons: List<In
 
 abstract class Interview {
     abstract val interviewQuestions: List<InterviewQuestion>
+
+    protected val reviewQuestion = InterviewQuestion(
+        "Оцените, пожалуйста, пройденный план по 5-бальной шкале (1 - не понравился, 5 - превосходно). Нам важно Ваше мнение!",
+        listOf(
+            InterviewButton("1", "negative"),
+            InterviewButton("2", "negative"),
+            InterviewButton("3", "primary"),
+            InterviewButton("4", "positive"),
+            InterviewButton("5", "positive"),
+        )
+    )
 
     fun findAnswerNumberOnKthQuestion(answer: String, k: Int): Int {
         interviewQuestions[k].interviewButtons.forEachIndexed { index, interviewButton ->
@@ -91,7 +119,8 @@ class InterviewFor1Hour : Interview() {
                 InterviewButton("6 часов"),
                 InterviewButton("10 часов")
             )
-        )
+        ),
+        reviewQuestion
     )
 }
 
@@ -125,7 +154,8 @@ class InterviewFor6Hours : Interview() {
                 InterviewButton("Да"),
                 InterviewButton("Нет")
             )
-        )
+        ),
+        reviewQuestion
     )
 }
 
@@ -159,7 +189,8 @@ class InterviewFor10Hours : Interview() {
                 InterviewButton("Да"),
                 InterviewButton("Нет")
             )
-        )
+        ),
+         reviewQuestion
     )
 }
 

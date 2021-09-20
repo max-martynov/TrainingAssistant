@@ -6,8 +6,7 @@ import Status
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.*
-import keyboards.MainKeyboardWithPromocodes
-import kotlinx.coroutines.async
+import keyboards.MainKeyboardAfterPayment
 import kotlinx.coroutines.coroutineScope
 
 class MessageEventHandler(
@@ -89,7 +88,7 @@ class MessageEventHandler(
                 "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и за это время Вы сможете получить ровно 4 плана.\n" +
                         "Для того, чтобы начать тренировочный процесс, нажмите \"Начать цикл\" (если Вы не видите этой кнопки, нажмите на кнопку чуть правее поля для ввода сообщения).\n" +
                         "Также не забывайте, что Вам теперь доступны промокоды 🎁",
-                keyboard = MainKeyboardWithPromocodes().keyboard
+                keyboard = MainKeyboardAfterPayment().keyboard
             )
         }
         else {

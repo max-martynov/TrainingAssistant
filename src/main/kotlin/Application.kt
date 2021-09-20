@@ -16,17 +16,7 @@ import java.time.LocalTime
 
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
-
     val clientsRepository = InDataBaseClientsRepository()
-    clientsRepository.clear()
-    /*clientsRepository.update(
-        217619042,
-        newStatus = Status.WAITING_FOR_RESULTS,
-        newInterviewResults = mutableListOf(1, 2, 2, 2),
-        newTrial = false,
-        newWeeksPassed = 4,
-        newDaysPassed = 26
-    )*/
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
@@ -42,8 +32,8 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-            LocalTime.now().plusSeconds(5),
-            Duration.ofSeconds(10)
+            //LocalTime.now().plusSeconds(5),
+            //Duration.ofSeconds(10)
         )
     }
 
