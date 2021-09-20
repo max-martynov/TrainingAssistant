@@ -17,13 +17,13 @@ import java.time.LocalTime
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
     val clientsRepository = InDataBaseClientsRepository()
-    clientsRepository.getAll().forEach { println(it) }
-    return@runBlocking
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
+
+    temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 

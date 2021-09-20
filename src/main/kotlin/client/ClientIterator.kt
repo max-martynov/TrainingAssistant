@@ -84,7 +84,7 @@ class ClientIterator(
         val clients = clientsRepository.getAll()
         println("\n\nLOG OF ALL CLIENTS ${LocalDateTime.now()}\n" +
                 "Total number of registered clients: ${clients.size}\n")
-        val numberOfActiveClients = clients.count { it.status in activeStatuses }
+        val numberOfActiveClients = clients.count { (it.status in activeStatuses) && (!it.trial) }
         println("Total number of active clients: $numberOfActiveClients\n\nList of all clients:\n")
         clients.forEach { println(it) }
         println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}\n")
