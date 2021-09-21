@@ -23,9 +23,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
 
-    vkApiClient.sendMessageSafely(217619042, "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\".")
-
-    //temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
+    temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
