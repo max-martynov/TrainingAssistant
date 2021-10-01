@@ -22,8 +22,8 @@ fun main(args: Array<String>): Unit = runBlocking {
     )
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
-
-    //temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
+    
+    temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
