@@ -3,5 +3,8 @@ import keyboards.MainKeyboardAfterPayment
 import keyboards.MainKeyboardBeforePayment
 
 suspend fun temporaryUpdate(clientsRepository: ClientsRepository, vkApiClient: VKApiClient) {
-    println(clientsRepository.findById(464281827)!!)
+    clientsRepository.update(
+        464281827,
+        newWeeksPassed = 1
+    )
 }
