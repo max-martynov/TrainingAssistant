@@ -31,17 +31,15 @@ class TrainingPlansRepository(
     fun getPathToFile(trainingPlan: TrainingPlan) =
         "$pathToDirectory/${trainingPlan.month}/${trainingPlan.hours}/${trainingPlan.week}.pdf"
 
-    fun determineNextTrainingPlan(client: Client): TrainingPlan? {
-        if (client.weeksPassed == 4)
-            return null
-        val month = if (client.trainingPlan.week != 4)
-            client.trainingPlan.month
-        else if (client.trainingPlan.month != LocalDate.now().monthValue)
-            LocalDate.now().monthValue
+    fun determineNextTrainingPlan(client: Client): TrainingPlan {
+        val (month, _, week) = client.trainingPlan
+        val nextHours = determineNextHours(client)
+        if (week < 4)
+            return TrainingPlan(month, nextHours, week + 1)
+        else if (month != LocalDate.now().monthValue)
+            return TrainingPlan(LocalDate.now().monthValue, nextHours, 1)
         else
-            calculateNextMonth(client.trainingPlan.month)
-        val week = calculateNextWeek(client.trainingPlan.week)
-        return TrainingPlan(month, determineNextHours(client), week)
+            return TrainingPlan(month, nextHours, 4 + ((week - 3) % 3))
     }
 
     private fun determineNextHours(client: Client): Int =
