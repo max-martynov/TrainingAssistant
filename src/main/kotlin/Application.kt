@@ -11,11 +11,14 @@ import io.ktor.server.netty.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalTime
 
 
 @OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
+
+
     val clientsRepository = InDataBaseClientsRepository()
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"

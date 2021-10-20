@@ -9,7 +9,7 @@ suspend fun temporaryUpdate(clientsRepository: ClientsRepository, vkApiClient: V
             newWeeksPassed = 0,
             newDaysPassed = 0,
             newTrainingPlan = TrainingPlan(10, 10, 1),
-            newInterviewResults = mutableListOf()
+            newInterviewResults = mutableListOf(),
     )
     vkApiClient.sendMessageSafely(
         143964633,
