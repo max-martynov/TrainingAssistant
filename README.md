@@ -1,5 +1,11 @@
-![](https://sun9-47.userapi.com/impg/fWx4-P2dnjgzI774yBYkK6lNH4vH4N-PaS99aw/YDGMh2gg7CY.jpg?size=1654x1654&quality=95&sign=8eedfae7000b7958341305ff9ed3b0e8&type=album)
-
 # TrainingAssistant
-This is a bot which main purpose is to form a training programm based on athlete's previous experience and current physical condition. It's one of the most effecient and affordable services offered by [Prosto o trenirovkah](https://vk.com/club_prosto_o_trenirovkah) training club.
+This is a bot which main purpose is to form a training programm based on athlete's previous experience and current physical condition. It's one of the most efficient and affordable services offered by [Prosto o trenirovkah](https://vk.com/club_prosto_o_trenirovkah) training club.
+[![YDGMh2gg7-CY.jpg](https://i.postimg.cc/FsJpZDKB/YDGMh2gg7-CY.jpg)](https://postimg.cc/8jNLkdMR)
 ## How to use?
+1. Open official VK page of [Prosto o trenirovkah](https://vk.com/club_prosto_o_trenirovkah) training club.
+2. Go to Products.
+3. Choose Trainings With Subscription and follow the instructions.
+## Why us?
+More than 50 clients have already chosen us, so don't be scary and try this completely new way of training. You will get far more training benefit and motivation with our bot. Let's go to new achievements!
+
+
