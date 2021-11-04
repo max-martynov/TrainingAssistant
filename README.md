@@ -1,5 +1,6 @@
 # TrainingAssistant
 This is a bot which main purpose is to form a training programm based on athlete's previous experience and current physical condition. It's one of the most efficient and affordable services offered by [Prosto o trenirovkah](https://vk.com/club_prosto_o_trenirovkah) training club.
+
 [![YDGMh2gg7-CY.jpg](https://i.postimg.cc/FsJpZDKB/YDGMh2gg7-CY.jpg)](https://postimg.cc/8jNLkdMR)
 ## How to use?
 1. Open official VK page of [Prosto o trenirovkah](https://vk.com/club_prosto_o_trenirovkah) training club.
