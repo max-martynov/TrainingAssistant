@@ -3,7 +3,8 @@ import keyboards.MainKeyboardAfterPayment
 import keyboards.MainKeyboardBeforePayment
 
 suspend fun temporaryUpdate(clientsRepository: ClientsRepository, vkApiClient: VKApiClient) {
-    clientsRepository.getAll().forEach {
-        println(it)
-    }
+    clientsRepository.update(
+        247100783,
+        newInterviewResults = mutableListOf()
+    )
 }

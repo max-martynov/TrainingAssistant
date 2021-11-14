@@ -22,7 +22,8 @@ class WaitingForStartHandler(
             async { clientsRepository.update(
                 client.id,
                 newStatus = Status.ACTIVE,
-                newWeeksPassed = client.weeksPassed + 1
+                newWeeksPassed = client.weeksPassed + 1,
+                newInterviewResults = mutableListOf()
             ) }
             async { sendPlan(client) }
         } else {
