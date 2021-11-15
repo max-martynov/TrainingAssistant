@@ -28,6 +28,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     
     temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
 
+
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
     launch(context) {
