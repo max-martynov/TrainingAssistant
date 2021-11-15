@@ -35,7 +35,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
 
     // Hikari
-    implementation("com.zaxxer:HikariCP:5.0.0")
+    //implementation("com.zaxxer:HikariCP:5.0.0")
 
     // vk sdk
     val vk_sdk_version: String by project

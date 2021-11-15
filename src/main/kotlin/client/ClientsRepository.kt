@@ -101,15 +101,7 @@ class InMemoryClientsRepository : ClientsRepository {
 class InDataBaseClientsRepository() : ClientsRepository {
 
     init {
-        val config = HikariConfig()
-        config.jdbcUrl = "jdbc:h2:~/mem_test"
-        config.username = "org.h2.Driver"
-        config.password = "aRootPassword"
-        config.driverClassName = "org.h2.Driver"
-        config.maxLifetime = 300000
-        config.maximumPoolSize = 10
-
-        Database.connect(HikariDataSource(config))
+        Database.connect(url = "jdbc:h2:~/mem_test", driver = "org.h2.Driver", user = "org.h2.Driver", password = "aRootPassword")
 
         transaction {
             SchemaUtils.create(Clients)
