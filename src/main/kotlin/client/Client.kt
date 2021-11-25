@@ -25,7 +25,7 @@ data class Client(
     var status: Status = Status.NEW_CLIENT,
     var previousStatus: Status = status,
     var daysPassed: Int = -1,
-    var weeksPassed: Int = -1,
+    var weeksPassed: Int = -1, // actually redundant
     var trainingPlan: TrainingPlan = TrainingPlan(-1, -1, -1),
     var interviewResults: MutableList<Int> = mutableListOf(),
     var billId: String = ""
