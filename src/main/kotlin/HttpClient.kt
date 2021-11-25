@@ -27,7 +27,7 @@ fun createHttpClient(): HttpClient {
                 isLenient = true
             })
         }
-        install(Logging)
+        //install(Logging)
         engine {
             threadsCount = 4
             maxConnectionsCount = 20

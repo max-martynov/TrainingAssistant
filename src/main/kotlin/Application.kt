@@ -15,11 +15,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 
-@OptIn(ObsoleteCoroutinesApi::class)
+//@OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
 
 
     val clientsRepository = InDataBaseClientsRepository()
+    //clientsRepository.clear()
     val trainingPlansRepository = TrainingPlansRepository(
         "src/main/resources/TrainingPlans"
     )
@@ -61,6 +62,9 @@ fun main(args: Array<String>): Unit = runBlocking {
         embeddedServer(Netty, port = 8080, configure = {
             runningLimit = 20
             shareWorkGroup = true
+            connectionGroupSize = 2
+            workerGroupSize = 5
+            callGroupSize = 10
         }) {
             install(ContentNegotiation) {
                 json(Json {
