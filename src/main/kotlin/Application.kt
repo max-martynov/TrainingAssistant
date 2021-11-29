@@ -7,6 +7,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
+import io.ktor.server.jetty.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
@@ -27,8 +28,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
     
-    temporaryUpdate(clientsRepository, vkApiClient) // Comment me!!!
-
+    temporaryUpdate(clientsRepository, vkApiClient)
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
 
@@ -39,7 +39,7 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-            //LocalTime.now().plusSeconds(5),
+            //LocalTime.now().plusSeconds(5), // For testing only!
             //Duration.ofSeconds(10)
         )
     }
@@ -59,9 +59,7 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
 
-        embeddedServer(Netty, port = 8080, configure = {
-            runningLimit = 20
-            shareWorkGroup = true
+        embeddedServer(Jetty, port = 8080, configure = {
             connectionGroupSize = 2
             workerGroupSize = 5
             callGroupSize = 10

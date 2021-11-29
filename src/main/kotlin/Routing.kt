@@ -25,6 +25,8 @@ fun Application.routing(
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
+                    if (notification.length < 9)
+                        return@withContext
                     when (getType(notification)) {
                         "message_new" -> {
                             call.respondText("ok")
