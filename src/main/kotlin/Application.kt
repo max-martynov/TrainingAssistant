@@ -7,8 +7,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
-import io.ktor.server.jetty.*
-import io.ktor.server.netty.*
+import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import java.time.Duration
@@ -59,7 +58,7 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
 
-        embeddedServer(Jetty, port = 8080, configure = {
+        embeddedServer(Tomcat, port = 8080, configure = {
             connectionGroupSize = 2
             workerGroupSize = 5
             callGroupSize = 10

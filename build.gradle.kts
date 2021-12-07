@@ -18,8 +18,9 @@ dependencies {
     val ktor_version: String by project
     val logback_version: String by project
     // ktor server
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("io.ktor:ktor-server-jetty:$ktor_version")
+   // implementation("io.ktor:ktor-server-netty:$ktor_version")
+   // implementation("io.ktor:ktor-server-jetty:$ktor_version")
+    implementation("io.ktor:ktor-server-tomcat:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-serialization:$ktor_version")
