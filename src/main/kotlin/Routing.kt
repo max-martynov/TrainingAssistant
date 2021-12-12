@@ -13,8 +13,11 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 
 
-fun getType(call: String): String =
-    call.substring(9, call.indexOf('"', 9))
+fun getType(call: String): String {
+    if (call.length < 10)
+        return ""
+    return call.substring(9, maxOf(call.indexOf('"', 9), 10))
+}
 
 fun Application.routing(
     incomingMessageHandler: IncomingMessageHandler,
@@ -25,8 +28,6 @@ fun Application.routing(
             withContext(Dispatchers.IO) {
                 call.receive<InputStream>().use {
                     val notification = it.readBytes().decodeToString()
-                    if (notification.length < 9)
-                        return@withContext
                     when (getType(notification)) {
                         "message_new" -> {
                             call.respondText("ok")

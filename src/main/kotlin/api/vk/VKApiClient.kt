@@ -105,7 +105,7 @@ class VKApiClient {
     }
 
     private suspend fun uploadFile(address: String, pathToFile: String): String {
-        val response: ResponseWithFile = createHttpClient().submitFormWithBinaryData(
+        val response: ResponseWithFile = httpClient.submitFormWithBinaryData(
             url = address,
             formData = formData {
                 append("file", File(pathToFile).readBytes(), Headers.build {
@@ -121,7 +121,7 @@ class VKApiClient {
     private data class ResponseWithFile(val file: String)
 
     private suspend fun saveDoc(file: String): Doc {
-        return createHttpClient().post<ResponseWithDocs>(
+        return httpClient.post<ResponseWithDocs>(
             "https://api.vk.com/method/docs.save?"
         ) {
             parameter("access_token", accessToken)
