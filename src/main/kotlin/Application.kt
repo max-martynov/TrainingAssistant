@@ -10,19 +10,19 @@ import io.ktor.server.engine.*
 import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
+import io.ktor.server.jetty.Jetty
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
+const val pathToTrainingPlansRepository = "src/main/resources/TrainingPlans"
 
 //@OptIn(ObsoleteCoroutinesApi::class)
 fun main(args: Array<String>): Unit = runBlocking {
-
-
     val clientsRepository = InDataBaseClientsRepository()
-    //clientsRepository.clear()
+    clientsRepository.clear()
     val trainingPlansRepository = TrainingPlansRepository(
-        "src/main/resources/TrainingPlans"
+        pathToTrainingPlansRepository
     )
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
@@ -38,8 +38,8 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-            //LocalTime.now().plusSeconds(5), // For testing only!
-            //Duration.ofSeconds(10)
+            LocalTime.now().plusSeconds(5), // For testing only!
+            Duration.ofSeconds(10)
         )
     }
 
@@ -47,7 +47,6 @@ fun main(args: Array<String>): Unit = runBlocking {
         val messageEventHandler = MessageEventHandler(
             clientsRepository,
             vkApiClient,
-            trainingPlansRepository,
             qiwiApiClient
         )
 
@@ -58,7 +57,7 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
 
-        embeddedServer(Tomcat, port = 8080, configure = {
+        embeddedServer(Jetty, port = 8080, configure = {
             connectionGroupSize = 2
             workerGroupSize = 5
             callGroupSize = 10

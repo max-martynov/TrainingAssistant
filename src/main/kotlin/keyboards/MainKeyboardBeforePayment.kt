@@ -22,6 +22,14 @@ class MainKeyboardBeforePayment() : Keyboard() {
                                 "label":"Инструкция"
                             }
                         }
+                     ], [
+                        {
+                            "action":{
+                                "type":"open_link",
+                                "link":"https://vk.com/@club_prosto_o_trenirovkah-trenirovki-po-podpiske-20",
+                                "label":"Видео"
+                            }
+                        }
                      ], [   
                         {
                             "action":{

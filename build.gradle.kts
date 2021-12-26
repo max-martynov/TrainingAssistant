@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm") version "1.5.30"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.20"
+    kotlin("jvm") version "1.6.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.0"
     application
 }
 group = "projects"
@@ -18,8 +18,8 @@ dependencies {
     val ktor_version: String by project
     val logback_version: String by project
     // ktor server
-   // implementation("io.ktor:ktor-server-netty:$ktor_version")
-   // implementation("io.ktor:ktor-server-jetty:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.ktor:ktor-server-jetty:$ktor_version")
     implementation("io.ktor:ktor-server-tomcat:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")

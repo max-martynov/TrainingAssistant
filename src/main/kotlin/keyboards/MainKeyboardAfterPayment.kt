@@ -25,13 +25,7 @@ class MainKeyboardAfterPayment() : Keyboard() {
                             "action":{
                                 "type":"open_link",
                                 "link":"https://vk.com/@club_prosto_o_trenirovkah-skidki-dlya-uchastnikov-kluba",
-                                "label":"Промокоды 🎁"
-                            }
-                        }, {
-                            "action":{
-                                "type":"open_link",
-                                "link":"https://vk.com/@club_prosto_o_trenirovkah-motivacionnye-filmy",
-                                "label":"Мотивация 🏆"
+                                "label":"Полезное"
                             }
                         }
                      ], [   

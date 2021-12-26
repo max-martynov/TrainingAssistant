@@ -3,6 +3,8 @@ package stateHandlers
 import Client
 import ClientsRepository
 import api.vk.VKApiClient
+import keyboards.HasCompetitionKeyboard
+import keyboards.MainActivityKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -14,35 +16,40 @@ class ActiveClientHandler(
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         if (text == "Закончить цикл") {
             val phrases = listOf(
-                "Поздравляю с окончанием недельного цикла!\nЧтобы сформировать план на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
-                "Отличная работа!\nДля формирования плана на следующую неделю, пройдите, пожалуйста, небольшой опрос.",
-                "Недельный цикл успешно завершен! Пройдите, пожалуйста, небольшой опрос, чтобы сформировать план на следующую неделю."
+                "Отлично 🔥\nДавайте сформируем план на следующую неделю!",
+                "Хорошая работа 💪\nДавайте определимся с тренировочным планом на следующую неделю!",
+                "Недельный цикл успешно завершен 😎\nТеперь необходимо сформировать план на следующую неделю!"
             )
             vkApiClient.sendMessageSafely(
                 client.id,
-                if (client.trial)
-                    "Поздравляю с окончанием пробной недели!\nЧтобы сформировать Ваш персональный план на следующую неделю пройдите, пожалуйста, небольшой опрос."
-                else
-                    phrases.random()
+                phrases.random()
             )
             async { clientsRepository.update(
                 client.id,
-                newStatus = Status.WAITING_FOR_RESULTS
+                newStatus = Status.COMPLETING_INTERVIEW0,
+                newWeeksPassed = client.weeksPassed + 1
             ) }
-            async { sendInterviewQuestion(client, 0) }
+            async { sendFirstQuestion(client) }
         } else {
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\"."
+                "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\". Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
             )
         }
     }
 
-    private suspend fun sendInterviewQuestion(client: Client, questionNumber: Int) {
+    private suspend fun sendFirstQuestion(client: Client) {
+        if (client.hasCompetition) {
+            vkApiClient.sendMessageSafely(
+                client.id,
+                "Пробежали ли Вы старт?",
+                keyboard = HasCompetitionKeyboard().keyboard
+            )
+        }
         vkApiClient.sendMessageSafely(
             client.id,
-            client.interview.interviewQuestions[questionNumber].question,
-            keyboard = client.interview.interviewQuestions[questionNumber].toString()
+            "Выберите, как бы Вы хотели тренироваться на этой неделе. Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции.",
+            keyboard = MainActivityKeyboard().keyboard
         )
     }
 }

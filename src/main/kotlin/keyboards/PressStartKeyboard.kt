@@ -18,7 +18,7 @@ class PressStartKeyboard() : Keyboard() {
                                 "type":"text",
                                 "label":"Старт!"
                             },
-                            "color":"primary"
+                            "color":"positive"
                         }
                      ]
                 ],

@@ -15,6 +15,7 @@ import stateHandlers.*
 import java.lang.management.ManagementFactory
 
 
+
 class IncomingMessageHandler(
     private val clientsRepository: ClientsRepository,
     private val vKApiClient: VKApiClient,
@@ -23,8 +24,18 @@ class IncomingMessageHandler(
 ) {
     private val productId = 8 // 803 for Fake Community
 
+//    private val newClientHandler = NewClientHandler(clientsRepository, vKApiClient)
+//    private val waitingForPlanHandler = WaitingForPlanHandler(clientsRepository, trainingPlansRepository, vKApiClient)
+//    private val waitingForStartHandler = WaitingForStartHandler(clientsRepository, vKApiClient)
+//    private val activeClientHandler = ActiveClientHandler(clientsRepository, vKApiClient)
+//    private val waitingForPaymentHandler = WaitingForPaymentHandler(clientsRepository, vKApiClient)
+//    private val completingInterviewHandler0 = CompletingInterview0Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+//    private val completingInterviewHandler1 = CompletingInterview1Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+//    private val completingInterviewHandler2 = CompletingInterview2Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+//    private val completingInterviewHandler3 = CompletingInterview3Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+
     suspend fun receiveMessage(incomingMessage: IncomingMessage) {
-        val clientId = incomingMessage.fromId
+       /* val clientId = incomingMessage.fromId
         val text = incomingMessage.text
         val attachments = incomingMessage.attachments
 
@@ -37,10 +48,10 @@ class IncomingMessageHandler(
         }
         else if (client != null) {
             getAppropriateHandler(client).handle(client, text)
-        }
+        }*/
     }
 
-    private fun isOurProduct(attachment: String): Boolean {
+    /*private fun isOurProduct(attachment: String): Boolean {
         return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
                 Json {
                     ignoreUnknownKeys = true
@@ -55,57 +66,27 @@ class IncomingMessageHandler(
     private suspend fun sendGreetings(peerId: Int) {
         vKApiClient.sendMessageSafely(
             peerId,
-            "Здравствуйте!\nСпасибо, что решили попробовать инновационные тренировки по подписке 🤖\n" +
-                    "🔹 Если у Вас внизу не отображаются кнопки \"Старт\" и \"Инструкция\", нажмите на значок чуть правее поля для ввода сообещния.\n" +
-                    "🔹 Если у Вас есть вопросы о том, как тут все работает, жмите \"Инструкция\".\n" +
-                    "🔹 Если же Вы все поняли и готовы начинать, жмите \"Старт!\".",
+            "Привет!\n" +
+                    "Я персональный тренер в Вашем смартфоне. Ознакомьтесь с принципом работы, нажав на кнопку \"Инструкция\". " +
+                    "А после жмите \"Старт\", чтобы начать тренироваться вместо со мной!",
             keyboard = PressStartKeyboard().keyboard
         )
     }
 
     private fun getAppropriateHandler(client: Client): StateHandler {
         return when(client.status) {
-            Status.NEW_CLIENT -> NewClientHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_PLAN -> WaitingForPlanHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_START -> WaitingForStartHandler(clientsRepository, vKApiClient, trainingPlansRepository)
-            Status.ACTIVE -> ActiveClientHandler(clientsRepository, vKApiClient)
-            Status.WAITING_FOR_RESULTS -> WaitingForResultsHandler(clientsRepository, vKApiClient, trainingPlansRepository, qiwiApiClient)
-            else -> WaitingForPaymentHandler(clientsRepository, vKApiClient)
+            Status.NEW_CLIENT -> newClientHandler
+            Status.WAITING_FOR_PLAN -> waitingForPlanHandler
+            Status.WAITING_FOR_START -> waitingForStartHandler
+            Status.ACTIVE -> activeClientHandler
+            Status.WAITING_FOR_PAYMENT -> waitingForPaymentHandler
+            Status.COMPLETING_INTERVIEW0 -> completingInterviewHandler0
+            Status.COMPLETING_INTERVIEW1 -> completingInterviewHandler1
+            Status.COMPLETING_INTERVIEW2 -> completingInterviewHandler2
+            Status.COMPLETING_INTERVIEW3 -> completingInterviewHandler3
         }
-    }
+    }*/
 }
 
 
-/**
- * 1. Скажите, пожалуйста, как Ваше самочувствие после пройденного недельного цикла?
- *  - Устал / утомился
- *  - Чувствую себя нормально
- *  - Чувствую себя легко
- * 2. Нужно ли сделать тренировочный план легче / меньше?
- *  - Да
- *  - Нет
- * 3. Болели ли Вы в течение недельного цикла?
- *  - Да
- *  - Нет
- * 4. Нужно ли вам восстановление? (в случае ответа Нет на предыдущий вопрос, тут автоматически ответ Нет)
- *  - Да
- *  - Нет
- *
- *
- * Постоянная кнопка: Начал выполнение недельног оцикла, Закончил выаплнеие недельного циклва Обратная связь
- * Деньги собирать всегда через 30 дней
- * Может начать план только 4 раза за месяц
- * Забиваем на 3 часа
- *
- * "action": {
-"type": "vkpay",
-"payload": "{\"button\": \"1\"}",
-"hash": "action=pay-to-user&amount=5&description=aaaa&user_id=15733972&aid=7889001"
-}
- *
- *  - Пробная неделя
- *  - Добавить постоянную кнопку промокоды
- *  - 29 июля
- *
- *
- */
+

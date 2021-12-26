@@ -17,7 +17,6 @@ class ClientIterator(
     private val vkApiClient: VKApiClient,
     private val qiwiApiClient: QiwiApiClient
 ) {
-    private val activeStatuses = listOf(Status.ACTIVE, Status.WAITING_FOR_START, Status.WAITING_FOR_RESULTS)
 
     suspend fun iterateOverClients(
         checkTime: LocalTime = LocalTime.of(9, 0),
@@ -49,7 +48,7 @@ class ClientIterator(
                     LocalTime.of(0, 0).until(requiredTime, ChronoUnit.MILLIS)
 
     private suspend fun checkState(client: Client, vkApiClient: VKApiClient) {
-        if (activeStatuses.contains(client.status) && !client.trial) {
+        if (!client.trial && client.status != Status.WAITING_FOR_PAYMENT) {
             if (client.daysPassed == 28) {
                 clientsRepository.update(
                     client.id,
@@ -84,7 +83,7 @@ class ClientIterator(
         val clients = clientsRepository.getAll()
         println("\n\nLOG OF ALL CLIENTS ${LocalDateTime.now()}\n" +
                 "Total number of registered clients: ${clients.size}\n")
-        val numberOfActiveClients = clients.count { (it.status in activeStatuses) && (!it.trial) }
+        val numberOfActiveClients = clients.count { !it.trial }
         println("Total number of active clients: $numberOfActiveClients\n\nList of all clients:\n")
         clients.forEach { println(it) }
         println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}\n")

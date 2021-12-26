@@ -1,79 +1,61 @@
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.io.File
-import java.time.LocalDate
+import java.io.InputStream
+import java.lang.StringBuilder
+
 
 data class TrainingPlan(
-    val month: Int,
-    val hours: Int,
-    val week: Int,
-) {
-    private var numberOfReviews: Int = 0
-    private var sum: Int = 0
-    val rating: Double
-        get() = if (numberOfReviews == 0) 0.0 else sum * 1.0 / numberOfReviews
-    fun processReview(newReview: Int) {
-        numberOfReviews++
-        sum += newReview
-    }
-}
+    val activityType: Int,
+    val duration: Int,
+    val plan: String
+)
 
 class TrainingPlansRepository(
     private val pathToDirectory: String
 ) {
-
-    fun getPathToFile(trainingPlan: TrainingPlan) =
-        "$pathToDirectory/${trainingPlan.month}/${trainingPlan.hours}/${trainingPlan.week}.pdf"
-
-    fun determineNextTrainingPlan(client: Client): TrainingPlan {
-        val (month, _, week) = client.trainingPlan
-        val nextHours = determineNextHours(client)
-        if (week < 4)
-            return TrainingPlan(month, nextHours, week + 1)
-        else if (month != LocalDate.now().monthValue)
-            return TrainingPlan(LocalDate.now().monthValue, nextHours, 1)
-        else
-            return TrainingPlan(month, nextHours, 4 + ((week - 3) % 3))
+    fun getTrainingPlan(client: Client, activityType: Int, duration: Int): TrainingPlan {
+        if (client.hasCompetition)
+            return getTrainingPlanAfterCompetition(client)
+        val builder = StringBuilder()
+        val leadingPhrase = "Ваш план на эту неделю:\n\n"
+        builder.append(leadingPhrase)
+        for (i in 0 until 3) {
+            builder.append(
+                readStringFromFile(getRandomFile(activityType, duration, i))
+            )
+            builder.append("\n\n")
+        }
+        return TrainingPlan(activityType, duration, plan = builder.toString())
     }
 
-    private fun determineNextHours(client: Client): Int =
-        when (client.trainingPlan.hours) {
-            1 -> {
-                if (client.interviewResults[1] == 1)
-                    1
-                else if (client.interviewResults[2] == 0)
-                    6
-                else
-                    10
-            }
-            6 -> {
-                if (client.interviewResults[3] == 0)
-                    1
-                else if (client.interviewResults[1] == 0)
-                    10
-                else
-                    6
-            }
-            10 -> {
-                if (client.interviewResults[3] == 0)
-                    1
-                else if (client.interviewResults[1] == 0)
-                    6
-                else
-                    10
-            }
-            else -> -1
+    private fun getTrainingPlanAfterCompetition(client: Client): TrainingPlan {
+        val builder = StringBuilder()
+        val leadingPhrase = "Ваш план на эту неделю будет менее интенсивным, " +
+                "однако, тренируюясь по нему, Вы сможете стартовать и на следующих выходных, если захотите:\n\n"
+        builder.append(leadingPhrase)
+        val activityType = 0
+        val duration = client.trainingPlan.duration % 2
+        val day = client.trainingPlan.duration / 10
+        val path = "$pathToDirectory/$activityType/$duration/0_after_competition/$day.txt"
+        builder.append(readStringFromFile(path))
+        for (i in 1 until 3) {
+            builder.append(
+                readStringFromFile(getRandomFile(activityType, duration, i))
+            )
+            builder.append("\n\n")
         }
+        return TrainingPlan(activityType, duration, plan = builder.toString())
+    }
 
-    private fun calculateNextWeek(currentWeek: Int): Int =
-        maxOf(1, (currentWeek + 1) % 5)
+    private fun getRandomFile(activityType: Int, duration: Int, number: Int): String {
+        val path = "$pathToDirectory/$activityType/$duration/$number"
+        val sz = File(path).listFiles().size
+        val id = (0 until sz).random()
+        return "$path/$id.txt"
+    }
 
-    private fun calculateNextMonth(currentMonth: Int): Int =
-        maxOf(1, (currentMonth + 1) % 13)
+    private fun readStringFromFile(path: String): String {
+        val inputStream: InputStream = File(path).inputStream()
+        return inputStream.bufferedReader().use { it.readText() }
+    }
 }
+

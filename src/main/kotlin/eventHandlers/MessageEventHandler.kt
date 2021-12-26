@@ -12,7 +12,6 @@ import kotlinx.coroutines.coroutineScope
 class MessageEventHandler(
     private val clientsRepository: ClientsRepository,
     private val vKApiClient: VKApiClient,
-    private val trainingPlansRepository: TrainingPlansRepository,
     private val qiwiApiClient: QiwiApiClient
 ) {
     suspend fun checkPayment(messageEvent: MessageEvent) = coroutineScope {
@@ -31,32 +30,24 @@ class MessageEventHandler(
     }
 
     private suspend fun confirmPayment(client: Client, messageEvent: MessageEvent?) {
-        val phrase =
-            if (client.trial)
-                "Оплата подтверждена! Спасибо, что решили продолжить тренировки по подписке."
-            else
-                "Оплата подтверждена! Надеюсь, Вам понравятся тренировки в этом месяце."
+        val phrase = "Оплата подтверждена. Хороших тренировок в этом месяце!"
         updateClient(client)
         if (messageEvent != null)
             vKApiClient.sendMessageEventAnswerSafely(messageEvent, getShowSnackbarString(phrase))
     }
 
     private suspend fun updateClient(client: Client) {
-        if (client.trial) { // for clients after trial
+        if (client.trialPeriodEnded) {
             clientsRepository.update(
                 client.id,
-                newTrial = false,
                 newStatus = Status.WAITING_FOR_START,
-                newWeeksPassed = 0,
-                newDaysPassed = 0
             )
         }
         else {
             clientsRepository.update(
                 client.id,
                 newStatus = client.previousStatus,
-                newDaysPassed = 0,
-                newWeeksPassed = 0
+                newDaysPassed = 0
             )
         }
     }
@@ -70,19 +61,21 @@ class MessageEventHandler(
     """.trimIndent()
 
     private suspend fun sendThanks(client: Client) {
-        if (client.trial) {
+        if (client.trialPeriodEnded) {
             vKApiClient.sendMessageSafely(
                 client.id,
                 "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её.\n" +
                         "Для того, чтобы начать тренировочный процесс, нажмите \"Начать цикл\" (если Вы не видите этой кнопки, нажмите на кнопку чуть правее поля для ввода сообщения).\n" +
-                        "Также не забывайте, что теперь Вам доступны промокоды и подборка фильмов 🎁",
+                        "Также не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором вы всегда сможете найти:\n" +
+                        " \uD83D\uDD39 промокоды от партнеров\n" +
+                        " \uD83D\uDD39 мотивационную подборку",
                 keyboard = MainKeyboardAfterPayment().keyboard
             )
         }
         else {
             vKApiClient.sendMessageSafely(
                 client.id,
-                "Спасибо, что продолжаете тренироваться вместе с нами! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её."
+                "Спасибо, что продолжаете тренироваться вместе со мной! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её."
             )
         }
     }

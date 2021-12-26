@@ -1,11 +1,8 @@
-import org.h2.jdbcx.JdbcDataSource
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import javax.naming.Context
-import javax.naming.InitialContext
 import kotlin.concurrent.withLock
 
 
@@ -15,12 +12,10 @@ interface ClientsRepository {
     suspend fun getAll(): List<Client>
     suspend fun update(
         id: Int,
-        newTrial: Boolean? = null,
         newStatus: Status? = null,
-        newDaysPassed: Int? = null,
         newWeeksPassed: Int? = null,
+        newDaysPassed: Int? = null,
         newTrainingPlan: TrainingPlan? = null,
-        newInterviewResults: MutableList<Int>? = null,
         newBillId: String? = null
     )
     suspend fun delete(clientId: Int)
@@ -54,31 +49,25 @@ class InMemoryClientsRepository : ClientsRepository {
 
     override suspend fun update(
         id: Int,
-        newTrial: Boolean?,
         newStatus: Status?,
-        newDaysPassed: Int?,
         newWeeksPassed: Int?,
+        newDaysPassed: Int?,
         newTrainingPlan: TrainingPlan?,
-        newInterviewResults: MutableList<Int>?,
         newBillId: String?
     ) {
         val client = findById(id) ?: return
         lock.withLock {
             clients.remove(client)
-            if (newTrial != null)
-                client.trial = newTrial
             if (newStatus != null) {
                 client.previousStatus = client.status
                 client.status = newStatus
             }
-            if (newDaysPassed != null)
-                client.daysPassed = newDaysPassed
             if (newWeeksPassed != null)
                 client.weeksPassed = newWeeksPassed
+            if (newDaysPassed != null)
+                client.daysPassed = newDaysPassed
             if (newTrainingPlan != null)
                 client.trainingPlan = newTrainingPlan
-            if (newInterviewResults != null)
-                client.interviewResults = newInterviewResults
             if (newBillId != null)
                 client.billId = newBillId
             clients.add(client)
@@ -112,15 +101,13 @@ class InDataBaseClientsRepository() : ClientsRepository {
             if (findById(client.id) == null) {
                 Clients.insert {
                     it[id] = client.id
-                    it[trial] = client.trial
                     it[status] = client.status.toString()
                     it[previousStatus] = client.previousStatus.toString()
                     it[daysPassed] = client.daysPassed
                     it[weeksPassed] = client.weeksPassed
-                    it[trainingPlanMonth] = client.trainingPlan.month
-                    it[trainingPlanWeek] = client.trainingPlan.week
-                    it[trainingPlanHours] = client.trainingPlan.hours
-                    it[interviewResults] = client.interviewResults.joinToString(separator = "")
+                    it[activityType] = client.trainingPlan.activityType
+                    it[duration] = client.trainingPlan.duration
+                    it[plan] = client.trainingPlan.plan
                     it[billId] = client.billId
                 }
             }
@@ -143,17 +130,11 @@ class InDataBaseClientsRepository() : ClientsRepository {
     private fun convertClientToDataClass(client: ResultRow): Client {
         return Client(
             id = client[Clients.id],
-            trial = client[Clients.trial],
             status = Status.valueOf(client[Clients.status]),
             previousStatus = Status.valueOf(client[Clients.previousStatus]),
-            daysPassed = client[Clients.daysPassed],
             weeksPassed = client[Clients.weeksPassed],
-            trainingPlan = TrainingPlan(
-                month = client[Clients.trainingPlanMonth],
-                hours = client[Clients.trainingPlanHours],
-                week = client[Clients.trainingPlanWeek],
-            ),
-            interviewResults = client[Clients.interviewResults].map { it.toString().toInt() }.toMutableList(),
+            daysPassed = client[Clients.daysPassed],
+            trainingPlan = TrainingPlan(client[Clients.activityType], client[Clients.duration], client[Clients.plan]),
             billId = client[Clients.billId]
         )
     }
@@ -164,30 +145,27 @@ class InDataBaseClientsRepository() : ClientsRepository {
 
     override suspend fun update(
         id: Int,
-        newTrial: Boolean?,
         newStatus: Status?,
-        newDaysPassed: Int?,
         newWeeksPassed: Int?,
+        newDaysPassed: Int?,
         newTrainingPlan: TrainingPlan?,
-        newInterviewResults: MutableList<Int>?,
         newBillId: String?
     ) {
         newSuspendedTransaction {
             Clients.update({ Clients.id eq id }) {
-                if (newTrial != null)
-                    it[trial] = newTrial
                 if (newStatus != null) {
                     it[previousStatus] = Clients.status
                     it[status] = newStatus.toString()
                 }
-                if (newDaysPassed != null) it[daysPassed] = newDaysPassed
-                if (newWeeksPassed != null) it[weeksPassed] = newWeeksPassed
+                if (newWeeksPassed != null)
+                    it[weeksPassed] = newWeeksPassed
+                if (newDaysPassed != null)
+                    it[daysPassed] = newDaysPassed
                 if (newTrainingPlan != null) {
-                    it[trainingPlanMonth] = newTrainingPlan.month
-                    it[trainingPlanHours] = newTrainingPlan.hours
-                    it[trainingPlanWeek] = newTrainingPlan.week
+                    it[activityType] = newTrainingPlan.activityType
+                    it[duration] = newTrainingPlan.duration
+                    it[plan] = newTrainingPlan.plan
                 }
-                if (newInterviewResults != null) it[interviewResults] = newInterviewResults.joinToString(separator = "")
                 if (newBillId != null) it[billId] = newBillId
             }
         }
@@ -209,15 +187,13 @@ class InDataBaseClientsRepository() : ClientsRepository {
 
 object Clients : Table() {
     val id = integer("id")
-    val trial = bool("trial")
     val status = varchar("status", 20)
     val previousStatus = varchar("previous_status", 20)
-    val daysPassed = integer("days_passed")
     val weeksPassed = integer("weeks_passed")
-    val trainingPlanMonth = integer("training_plan_month")
-    val trainingPlanHours = integer("training_plan_hours")
-    val trainingPlanWeek = integer("training_plan_week")
-    val interviewResults = varchar("interview_results", 10)
+    val daysPassed = integer("days_passed")
+    val activityType = integer("activity_type")
+    val duration = integer("duration")
+    val plan = varchar("training_plan", 2000)
     val billId = varchar("bill_id", 20)
     override val primaryKey = PrimaryKey(id)
 }
