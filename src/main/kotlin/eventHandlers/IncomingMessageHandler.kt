@@ -1,8 +1,8 @@
 package eventHandlers
 
-import Client
+import client.Client
 import ClientsRepository
-import Status
+import client.Status
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.*
@@ -24,20 +24,23 @@ class IncomingMessageHandler(
 ) {
     private val productId = 8 // 803 for Fake Community
 
-//    private val newClientHandler = NewClientHandler(clientsRepository, vKApiClient)
-//    private val waitingForPlanHandler = WaitingForPlanHandler(clientsRepository, trainingPlansRepository, vKApiClient)
-//    private val waitingForStartHandler = WaitingForStartHandler(clientsRepository, vKApiClient)
-//    private val activeClientHandler = ActiveClientHandler(clientsRepository, vKApiClient)
-//    private val waitingForPaymentHandler = WaitingForPaymentHandler(clientsRepository, vKApiClient)
-//    private val completingInterviewHandler0 = CompletingInterview0Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
-//    private val completingInterviewHandler1 = CompletingInterview1Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
-//    private val completingInterviewHandler2 = CompletingInterview2Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
-//    private val completingInterviewHandler3 = CompletingInterview3Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+    private val newClientHandler = NewClientHandler(clientsRepository, vKApiClient)
+    private val waitingForPlanHandler = WaitingForPlanHandler(clientsRepository, trainingPlansRepository, vKApiClient)
+    private val waitingForStartHandler = WaitingForBeginHandler(clientsRepository, vKApiClient)
+    private val activeClientHandler = ActiveClientHandler(clientsRepository, vKApiClient)
+    private val waitingForPaymentHandler = WaitingForPaymentHandler(clientsRepository, vKApiClient)
+    private val completingInterviewHandler0 = CompletingInterview0Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+    private val completingInterviewHandler1 = CompletingInterview1Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+    private val completingInterviewHandler2 = CompletingInterview2Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+    private val completingInterviewHandler3 = CompletingInterview3Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
 
     suspend fun receiveMessage(incomingMessage: IncomingMessage) {
-       /* val clientId = incomingMessage.fromId
+        val clientId = incomingMessage.fromId
         val text = incomingMessage.text
         val attachments = incomingMessage.attachments
+
+        if (clientId != 217619042 && clientId != 15733972)
+            return
 
         println("Current number of threads = ${ManagementFactory.getThreadMXBean().threadCount}")
 
@@ -48,10 +51,10 @@ class IncomingMessageHandler(
         }
         else if (client != null) {
             getAppropriateHandler(client).handle(client, text)
-        }*/
+        }
     }
 
-    /*private fun isOurProduct(attachment: String): Boolean {
+    private fun isOurProduct(attachment: String): Boolean {
         return Json { ignoreUnknownKeys = true }.decodeFromString<Attachment>(attachment).type == "market" &&
                 Json {
                     ignoreUnknownKeys = true
@@ -67,9 +70,10 @@ class IncomingMessageHandler(
         vKApiClient.sendMessageSafely(
             peerId,
             "Привет!\n" +
-                    "Я персональный тренер в Вашем смартфоне. Ознакомьтесь с принципом работы, нажав на кнопку \"Инструкция\". " +
-                    "А после жмите \"Старт\", чтобы начать тренироваться вместо со мной!",
-            keyboard = PressStartKeyboard().keyboard
+                    "Я персональный тренер в Вашем смартфоне. " +
+                    "Это новый формат тренировок, сочетающий в себе продуманный тренерский подход с удобством автоматизированного общения. " +
+                    "Нажмите \"Старт!\", чтобы начать тренироваться вместе со мной!",
+            keyboard = PressStartKeyboard().getKeyboard()
         )
     }
 
@@ -85,7 +89,7 @@ class IncomingMessageHandler(
             Status.COMPLETING_INTERVIEW2 -> completingInterviewHandler2
             Status.COMPLETING_INTERVIEW3 -> completingInterviewHandler3
         }
-    }*/
+    }
 }
 
 

@@ -1,32 +1,33 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
+import kotlinx.coroutines.coroutineScope
 
 
-class CompletingInterview2Handler(
+class CompletingInterview1Handler(
     private val clientsRepository: ClientsRepository,
     private val trainingPlansRepository: TrainingPlansRepository,
     private val vkApiClient: VKApiClient,
-    private val qiwiApiClient: QiwiApiClient
-) : CompletingInterviewHandler(clientsRepository, trainingPlansRepository, vkApiClient, qiwiApiClient) {
+    qiwiApiClient: QiwiApiClient
+) : CompletingInterviewHandler(clientsRepository, vkApiClient, qiwiApiClient) {
 
-    override suspend fun handle(client: Client, text: String) {
+    override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         when (text) {
             "6 часов" -> {
                 clientsRepository.update(
                     client.id,
-                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 1, 0)
+                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 0, 0)
                 )
                 checkIfTrial(client)
             }
             "10 часов" -> {
                 clientsRepository.update(
                     client.id,
-                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 1, 1)
+                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 0, 1)
                 )
                 checkIfTrial(client)
             }

@@ -1,6 +1,6 @@
 package api.vk
 
-import Client
+import client.Client
 import createHttpClient
 import io.ktor.client.features.*
 import io.ktor.client.request.*

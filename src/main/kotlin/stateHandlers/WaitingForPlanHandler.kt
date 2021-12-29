@@ -1,10 +1,11 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
 import TrainingPlan
 import TrainingPlansRepository
 import api.vk.VKApiClient
+import client.Status
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -13,7 +14,7 @@ class WaitingForPlanHandler(
     private val clientsRepository: ClientsRepository,
     private val trainingPlansRepository: TrainingPlansRepository,
     private val vkApiClient: VKApiClient
-) : StateHandler(clientsRepository, vkApiClient) {
+) : StateHandler() {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         val trainingPlan: TrainingPlan? = when (text) {
@@ -43,9 +44,8 @@ class WaitingForPlanHandler(
         vkApiClient.sendMessageSafely(
             peerId,
             "Недельный план сформирован!\n" +
-                    "Чтобы получить его и начать недельный цикл, нажмите \"Начать цикл\"" +
-                    "(если Вы не видите этой кнопки, нажмите на кнопку чуть правее поля для ввода сообщения).\n" +
-                    "Через неделю, после того, как выполните все тренировки, нажмите \"Закончить цикл\"."
+                    "Чтобы получить его и начать недельный цикл, нажмите кнопку \"Начать цикл\". " +
+                    "Через неделю, после того, как выполните все тренировки, нажмите кнопку \"Закончить цикл\"."
         )
     }
 }

@@ -1,32 +1,32 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
 
 
-class CompletingInterview3Handler(
+class CompletingInterview2Handler(
     private val clientsRepository: ClientsRepository,
     private val trainingPlansRepository: TrainingPlansRepository,
     private val vkApiClient: VKApiClient,
-    private val qiwiApiClient: QiwiApiClient
-) : CompletingInterviewHandler(clientsRepository, trainingPlansRepository, vkApiClient, qiwiApiClient) {
+    qiwiApiClient: QiwiApiClient
+) : CompletingInterviewHandler(clientsRepository, vkApiClient, qiwiApiClient) {
 
     override suspend fun handle(client: Client, text: String) {
         when (text) {
-            "Суббота" -> {
+            "6 часов" -> {
                 clientsRepository.update(
                     client.id,
-                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 4, client.trainingPlan.duration)
+                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 1, 0)
                 )
                 checkIfTrial(client)
             }
-            "Воскресенье" -> {
+            "10 часов" -> {
                 clientsRepository.update(
                     client.id,
-                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 4, 10 + client.trainingPlan.duration)
+                    newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 1, 1)
                 )
                 checkIfTrial(client)
             }

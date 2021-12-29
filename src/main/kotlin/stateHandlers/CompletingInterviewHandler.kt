@@ -1,26 +1,26 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
+import client.Status
 import keyboards.PaymentKeyboard
 import keyboards.SelectDayKeyboard
 import keyboards.SelectHoursKeyboard
 
 abstract class CompletingInterviewHandler(
     private val clientsRepository: ClientsRepository,
-    private val trainingPlansRepository: TrainingPlansRepository,
     private val vkApiClient: VKApiClient,
     private val qiwiApiClient: QiwiApiClient
-) : StateHandler(clientsRepository, vkApiClient) {
+) : StateHandler() {
 
     protected suspend fun askHours(client: Client) {
         vkApiClient.sendMessageSafely(
             client.id,
             "Сколько часов Вы бы хотели тренироваться на этой неделе?" ,
-            SelectHoursKeyboard().keyboard
+            SelectHoursKeyboard().getKeyboard()
         )
     }
 
@@ -28,7 +28,7 @@ abstract class CompletingInterviewHandler(
         vkApiClient.sendMessageSafely(
             client.id,
             "В какой день у Вас будет старт?" ,
-            SelectDayKeyboard().keyboard
+            SelectDayKeyboard().getKeyboard()
         )
     }
 
@@ -38,12 +38,13 @@ abstract class CompletingInterviewHandler(
                 client.id,
                 newStatus = Status.WAITING_FOR_PAYMENT
             )
+            qiwiApiClient.updateBill(client, clientsRepository)
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Тренировочный план составлен!\nОсталось только оплатить месячную подписку, и Вы сможете приступить к тренировкам!\n" +
-                        "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". " +
-                        "После совершения платежа нажмите \"Подтвердить оплату\".",
-                keyboard = PaymentKeyboard(qiwiApiClient.getPayUrl(client.billId)).keyboard
+                        "Чтобы открыть окно с оплатой, нажмите \"Оплатить подписку\". Оплата возможно только с помощью банковской карты, но не волнуйтесь, Ваши данные в безопасности.\n" +
+                        "После совершения платежа нажмите \"Подтвердить оплату\"!",
+                keyboard = PaymentKeyboard().getKeyboard(qiwiApiClient.getPayUrl(client.billId))
             )
         } else {
             clientsRepository.update(
@@ -53,7 +54,7 @@ abstract class CompletingInterviewHandler(
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Тренировочный план составлен!\n" +
-                        "Чтобы получить его и начать недельный цикл, нажмите \"Начать цикл\"."
+                        "Чтобы получить его и начать недельный цикл, нажмите кнопку \"Начать цикл\"."
             )
         }
     }

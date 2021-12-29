@@ -1,7 +1,8 @@
+import client.Client
+import client.Status
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -24,7 +25,7 @@ interface ClientsRepository {
 }
 
 class InMemoryClientsRepository : ClientsRepository {
-    private val clients = mutableListOf<Client>()//Collections.synchronizedList(mutableListOf<Client>())
+    private val clients = mutableListOf<Client>()//Collections.synchronizedList(mutableListOf<client.Client>())
 
     private val lock = ReentrantLock()
 
@@ -187,8 +188,8 @@ class InDataBaseClientsRepository() : ClientsRepository {
 
 object Clients : Table() {
     val id = integer("id")
-    val status = varchar("status", 20)
-    val previousStatus = varchar("previous_status", 20)
+    val status = varchar("status", 30)
+    val previousStatus = varchar("previous_status", 30)
     val weeksPassed = integer("weeks_passed")
     val daysPassed = integer("days_passed")
     val activityType = integer("activity_type")

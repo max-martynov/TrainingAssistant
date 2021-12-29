@@ -11,6 +11,8 @@ import io.ktor.server.tomcat.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import io.ktor.server.jetty.Jetty
+import java.io.File
+import java.io.InputStream
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -18,7 +20,7 @@ import java.time.LocalTime
 const val pathToTrainingPlansRepository = "src/main/resources/TrainingPlans"
 
 //@OptIn(ObsoleteCoroutinesApi::class)
-fun main(args: Array<String>): Unit = runBlocking {
+fun main(): Unit = runBlocking {
     val clientsRepository = InDataBaseClientsRepository()
     clientsRepository.clear()
     val trainingPlansRepository = TrainingPlansRepository(
@@ -26,7 +28,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     )
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
-    
+
     temporaryUpdate(clientsRepository, vkApiClient)
 
     val context = newFixedThreadPoolContext(3, "for_iterator")
@@ -38,8 +40,8 @@ fun main(args: Array<String>): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-            LocalTime.now().plusSeconds(5), // For testing only!
-            Duration.ofSeconds(10)
+           // LocalTime.now().plusSeconds(5), // For testing only!
+           // Duration.ofSeconds(60)
         )
     }
 
@@ -67,7 +69,6 @@ fun main(args: Array<String>): Unit = runBlocking {
                     ignoreUnknownKeys = true
                 })
             }
-            //install(CallLogging)
             routing(incomingMessageHandler, messageEventHandler)
         }.start(true)
     }

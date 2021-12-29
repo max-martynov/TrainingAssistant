@@ -1,0 +1,15 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Старт!"
+        },
+        "color": "positive"
+      }
+    ]
+  ],
+  "inline": false
+}

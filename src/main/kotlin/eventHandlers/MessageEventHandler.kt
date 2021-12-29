@@ -1,9 +1,8 @@
 package eventHandlers
 
-import Client
+import client.Client
 import ClientsRepository
-import Status
-import TrainingPlansRepository
+import client.Status
 import api.qiwi.QiwiApiClient
 import api.vk.*
 import keyboards.MainKeyboardAfterPayment
@@ -65,11 +64,11 @@ class MessageEventHandler(
             vKApiClient.sendMessageSafely(
                 client.id,
                 "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её.\n" +
-                        "Для того, чтобы начать тренировочный процесс, нажмите \"Начать цикл\" (если Вы не видите этой кнопки, нажмите на кнопку чуть правее поля для ввода сообщения).\n" +
-                        "Также не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором вы всегда сможете найти:\n" +
+                        "Для того, чтобы начать тренировочный процесс, нажмите кнопку или наберите команду Начать цикл.\n" +
+                        "Также не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором Вы всегда сможете найти:\n" +
                         " \uD83D\uDD39 промокоды от партнеров\n" +
-                        " \uD83D\uDD39 мотивационную подборку",
-                keyboard = MainKeyboardAfterPayment().keyboard
+                        " \uD83D\uDD39 мотивационную подборку.",
+                keyboard = MainKeyboardAfterPayment().getKeyboard()
             )
         }
         else {

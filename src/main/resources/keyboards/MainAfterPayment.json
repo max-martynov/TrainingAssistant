@@ -1,0 +1,54 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "open_link",
+          "link": "https://vk.com/@club_prosto_o_trenirovkah-personalnyi-trener-v-vashem-smartfone",
+          "label": "Инструкция"
+        }
+      },
+      {
+        "action": {
+          "type": "open_link",
+          "link": "https://vk.me/tuchin_a_95",
+          "label": "Обратная связь"
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "open_link",
+          "link": "https://vk.com/@club_prosto_o_trenirovkah-video-s-uprazhneniyami-dlya-silovoi-raboty",
+          "label": "Видео"
+        }
+      },
+      {
+        "action": {
+          "type": "open_link",
+          "link": "https://vk.com/@club_prosto_o_trenirovkah-skidki-dlya-uchastnikov-kluba",
+          "label": "Полезное"
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Начать цикл"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Закончить цикл"
+        },
+        "color": "primary"
+      }
+    ]
+  ],
+  "inline": false
+}

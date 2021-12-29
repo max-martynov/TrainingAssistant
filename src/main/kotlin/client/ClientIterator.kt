@@ -1,8 +1,6 @@
 package client
 
-import Client
 import ClientsRepository
-import Status
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
 import keyboards.PaymentKeyboard
@@ -75,7 +73,7 @@ class ClientIterator(
         vkApiClient.sendMessageSafely(
             client.id,
             phrases.random(),
-            keyboard = PaymentKeyboard(qiwiApiClient.getPayUrl(client.billId)).keyboard
+            keyboard = PaymentKeyboard().getKeyboard(qiwiApiClient.getPayUrl(client.billId))
         )
     }
 

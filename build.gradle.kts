@@ -6,6 +6,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.0"
     application
 }
+
+
+
 group = "projects"
 version = "1.0-SNAPSHOT"
 

@@ -1,12 +1,13 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
-import Status
+import client.Status
 import TrainingPlan
 import TrainingPlansRepository
 import api.qiwi.QiwiApiClient
 import api.vk.VKApiClient
+import keyboards.MainActivityKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -15,8 +16,8 @@ class CompletingInterview0Handler(
     private val clientsRepository: ClientsRepository,
     private val trainingPlansRepository: TrainingPlansRepository,
     private val vkApiClient: VKApiClient,
-    private val qiwiApiClient: QiwiApiClient
-) : CompletingInterviewHandler(clientsRepository, trainingPlansRepository, vkApiClient, qiwiApiClient) {
+    qiwiApiClient: QiwiApiClient
+) : CompletingInterviewHandler(clientsRepository, vkApiClient, qiwiApiClient) {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         if (client.hasCompetition) {
@@ -39,7 +40,8 @@ class CompletingInterview0Handler(
                     async {
                         vkApiClient.sendMessageSafely(
                             client.id,
-                            "Как бы Вы хотели тренироваться на этой неделе? Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции."
+                            "Как бы Вы хотели тренироваться на этой неделе? Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции.",
+                            keyboard = MainActivityKeyboard().getKeyboard()
                         )
                     }
                 }
@@ -69,7 +71,7 @@ class CompletingInterview0Handler(
                         askHours(client)
                     }
                 }
-                "OФП" -> {
+                "ОФП" -> {
                     clientsRepository.update(
                         client.id,
                         newTrainingPlan = trainingPlansRepository.getTrainingPlan(client, 2, 0)

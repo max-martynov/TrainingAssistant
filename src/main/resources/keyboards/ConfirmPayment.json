@@ -1,0 +1,15 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "callback",
+          "label": "Подтвердить оплату"
+        },
+        "color": "positive"
+      }
+    ]
+  ],
+  "inline": true
+}

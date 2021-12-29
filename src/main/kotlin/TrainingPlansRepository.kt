@@ -1,3 +1,4 @@
+import client.Client
 import java.io.File
 import java.io.InputStream
 import java.lang.StringBuilder
@@ -37,6 +38,7 @@ class TrainingPlansRepository(
         val day = client.trainingPlan.duration / 10
         val path = "$pathToDirectory/$activityType/$duration/0_after_competition/$day.txt"
         builder.append(readStringFromFile(path))
+        builder.append("\n\n")
         for (i in 1 until 3) {
             builder.append(
                 readStringFromFile(getRandomFile(activityType, duration, i))

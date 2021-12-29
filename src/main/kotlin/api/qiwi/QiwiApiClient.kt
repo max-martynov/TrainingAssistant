@@ -1,6 +1,6 @@
 package api.qiwi
 
-import Client
+import client.Client
 import ClientsRepository
 import createHttpClient
 import io.ktor.client.request.*
@@ -11,7 +11,7 @@ import java.time.OffsetDateTime
 class QiwiApiClient {
     private val secretKey =
         "eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6IjRzN2c0My0wMCIsInVzZXJfaWQiOiI3OTUzNTQ4NjMzMCIsInNlY3JldCI6ImNmYWU3YWM1MDQ1ODdlNGE3NjhkOTIzYzZiMGY0NTM0MmIwNTk4MTQyMGQ2YWQzYjg5OWU2NDFjMzRmYzgwYTcifX0="
-    private val moneyAmount = 500
+    private val moneyAmount = 650
     private val httpClient = createHttpClient()
 
     suspend fun getPayUrl(billId: String): String {
@@ -130,8 +130,8 @@ object QiwiAPI {
     )
 
     @Serializable
-    data class Status(val value: String, val changedDateTime: String)
+    data class client.Status(val value: String, val changedDateTime: String)
 
     @Serializable
-    data class Response(val status: Status, val payUrl: String)
+    data class Response(val status: client.Status, val payUrl: String)
 }*/

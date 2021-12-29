@@ -1,17 +1,18 @@
 package stateHandlers
 
-import Client
+import client.Client
 import ClientsRepository
 import api.vk.VKApiClient
-import keyboards.HasCompetitionKeyboard
+import client.Status
 import keyboards.MainActivityKeyboard
+import keyboards.YesNoKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 class ActiveClientHandler(
     private val clientsRepository: ClientsRepository,
     private val vkApiClient: VKApiClient
-) : StateHandler(clientsRepository, vkApiClient) {
+) : StateHandler() {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         if (text == "Закончить цикл") {
@@ -33,7 +34,7 @@ class ActiveClientHandler(
         } else {
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Для того, чтобы закончить выполнение недельного цикла, нажмите \"Закончить цикл\". Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
+                "Для того, чтобы закончить выполнение недельного цикла, нажмите кнопку \"Закончить цикл\". Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
             )
         }
     }
@@ -43,13 +44,16 @@ class ActiveClientHandler(
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Пробежали ли Вы старт?",
-                keyboard = HasCompetitionKeyboard().keyboard
+                keyboard = YesNoKeyboard().getKeyboard()
             )
         }
-        vkApiClient.sendMessageSafely(
-            client.id,
-            "Выберите, как бы Вы хотели тренироваться на этой неделе. Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции.",
-            keyboard = MainActivityKeyboard().keyboard
-        )
+        else {
+            vkApiClient.sendMessageSafely(
+                client.id,
+                "Выберите, как бы Вы хотели тренироваться на этой неделе. Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции.\n" +
+                        "Чтобы выбрать тренировочное направление, просто нажмите на соотвествующую синюю кнопку.",
+                keyboard = MainActivityKeyboard().getKeyboard()
+            )
+        }
     }
 }

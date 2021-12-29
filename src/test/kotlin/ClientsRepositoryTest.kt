@@ -13,15 +13,15 @@ class ClientsRepositoryTest {
     //private val clientsRepository = InMemoryClientsRepository()
 
     private val clients = listOf(
-        Client(id = 0),
-        Client(
+        client.Client(id = 0),
+        client.Client(
             id = 1,
-            status = Status.ACTIVE
+            status = client.Status.ACTIVE
         ),
-        Client(
+        client.Client(
             id = 2,
             trial = true,
-            status = Status.WAITING_FOR_PAYMENT,
+            status = client.Status.WAITING_FOR_PAYMENT,
             daysPassed = 20,
             weeksPassed = 2,
             trainingPlan = TrainingPlan(1, 6, 2),
@@ -50,7 +50,7 @@ class ClientsRepositoryTest {
 
     @Test
     fun `add already existed clients`() = runBlocking {
-        clientsRepository.add(Client(id = 2))
+        clientsRepository.add(client.Client(id = 2))
         assertEquals(clients, clientsRepository.getAll())
     }
 
@@ -66,10 +66,10 @@ class ClientsRepositoryTest {
     fun `update clients`() = runBlocking {
         clientsRepository.update(
             id  = 0,
-            newStatus = Status.ACTIVE
+            newStatus = client.Status.ACTIVE
         )
-        assertEquals(Status.ACTIVE, clientsRepository.findById(0)?.status)
-        assertEquals(Status.WAITING_FOR_PLAN, clientsRepository.findById(0)?.previousStatus)
+        assertEquals(client.Status.ACTIVE, clientsRepository.findById(0)?.status)
+        assertEquals(client.Status.WAITING_FOR_PLAN, clientsRepository.findById(0)?.previousStatus)
 
         clientsRepository.update(
             id = 1,
