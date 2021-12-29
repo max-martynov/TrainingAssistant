@@ -10,9 +10,10 @@ data class TrainingPlan(
     val plan: String
 )
 
-class TrainingPlansRepository(
-    private val pathToDirectory: String
-) {
+class TrainingPlansRepository() {
+
+    private val pathToDirectory = "src/main/resources/TrainingPlans"
+
     fun getTrainingPlan(client: Client, activityType: Int, duration: Int): TrainingPlan {
         if (client.hasCompetition)
             return getTrainingPlanAfterCompetition(client)

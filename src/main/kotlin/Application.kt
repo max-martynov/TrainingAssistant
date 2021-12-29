@@ -17,15 +17,12 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
-const val pathToTrainingPlansRepository = "src/main/resources/TrainingPlans"
 
 //@OptIn(ObsoleteCoroutinesApi::class)
 fun main(): Unit = runBlocking {
     val clientsRepository = InDataBaseClientsRepository()
     clientsRepository.clear()
-    val trainingPlansRepository = TrainingPlansRepository(
-        pathToTrainingPlansRepository
-    )
+    val trainingPlansRepository = TrainingPlansRepository()
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
 

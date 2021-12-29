@@ -4,7 +4,7 @@ import java.io.File
 import java.io.InputStream
 
 abstract class Keyboard {
-    private val pathToDirectory = "src/main/resources/Keyboards"
+    private val pathToDirectory = "src/main/resources/keyboards"
     abstract val fileName: String
 
     fun getKeyboard(): String {
