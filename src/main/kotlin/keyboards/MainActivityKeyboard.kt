@@ -1,5 +1,5 @@
 package keyboards
 
 class MainActivityKeyboard : Keyboard() {
-    override val fileName: String = "MainActivity"
+    override var fileName: String = "MainActivity"
 }

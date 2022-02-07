@@ -1,5 +1,5 @@
 package keyboards
 
 class ConfirmPaymentKeyboard : Keyboard() {
-    override val fileName: String = "ConfirmPayment"
+    override var fileName: String = "ConfirmPayment"
 }

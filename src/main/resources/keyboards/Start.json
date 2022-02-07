@@ -1,0 +1,15 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Все понятно!"
+        },
+        "color": "positive"
+      }
+    ]
+  ],
+  "inline": true
+}

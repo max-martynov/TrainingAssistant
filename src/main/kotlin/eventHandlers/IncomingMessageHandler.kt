@@ -33,6 +33,8 @@ class IncomingMessageHandler(
     private val completingInterviewHandler1 = CompletingInterview1Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
     private val completingInterviewHandler2 = CompletingInterview2Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
     private val completingInterviewHandler3 = CompletingInterview3Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+    private val completingInterviewHandler4 = CompletingInterview4Handler(clientsRepository, trainingPlansRepository, vKApiClient, qiwiApiClient)
+
 
     suspend fun receiveMessage(incomingMessage: IncomingMessage) {
         val clientId = incomingMessage.fromId
@@ -88,6 +90,7 @@ class IncomingMessageHandler(
             Status.COMPLETING_INTERVIEW1 -> completingInterviewHandler1
             Status.COMPLETING_INTERVIEW2 -> completingInterviewHandler2
             Status.COMPLETING_INTERVIEW3 -> completingInterviewHandler3
+            Status.COMPLETING_INTERVIEW4 -> completingInterviewHandler4
         }
     }
 }

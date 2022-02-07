@@ -1,7 +1,7 @@
 package keyboards
 
 class PaymentKeyboard : Keyboard() {
-    override val fileName: String = ""
+    override var fileName: String = ""
 
     fun getKeyboard(link: String): String {
         return """

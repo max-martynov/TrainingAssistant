@@ -1,5 +1,5 @@
 package keyboards
 
 class GoToPlanKeyboard : Keyboard() {
-    override val fileName: String = "GoToPlan"
+    override var fileName: String = "GoToPlan"
 }

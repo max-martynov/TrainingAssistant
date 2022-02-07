@@ -25,11 +25,11 @@ class ActiveClientHandler(
             )
             val phrasesPart2 = listOf(
                 "Если Вы хотите оставить отзыв о проделанной работе или задать любой вопрос о тренировках, воспользуйтесь кнопкой \"Написать тренеру\".\n",
-                "Возможно, у Вас есть вопрос по поводу проделанных тренировок? Не бойтесь задать его реальному человеку! Для этого просто нажмите кнопку \"Написать тренеру\".\n",
-                "Если недельный план Вас чем-то не утроил или у Вас есть иной вопрос по поводу тренировочного процесса, воспользуйтеся кнопкой \"Написать тренеру\".\n"
+                "Возможно, у Вас есть вопрос по поводу проделанных тренировок? Не бойтесь задать его реальному человеку, для этого просто нажмите кнопку \"Написать тренеру\".\n",
+                "Если недельный план Вас чем-то не утроил или у Вас есть вопрос по поводу тренировочного процесса, воспользуйтеся кнопкой \"Написать тренеру\".\n"
             )
             val phrasesPart3 = listOf(
-                "Чтобы обпределиться с планом на следующую неделю, нажмите зеленую кнопку ниже.",
+                "А чтобы обпределиться с планом на следующую неделю, нажмите зеленую кнопку ниже.",
                 "А чтобы выбрать новый план и продолжить тренировки, нажмите зеленую кнопку ниже."
             )
             vkApiClient.sendMessageSafely(
@@ -53,29 +53,22 @@ class ActiveClientHandler(
     }
 
     private suspend fun sendFirstQuestion(client: Client) {
-        val questions = listOf(
-            "Как оцените Ваше состояние по окончании недельного цикла?",
-            "Как Вам дался этот цикл?"
-        )
-        vkApiClient.sendMessageSafely(
-            client.id,
-            questions.random(),
-            keyboard = HowWasPlanKeyboard().getKeyboard()
-        )
-    //        if (client.hasCompetition) {
-//            vkApiClient.sendMessageSafely(
-//                client.id,
-//                "Пробежали ли Вы старт?",
-//                keyboard = YesNoKeyboard().getKeyboard()
-//            )
-//        }
-//        else {
-//            vkApiClient.sendMessageSafely(
-//                client.id,
-//                "Выберите, как бы Вы хотели тренироваться на этой неделе. Подробнее о типах тренировок, а также советы по выбору, Вы всегда можете найти в инструкции.\n" +
-//                        "Чтобы выбрать тренировочное направление, просто нажмите на соотвествующую синюю кнопку.",
-//                keyboard = MainActivityKeyboard().getKeyboard()
-//            )
-//        }
+        if (client.hasCompetition) {
+            vkApiClient.sendMessageSafely(
+                client.id,
+                "Пробежали ли Вы старт?",
+                keyboard = YesNoKeyboard().getKeyboard()
+            )
+        } else {
+            val questions = listOf(
+                "Как оцените Ваше состояние по окончании недельного плана?",
+                "Как Вам дался этот план?"
+            )
+            vkApiClient.sendMessageSafely(
+                client.id,
+                questions.random(),
+                keyboard = HowWasPlanKeyboard().getKeyboard()
+            )
+        }
     }
 }

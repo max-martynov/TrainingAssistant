@@ -1,5 +1,5 @@
 package keyboards
 
 class SelectDayKeyboard : Keyboard() {
-    override val fileName: String = "SelectDay"
+    override var fileName: String = "SelectDay"
 }

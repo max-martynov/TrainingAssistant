@@ -1,5 +1,5 @@
 package keyboards
 
 class PressStartKeyboard : Keyboard() {
-    override val fileName: String = "PressStart"
+    override var fileName: String = "PressStart"
 }

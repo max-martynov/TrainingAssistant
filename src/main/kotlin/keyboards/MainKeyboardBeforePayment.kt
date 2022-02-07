@@ -1,5 +1,5 @@
 package keyboards
 
 class MainKeyboardBeforePayment : Keyboard() {
-    override val fileName: String = "MainBeforePayment"
+    override var fileName: String = "MainBeforePayment"
 }
