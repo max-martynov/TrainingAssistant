@@ -1,0 +1,31 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Почти все тренировки давались легко"
+        },
+        "color": "primary"
+      }
+    ], [
+      {
+        "action": {
+          "type": "text",
+          "label": "Была усталось, но это нормально"
+        },
+        "color": "primary"
+      }
+    ], [
+      {
+        "action": {
+          "type": "text",
+          "label": "Было тяжело"
+        },
+        "color": "primary"
+      }
+    ]
+  ],
+  "inline": true
+}

@@ -5,9 +5,9 @@ import java.io.InputStream
 
 abstract class Keyboard {
     private val pathToDirectory = "src/main/resources/keyboards"
-    abstract val fileName: String
+    abstract var fileName: String
 
-    fun getKeyboard(): String {
+    open fun getKeyboard(): String {
         return try {
             val path = "$pathToDirectory/$fileName.json"
             val inputStream: InputStream = File(path).inputStream()

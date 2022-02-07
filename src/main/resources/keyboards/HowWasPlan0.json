@@ -1,0 +1,31 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Довольно легко"
+        },
+        "color": "primary"
+      }
+    ], [
+      {
+        "action": {
+          "type": "text",
+          "label": "Непросто, но состояние нормальное"
+        },
+        "color": "primary"
+      }
+    ], [
+      {
+        "action": {
+          "type": "text",
+          "label": "Тяжеловато"
+        },
+        "color": "primary"
+      }
+    ]
+  ],
+  "inline": true
+}

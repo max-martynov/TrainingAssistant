@@ -66,6 +66,7 @@ dependencies {
     // tests
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     testImplementation(kotlin("test-junit5"))
+    implementation(kotlin("stdlib-jdk8"))
 
 }
 
@@ -85,4 +86,12 @@ kotlin.sourceSets.all {
 
 application {
     mainClassName = "ApplicationKt"
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

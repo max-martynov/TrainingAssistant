@@ -1,0 +1,15 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Перейти к выбору плана"
+        },
+        "color": "positive"
+      }
+    ]
+  ],
+  "inline": true
+}

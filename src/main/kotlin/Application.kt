@@ -37,8 +37,8 @@ fun main(): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-           // LocalTime.now().plusSeconds(5), // For testing only!
-           // Duration.ofSeconds(60)
+            LocalTime.now().plusSeconds(5), // For testing only!
+            Duration.ofSeconds(60)
         )
     }
 

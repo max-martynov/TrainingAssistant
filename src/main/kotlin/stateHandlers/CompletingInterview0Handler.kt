@@ -20,6 +20,7 @@ class CompletingInterview0Handler(
 ) : CompletingInterviewHandler(clientsRepository, vkApiClient, qiwiApiClient) {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
+
         if (client.hasCompetition) {
             when (text) {
                 "Да" -> {
