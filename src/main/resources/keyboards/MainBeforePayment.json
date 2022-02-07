@@ -5,13 +5,6 @@
       {
         "action": {
           "type": "open_link",
-          "link": "https://vk.com/@club_prosto_o_trenirovkah-personalnyi-trener-v-vashem-smartfone",
-          "label": "Инструкция"
-        }
-      },
-      {
-        "action": {
-          "type": "open_link",
           "link": "https://vk.me/tuchin_a_95",
           "label": "Написать тренеру"
         }
@@ -21,25 +14,16 @@
       {
         "action": {
           "type": "open_link",
-          "link": "https://vk.com/@club_prosto_o_trenirovkah-video-s-uprazhneniyami-dlya-silovoi-raboty",
-          "label": "Видео"
+          "link": "https://vk.com/@club_prosto_o_trenirovkah-personalnyi-trener-v-vashem-smartfone",
+          "label": "Инструкция"
         }
-      }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
-          "label": "Начать цикл"
-        },
-        "color": "primary"
       },
       {
         "action": {
-          "type": "text",
-          "label": "Закончить цикл"
-        },
-        "color": "primary"
+          "type": "open_link",
+          "link": "https://vk.com/@club_prosto_o_trenirovkah-video-s-uprazhneniyami-dlya-silovoi-raboty",
+          "label": "Видео"
+        }
       }
     ]
   ],

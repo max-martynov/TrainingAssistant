@@ -18,7 +18,7 @@ object TextAnalyzer {
 
     private val answersToFirstQuestion = Answers(
         good = listOf("Довольно легко", "Есть легкость"),
-        normal = listOf( "Не легко, но нормально", "В целом нормально"),
+        normal = listOf( "Нормальный уровень", "В целом нормально"),
         hard = listOf("Тяжеловато", "Было тяжело")
     )
     private val clientAnswer = mutableMapOf<Client, Answer?>()
@@ -58,23 +58,20 @@ object TextAnalyzer {
     private suspend fun repeatQuestion(client: Client, vkApiClient: VKApiClient) {
         vkApiClient.sendMessageSafely(
             client.id,
-            "Выберите, пожалуйста, один из предложенных вариантов ответа. Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
+            "Выберите, пожалуйста, один из предложенных вариантов ответа."
         )
     }
 
     private fun analyzeText(client: Client, answer: Answer, isIll : Boolean): String {
         val answers = mutableListOf<String>()
         if (isIll) {
-            answers.add("Сейчас вы скорее всего не готовы к серьезным тренировкам, поэтому рекомендую перейти на восстановительный план.")
+            answers.add("Сейчас Вы скорее всего не готовы к серьезным тренировкам, поэтому рекомендую перейти на восстановительный план.")
             if (client.trainingPlan.duration == 1) {
                 answers.add("Рекомендую Вам снизить нагрузку до 6 часов, а лучше перейти на восстановительный план, ведь он разрабатывался специально для этих целей.")
             } else {
                 answers.add("В таком состоянии лучше не рисковать, поэтому рекомендую Вам пройти восстановительную неделю!")
             }
         } else {
-            if (client.hasCompetition) {
-                return "Надеюсь, что грамотная подводка к старту сработала! Продолжайте проходить опрос, чтобы я лучше понял Ваше состояние."
-            }
             if (client.trainingPlan.activityType == 3) {
                 if (answer == Answer.GOOD || answer == Answer.NORMAL)
                     return "Восстановлние сработало! Рекомендую Вам возвращаться к обычному режиму тренировок."
@@ -83,9 +80,9 @@ object TextAnalyzer {
             }
             when(answer) {
                 Answer.GOOD -> {
-                    answers.add("Отличный результат! Придерживайтесь такого же плана.")
+                    answers.add("Отличный результат! Рекомендую придерживайтесь такого же плана.")
                     if (client.trainingPlan.duration == 1) {
-                        answers.add("Вы в отличной форме! Не надо ничего менять, все идет по плану.")
+                        answers.add("Вы в отличной форме! Скорее всего не надо ничего менять, все идет по плану.")
                     } else if (client.trainingPlan.activityType == 2) {
                         answers.add("Вы в потрясающей форме! Если Вы готовы к более серьезным занятиям, попробуйте беговой план на 6 часов.")
                     } else {
@@ -93,7 +90,7 @@ object TextAnalyzer {
                     }
                 }
                 Answer.NORMAL -> {
-                    answers.add("Хороший результат! Придерживайтесь такого же плана.")
+                    answers.add("Хороший результат! Наверное стоит придерживаться такого же плана.")
                     answers.add("В целом, это правильное тренировочное состояние, поэтому я бы порекомендовал Вам выбрать такой же план.")
                     answers.add("Ваш план подходит Вам идеально! Я бы порекомдовал Вам выбрать такой же, чтобы сохранить тренировочный эффект.")
                 }

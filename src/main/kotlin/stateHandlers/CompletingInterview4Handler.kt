@@ -20,7 +20,6 @@ class CompletingInterview4Handler(
     qiwiApiClient: QiwiApiClient
 ) : CompletingInterviewHandler(clientsRepository, vkApiClient, qiwiApiClient) {
 
-
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
         when (text) {
             "Лыжи" -> {
@@ -83,7 +82,7 @@ class CompletingInterview4Handler(
             else -> {
                 vkApiClient.sendMessageSafely(
                     client.id,
-                    "Выберите, пожалуйста, один из предложенных вариантов ответа. Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
+                    "Выберите, пожалуйста, один из предложенных вариантов ответа."
                 )
             }
         }

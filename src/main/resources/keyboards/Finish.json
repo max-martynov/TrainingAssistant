@@ -5,9 +5,9 @@
       {
         "action": {
           "type": "text",
-          "label": "Начать план"
+          "label": "Закончить план"
         },
-        "color": "positive"
+        "color": "primary"
       }
     ]
   ],

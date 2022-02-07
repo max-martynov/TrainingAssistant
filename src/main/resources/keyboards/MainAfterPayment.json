@@ -32,22 +32,6 @@
           "label": "Полезное"
         }
       }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
-          "label": "Начать цикл"
-        },
-        "color": "primary"
-      },
-      {
-        "action": {
-          "type": "text",
-          "label": "Закончить цикл"
-        },
-        "color": "primary"
-      }
     ]
   ],
   "inline": false

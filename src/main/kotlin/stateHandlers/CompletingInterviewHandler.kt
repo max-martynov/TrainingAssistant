@@ -9,6 +9,7 @@ import client.Status
 import keyboards.PaymentKeyboard
 import keyboards.SelectDayKeyboard
 import keyboards.SelectHoursKeyboard
+import keyboards.StartKeyboard
 
 abstract class CompletingInterviewHandler(
     private val clientsRepository: ClientsRepository,
@@ -54,7 +55,8 @@ abstract class CompletingInterviewHandler(
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Тренировочный план составлен!\n" +
-                        "Чтобы получить его и начать недельный цикл, нажмите кнопку \"Начать цикл\"."
+                        "Чтобы получить его и начать тренироваться, нажмите на кпоку ниже.",
+                keyboard = StartKeyboard().getKeyboard()
             )
         }
     }

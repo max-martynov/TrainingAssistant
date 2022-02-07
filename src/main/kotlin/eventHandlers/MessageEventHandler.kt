@@ -6,6 +6,7 @@ import client.Status
 import api.qiwi.QiwiApiClient
 import api.vk.*
 import keyboards.MainKeyboardAfterPayment
+import keyboards.StartKeyboard
 import kotlinx.coroutines.coroutineScope
 
 class MessageEventHandler(
@@ -64,11 +65,15 @@ class MessageEventHandler(
             vKApiClient.sendMessageSafely(
                 client.id,
                 "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её.\n" +
-                        "Для того, чтобы начать тренировочный процесс, нажмите кнопку \"Начать цикл\".\n" +
-                        "Также не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором Вы всегда сможете найти:\n" +
+                        "Не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором Вы всегда сможете найти:\n" +
                         " \uD83D\uDD39 промокоды от партнеров\n" +
                         " \uD83D\uDD39 мотивационную подборку.",
                 keyboard = MainKeyboardAfterPayment().getKeyboard()
+            )
+            vKApiClient.sendMessageSafely(
+                client.id,
+                "Для того, чтобы продолжить тренировочный процесс, нажмите кнопку ниже.\n",
+                keyboard = StartKeyboard().getKeyboard()
             )
         }
         else {

@@ -6,6 +6,7 @@ import TrainingPlan
 import TrainingPlansRepository
 import api.vk.VKApiClient
 import client.Status
+import keyboards.StartKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -35,7 +36,7 @@ class WaitingForPlanHandler(
         } else {
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Выберите, пожалуйста, как бы Вы хотели тренироваться. Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
+                "Выберите, пожалуйста, как бы Вы хотели тренироваться."
             )
         }
     }
@@ -44,8 +45,8 @@ class WaitingForPlanHandler(
         vkApiClient.sendMessageSafely(
             peerId,
             "Недельный план сформирован!\n" +
-                    "Чтобы получить его и начать недельный цикл, нажмите кнопку \"Начать цикл\". " +
-                    "Через неделю, после того, как выполните все тренировки, нажмите кнопку \"Закончить цикл\"."
+                    "Чтобы его получить и начать тренироваться, нажмите на кнопку ниже.",
+            keyboard = StartKeyboard().getKeyboard()
         )
     }
 }

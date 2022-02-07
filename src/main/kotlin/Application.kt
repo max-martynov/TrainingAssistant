@@ -21,7 +21,7 @@ import java.time.LocalTime
 //@OptIn(ObsoleteCoroutinesApi::class)
 fun main(): Unit = runBlocking {
     val clientsRepository = InDataBaseClientsRepository()
-    clientsRepository.clear()
+    //clientsRepository.clear()
     val trainingPlansRepository = TrainingPlansRepository()
     val vkApiClient = VKApiClient()
     val qiwiApiClient = QiwiApiClient()
@@ -37,8 +37,8 @@ fun main(): Unit = runBlocking {
             qiwiApiClient
         )
         clientsIterator.iterateOverClients(
-            LocalTime.now().plusSeconds(5), // For testing only!
-            Duration.ofSeconds(60)
+           // LocalTime.now().plusSeconds(5), // For testing only!
+           // Duration.ofSeconds(60)
         )
     }
 

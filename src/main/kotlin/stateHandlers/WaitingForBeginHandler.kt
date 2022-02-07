@@ -4,6 +4,7 @@ import ClientsRepository
 import api.vk.VKApiClient
 import client.Client
 import client.Status
+import keyboards.FinishKeyboard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -12,7 +13,7 @@ class WaitingForBeginHandler(
     private val vkApiClient: VKApiClient,
 ) : StateHandler() {
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
-        if (text == "Начать цикл") {
+        if (text == "Начать план") {
             async { clientsRepository.update(
                 client.id,
                 newStatus = Status.ACTIVE
@@ -21,7 +22,7 @@ class WaitingForBeginHandler(
         } else {
             vkApiClient.sendMessageSafely(
                 client.id,
-                "Для того, чтобы получить план и начать недельный цикл, нажмите кнопку \"Начать цикл\". Если у Вас возникли вопросы, нажмите \"Обратная связь\"."
+                "Для того, чтобы получить план и начать тренироваться, нажмите кнопку \"Начать план\"."
             )
         }
     }
@@ -29,7 +30,8 @@ class WaitingForBeginHandler(
     private suspend fun sendPlan(client: Client) {
         vkApiClient.sendMessageSafely(
             client.id,
-            client.trainingPlan.plan
+            client.trainingPlan.plan,
+            keyboard = FinishKeyboard().getKeyboard()
         )
     }
 

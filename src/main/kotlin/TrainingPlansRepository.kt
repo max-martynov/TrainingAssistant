@@ -13,6 +13,9 @@ data class TrainingPlan(
 class TrainingPlansRepository() {
 
     private val pathToDirectory = "src/main/resources/TrainingPlans"
+    private val trailingPhrase = "----------------------------\n" +
+            "В идеале выполнять тренировки по дням согласно плану, но Вы конечно же можете отсупать от него на свое усмотрение. " +
+            "По окончании плана, нажмите на кнопку ниже, чтобы двигаться дальше."
 
     fun getTrainingPlan(client: Client, activityType: Int, duration: Int): TrainingPlan {
         if (client.hasCompetition)
@@ -26,6 +29,7 @@ class TrainingPlansRepository() {
             )
             builder.append("\n\n")
         }
+        builder.append(trailingPhrase)
         return TrainingPlan(activityType, duration, plan = builder.toString())
     }
 
@@ -46,6 +50,7 @@ class TrainingPlansRepository() {
             )
             builder.append("\n\n")
         }
+        builder.append(trailingPhrase)
         return TrainingPlan(activityType, duration, plan = builder.toString())
     }
 

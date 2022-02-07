@@ -23,7 +23,7 @@ Content-Type: application/json
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Бег, 6 часов в неделю","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Бег, 10 часов в неделю","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
 
 ###
 POST http://127.0.0.1:8080/
@@ -43,13 +43,13 @@ Content-Type: application/json
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Начать цикл","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Начать план","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
 
 ###
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Закончить цикл","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Закончить план","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
 
 ###
 POST http://127.0.0.1:8080/
@@ -61,7 +61,7 @@ Content-Type: application/json
 POST http://127.0.0.1:8080/
 Content-Type: application/json
 
-{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Почти все тренировки давались легко","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"В целом нормально","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
 
 
 ###
@@ -129,6 +129,13 @@ POST http://127.0.0.1:8080/
 Content-Type: application/json
 
 {"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Да","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
+
+
+###
+POST http://127.0.0.1:8080/
+Content-Type: application/json
+
+{"type":"message_new","object":{"date":1624881518,"from_id":217619042,"id":13,"out":0,"peer_id":217619042,"text":"Восстановление","conversation_message_id":12,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":205462754,"event_id":"9ad98f6dbbd59f9b44c3cdd62a9d2d37b6ab9194","secret":"EWmBzU9QTeXtVTYe7nQ8Nh6y3WPgaPM"}
 
 
 

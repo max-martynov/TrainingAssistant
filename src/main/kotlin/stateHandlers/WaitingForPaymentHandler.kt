@@ -5,6 +5,7 @@ import ClientsRepository
 import api.vk.VKApiClient
 import client.Status
 import keyboards.MainKeyboardAfterPayment
+import keyboards.StartKeyboard
 import kotlinx.coroutines.coroutineScope
 
 class WaitingForPaymentHandler(
@@ -13,17 +14,17 @@ class WaitingForPaymentHandler(
 ) : StateHandler() {
 
     override suspend fun handle(client: Client, text: String): Unit = coroutineScope {
-//        if (text == "228") {
-//            sendThanks(client)
-//            updateClient(client)
-//        }
-//        else {
+        if (text == "228") {
+            sendThanks(client)
+            updateClient(client)
+        }
+        else {
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Если Вы хотите продолжить тренировки, оплатите, подписку. " +
                         "Для этого нажмите \"Оплатить подписку\", а после завершения платежа - \"Подтвердить оплату\"."
             )
-        //}
+        }
     }
 
     private suspend fun updateClient(client: Client) {
@@ -48,11 +49,15 @@ class WaitingForPaymentHandler(
             vkApiClient.sendMessageSafely(
                 client.id,
                 "Впереди месяц интересных тренировок! Подписка будет действовать 28 дней и по истечению этого срока Вам автоматически будет предложено продлить её.\n" +
-                        "Для того, чтобы начать тренировочный процесс, нажмите кнопку \"Начать цикл\".\n" +
-                        "Также не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором Вы всегда сможете найти:\n" +
+                        "Не забывайте, что теперь Вам доступен раздел \"Полезное\", в котором Вы всегда сможете найти:\n" +
                         " \uD83D\uDD39 промокоды от партнеров\n" +
                         " \uD83D\uDD39 мотивационную подборку.",
                 keyboard = MainKeyboardAfterPayment().getKeyboard()
+            )
+            vkApiClient.sendMessageSafely(
+                client.id,
+                "Для того, чтобы продолжить тренировочный процесс, нажмите кнопку ниже.\n",
+                keyboard = StartKeyboard().getKeyboard()
             )
         }
         else {

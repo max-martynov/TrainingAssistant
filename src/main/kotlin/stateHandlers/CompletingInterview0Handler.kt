@@ -65,7 +65,7 @@ class CompletingInterview0Handler(
             async {
                 vkApiClient.sendMessageSafely(
                     client.id,
-                    "$recommendation\nЧуть ниже выберите, как бы Вы хотели тренироваться на следующей неделе.",
+                    "$recommendation\nВыбор за Вами:",
                     keyboard = MainActivityKeyboard().getKeyboard()
                 )
             }
